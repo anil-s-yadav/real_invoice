@@ -1,16 +1,14 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
-import '../../../core/constants/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
-import '../../../core/widgets/app_card.dart';
-import '../../../core/widgets/app_text_field.dart';
 import '../../home/bloc/home_bloc.dart';
 import '../../home/bloc/home_event.dart';
 import '../bloc/business_profile_bloc.dart';
 import '../bloc/business_profile_event.dart';
 import '../bloc/business_profile_state.dart';
+import '../data/business_profile_repository.dart';
 import '../domain/business_profile_model.dart';
 import '../../onboarding/bloc/onboarding_cubit.dart';
 import '../../navigation/main_nav_scaffold.dart';
@@ -18,7 +16,11 @@ import '../../navigation/main_nav_scaffold.dart';
 class BusinessProfileScreen extends StatefulWidget {
   final bool isOnboarding;
   final String? profileId;
-  const BusinessProfileScreen({super.key, this.isOnboarding = false, this.profileId});
+  const BusinessProfileScreen({
+    super.key,
+    this.isOnboarding = false,
+    this.profileId,
+  });
 
   @override
   State<BusinessProfileScreen> createState() => _BusinessProfileScreenState();
@@ -45,6 +47,8 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
   String _currencySymbol = '₹';
   bool _isSaving = false;
   bool _isInitialized = false;
+  bool _isLoading = true;
+  BusinessProfile _currentProfile = const BusinessProfile(id: '');
 
   @override
   void initState() {
@@ -62,6 +66,28 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     _upiIdController = TextEditingController();
     _termsController = TextEditingController();
     _notesController = TextEditingController();
+    _loadInitialProfile();
+  }
+
+  Future<void> _loadInitialProfile() async {
+    if (widget.profileId == null) {
+      final state = context.read<BusinessProfileBloc>().state;
+      if (state is BusinessProfileLoaded) {
+        _currentProfile = state.profile;
+      }
+    } else if (widget.profileId!.isEmpty) {
+      _currentProfile = const BusinessProfile(id: '');
+    } else {
+      final repo = context.read<BusinessProfileRepository>();
+      try {
+        _currentProfile = await repo.getProfile(widget.profileId);
+      } catch (_) {}
+    }
+
+    _populateFromProfile(_currentProfile);
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   void _populateFromProfile(BusinessProfile profile) {
@@ -106,47 +132,74 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your business or freelancer name')),
+        const SnackBar(
+          content: Text('Please enter your business or freelancer name'),
+        ),
       );
       return;
     }
 
     setState(() => _isSaving = true);
 
-    final profileState = context.read<BusinessProfileBloc>().state;
-    final currentProfile = profileState is BusinessProfileLoaded ? profileState.profile : const BusinessProfile();
-    final updated = currentProfile.copyWith(
+    final updated = _currentProfile.copyWith(
       businessName: name,
-      phone: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
-      email: _emailController.text.trim().isNotEmpty ? _emailController.text.trim() : null,
-      website: _websiteController.text.trim().isNotEmpty ? _websiteController.text.trim() : null,
-      address: _addressController.text.trim().isNotEmpty ? _addressController.text.trim() : null,
+      phone: _phoneController.text.trim().isNotEmpty
+          ? _phoneController.text.trim()
+          : null,
+      email: _emailController.text.trim().isNotEmpty
+          ? _emailController.text.trim()
+          : null,
+      website: _websiteController.text.trim().isNotEmpty
+          ? _websiteController.text.trim()
+          : null,
+      address: _addressController.text.trim().isNotEmpty
+          ? _addressController.text.trim()
+          : null,
       gstin: _gstinController.text.trim().isNotEmpty
           ? _gstinController.text.trim().toUpperCase()
           : null,
       pan: _panController.text.trim().isNotEmpty
           ? _panController.text.trim().toUpperCase()
           : null,
-      bankName: _bankNameController.text.trim().isNotEmpty ? _bankNameController.text.trim() : null,
+      bankName: _bankNameController.text.trim().isNotEmpty
+          ? _bankNameController.text.trim()
+          : null,
       accountNumber: _accountNumberController.text.trim().isNotEmpty
           ? _accountNumberController.text.trim()
           : null,
       ifscCode: _ifscController.text.trim().isNotEmpty
           ? _ifscController.text.trim().toUpperCase()
           : null,
-      upiId: _upiIdController.text.trim().isNotEmpty ? _upiIdController.text.trim() : null,
+      upiId: _upiIdController.text.trim().isNotEmpty
+          ? _upiIdController.text.trim()
+          : null,
       defaultTerms: _termsController.text.trim(),
       defaultNotes: _notesController.text.trim(),
       currencyCode: _currencyCode,
       currencySymbol: _currencySymbol,
     );
 
-    context.read<BusinessProfileBloc>().add(UpdateBusinessProfileEvent(updated));
-    context.read<HomeBloc>().add(const LoadHomeDataEvent());
+    final repo = context.read<BusinessProfileRepository>();
+    final activeId = await repo.getActiveProfileId();
+    final savedProfile = await repo.saveProfile(updated);
+
+    if (widget.isOnboarding ||
+        activeId == savedProfile.id ||
+        activeId.isEmpty) {
+      if (activeId.isEmpty) {
+        await repo.setActiveProfileId(savedProfile.id);
+      }
+      if (mounted) {
+        context.read<BusinessProfileBloc>().add(
+          UpdateBusinessProfileEvent(savedProfile),
+        );
+      }
+    }
 
     if (mounted) {
+      context.read<HomeBloc>().add(const LoadHomeDataEvent());
       setState(() => _isSaving = false);
-      
+
       if (widget.isOnboarding) {
         context.read<OnboardingCubit>().completeOnboarding();
         Navigator.of(context).pushAndRemoveUntil(
@@ -156,10 +209,13 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Business profile saved! All new documents will use these details.'),
+            content: Text(
+              'Business profile saved! All new documents will use these details.',
+            ),
             backgroundColor: AppColors.statusPaidText,
           ),
         );
+        Navigator.of(context).pop();
       }
     }
   }
@@ -169,7 +225,10 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        title: Text(widget.isOnboarding ? 'Business Setup' : 'Business Profile', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          widget.isOnboarding ? 'Business Setup' : 'Business Profile',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: AppColors.canvas,
         elevation: 0,
@@ -178,203 +237,240 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
         actions: [
           TextButton(
             onPressed: _isSaving ? null : _handleSave,
-            child: Text(widget.isOnboarding ? 'Finish' : 'Save', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text(
+              widget.isOnboarding ? 'Finish' : 'Save',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
           ),
         ],
       ),
-      body: BlocConsumer<BusinessProfileBloc, BusinessProfileState>(
-        listener: (context, state) {
-          if (state is BusinessProfileError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: AppColors.statusOverdueText),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is BusinessProfileLoaded) {
-            _populateFromProfile(state.profile);
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.lg, vertical: AppDimensions.md),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.md,
+                vertical: AppDimensions.md,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Header callout
-                    AppCard(
-                      backgroundColor: AppColors.primaryLight.withValues(alpha: 0.5),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
-                      padding: const EdgeInsets.all(AppDimensions.md),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.info_outline, color: AppColors.primary, size: 22),
-                          ),
-                          const SizedBox(width: AppDimensions.md),
-                          Expanded(
-                            child: Text(
-                              'Configure once. These details automatically appear on your invoices and quotations.',
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.primaryDark,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
+                    _buildSectionHeader('Basic Details'),
+                    _buildSection([
+                      _buildFieldRow(
+                        label: 'Name *',
+                        controller: _nameController,
+                        hint: 'Business or Freelancer Name',
+                        textCapitalization: TextCapitalization.words,
                       ),
-                    ),
-                    const SizedBox(height: AppDimensions.xl),
+                      _buildFieldRow(
+                        label: 'Phone',
+                        controller: _phoneController,
+                        hint: '+91 98765 43210',
+                        keyboardType: TextInputType.phone,
+                      ),
+                      _buildFieldRow(
+                        label: 'Email',
+                        controller: _emailController,
+                        hint: 'billing@example.com',
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      _buildFieldRow(
+                        label: 'Website',
+                        controller: _websiteController,
+                        hint: 'https://example.com',
+                        keyboardType: TextInputType.url,
+                      ),
+                      _buildFieldRow(
+                        label: 'Address',
+                        controller: _addressController,
+                        hint: 'Street, City, State, PIN',
+                        maxLines: 2,
+                        showDivider: false,
+                      ),
+                    ]),
 
-                    // Basic Business Info
-                    _buildSectionHeader('BASIC DETAILS'),
-                    AppCard(
-                      padding: const EdgeInsets.all(AppDimensions.md),
-                      child: Column(
-                        children: [
-                          AppTextField(
-                            controller: _nameController,
-                            label: 'Business / Freelancer Name *',
-                            hint: 'e.g. Apex Creative Studio',
-                            textCapitalization: TextCapitalization.words,
-                          ),
-                          const SizedBox(height: AppDimensions.md),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: AppTextField(
-                                  controller: _phoneController,
-                                  label: 'Business Phone',
-                                  hint: '+91 98765 43210',
-                                  keyboardType: TextInputType.phone,
-                                  prefix: const Icon(Icons.phone_outlined, size: 18, color: AppColors.textMuted),
-                                ),
-                              ),
-                              const SizedBox(width: AppDimensions.md),
-                              Expanded(
-                                child: AppTextField(
-                                  controller: _emailController,
-                                  label: 'Business Email',
-                                  hint: 'billing@apex.in',
-                                  keyboardType: TextInputType.emailAddress,
-                                  prefix: const Icon(Icons.mail_outline, size: 18, color: AppColors.textMuted),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppDimensions.md),
-                          AppTextField(
-                            controller: _addressController,
-                            label: 'Business Address',
-                            hint: 'Flat/Shop No, Street, City, State, PIN',
-                            maxLines: 2,
-                          ),
-                          const SizedBox(height: AppDimensions.md),
-                          AppTextField(
-                            controller: _websiteController,
-                            label: 'Website (Optional)',
-                            hint: 'https://apexstudio.in',
-                            keyboardType: TextInputType.url,
-                            prefix: const Icon(Icons.language_outlined, size: 18, color: AppColors.textMuted),
-                          ),
-                        ],
+                    _buildSectionHeader('Tax & Registration'),
+                    _buildSection([
+                      _buildFieldRow(
+                        label: 'GSTIN',
+                        controller: _gstinController,
+                        hint: '29AAAAA0000A1Z5',
+                        textCapitalization: TextCapitalization.characters,
                       ),
-                    ),
-                    const SizedBox(height: AppDimensions.xl),
+                      _buildFieldRow(
+                        label: 'PAN',
+                        controller: _panController,
+                        hint: 'ABCDE1234F',
+                        textCapitalization: TextCapitalization.characters,
+                        showDivider: false,
+                      ),
+                    ]),
 
-                    // Tax & Registration (Indian GST / PAN)
-                    _buildSectionHeader('TAX & REGISTRATION'),
-                    AppCard(
-                      padding: const EdgeInsets.all(AppDimensions.md),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: AppTextField(
-                                  controller: _gstinController,
-                                  label: 'GSTIN (GST Number)',
-                                  hint: '29AAAAA0000A1Z5',
-                                  textCapitalization: TextCapitalization.characters,
-                                ),
-                              ),
-                              const SizedBox(width: AppDimensions.md),
-                              Expanded(
-                                child: AppTextField(
-                                  controller: _panController,
-                                  label: 'PAN (Permanent Account No.)',
-                                  hint: 'ABCDE1234F',
-                                  textCapitalization: TextCapitalization.characters,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                    _buildSectionHeader('Bank & Payment'),
+                    _buildSection([
+                      _buildFieldRow(
+                        label: 'Bank Name',
+                        controller: _bankNameController,
+                        hint: 'HDFC Bank',
+                        textCapitalization: TextCapitalization.words,
                       ),
-                    ),
-                    const SizedBox(height: AppDimensions.xl),
+                      _buildFieldRow(
+                        label: 'Account No',
+                        controller: _accountNumberController,
+                        hint: '501002000000',
+                        keyboardType: TextInputType.number,
+                      ),
+                      _buildFieldRow(
+                        label: 'IFSC Code',
+                        controller: _ifscController,
+                        hint: 'HDFC0001234',
+                        textCapitalization: TextCapitalization.characters,
+                      ),
+                      _buildFieldRow(
+                        label: 'UPI ID',
+                        controller: _upiIdController,
+                        hint: 'name@upi',
+                        showDivider: false,
+                      ),
+                    ]),
 
-                    // Default Notes & Terms
-                    _buildSectionHeader('DEFAULT TERMS & NOTES'),
-                    AppCard(
-                      padding: const EdgeInsets.all(AppDimensions.md),
-                      child: Column(
-                        children: [
-                          AppTextField(
-                            controller: _termsController,
-                            label: 'Terms & Conditions',
-                            hint: 'Terms printed at the bottom of documents...',
-                            maxLines: 3,
-                          ),
-                          const SizedBox(height: AppDimensions.md),
-                          AppTextField(
-                            controller: _notesController,
-                            label: 'Client Note / Thank You',
-                            hint: 'e.g. Thank you for your business!',
-                            maxLines: 2,
-                          ),
-                        ],
+                    _buildSectionHeader('Default Terms & Notes'),
+                    _buildSection([
+                      _buildFieldRow(
+                        label: 'Terms',
+                        controller: _termsController,
+                        hint: 'Terms and Conditions...',
+                        maxLines: 3,
                       ),
-                    ),
+                      _buildFieldRow(
+                        label: 'Notes',
+                        controller: _notesController,
+                        hint: 'Thank you for your business!',
+                        maxLines: 2,
+                        showDivider: false,
+                      ),
+                    ]),
+
                     const SizedBox(height: AppDimensions.xxl),
 
-                    AppButton(
-                      label: 'Save Profile',
-                      onPressed: _handleSave,
-                      isLoading: _isSaving,
-                      icon: Icons.check,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.sm,
+                      ),
+                      child: AppButton(
+                        label: 'Save Profile',
+                        onPressed: _handleSave,
+                        isLoading: _isSaving,
+                        icon: Icons.check,
+                      ),
                     ),
                     const SizedBox(height: AppDimensions.xxxl),
                   ],
                 ),
               ),
-            );
-          }
-          if (state is BusinessProfileLoading) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
-          }
-          return const Center(child: Text('Unable to load profile'));
-        },
-      ),
+            ),
     );
   }
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      padding: const EdgeInsets.only(left: 16, bottom: 8, top: 24),
       child: Text(
-        title,
+        title.toUpperCase(),
         style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.2,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
           color: AppColors.textSecondary,
+          letterSpacing: 0.5,
         ),
       ),
+    );
+  }
+
+  Widget _buildSection(List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildFieldRow({
+    required String label,
+    required TextEditingController controller,
+    String? hint,
+    TextInputType? keyboardType,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    int maxLines = 1,
+    bool showDivider = true,
+  }) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            crossAxisAlignment: maxLines > 1
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 100,
+                child: Padding(
+                  padding: EdgeInsets.only(top: maxLines > 1 ? 2.0 : 0),
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  keyboardType: keyboardType,
+                  textCapitalization: textCapitalization,
+                  maxLines: maxLines,
+                  minLines: maxLines > 1 ? 1 : null,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.textMuted,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showDivider)
+          const Divider(height: 1, indent: 16, color: Color(0xFFEEEEEE)),
+      ],
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../documents/domain/document_model.dart';
 
 class TemplateInfo {
   final String id;
@@ -21,6 +22,7 @@ class TemplateRegistry {
   TemplateRegistry._();
 
   static const String modernCrimson = 'modern_crimson';
+  static const String sunsetOrange = 'sunset_orange';
   static const String minimal = 'minimal';
   static const String corporate = 'corporate';
   static const String elegant = 'elegant';
@@ -34,6 +36,13 @@ class TemplateRegistry {
       description: 'Signature RedInvoice layout with refined crimson accents and carded totals.',
       icon: Icons.auto_awesome,
       accentColor: AppColors.primary,
+    ),
+    TemplateInfo(
+      id: sunsetOrange,
+      name: 'Sunset Orange',
+      description: 'Warm peach quotation layout with carded party boxes, bold orange header, and signature seal.',
+      icon: Icons.wb_sunny_outlined,
+      accentColor: Color(0xFFF26522),
     ),
     TemplateInfo(
       id: minimal,
@@ -77,5 +86,42 @@ class TemplateRegistry {
       (t) => t.id == id,
       orElse: () => allTemplates.first,
     );
+  }
+
+  static List<TemplateInfo> getTemplatesFor(DocumentType type) {
+    switch (type) {
+      case DocumentType.invoice:
+        return [
+          getById(modernCrimson),
+          getById(corporate),
+          getById(minimal),
+          getById(bold),
+          getById(elegant),
+        ];
+      case DocumentType.quotation:
+        return [
+          getById(sunsetOrange),
+          getById(modernCrimson),
+          getById(corporate),
+          getById(minimal),
+          getById(bold),
+        ];
+      case DocumentType.receipt:
+        return [
+          getById(compact),
+          getById(minimal),
+          getById(modernCrimson),
+          getById(corporate),
+          getById(elegant),
+        ];
+      case DocumentType.proforma:
+        return [
+          getById(corporate),
+          getById(modernCrimson),
+          getById(bold),
+          getById(minimal),
+          getById(elegant),
+        ];
+    }
   }
 }

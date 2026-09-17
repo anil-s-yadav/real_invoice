@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../data/auth_repository.dart';
+import '../domain/auth_user_model.dart';
 
 // Events
 abstract class AuthEvent extends Equatable {
@@ -13,14 +15,20 @@ class AppStartedEvent extends AuthEvent {
   const AppStartedEvent();
 }
 
-class SignInRequestedEvent extends AuthEvent {
-  final String email;
-  final String password;
-
-  const SignInRequestedEvent(this.email, this.password);
+class AuthUserChangedEvent extends AuthEvent {
+  final AuthUser? user;
+  const AuthUserChangedEvent(this.user);
 
   @override
-  List<Object?> get props => [email, password];
+  List<Object?> get props => [user];
+}
+
+class SignInWithGoogleRequestedEvent extends AuthEvent {
+  const SignInWithGoogleRequestedEvent();
+}
+
+class SignInWithAppleRequestedEvent extends AuthEvent {
+  const SignInWithAppleRequestedEvent();
 }
 
 class SignOutRequestedEvent extends AuthEvent {
@@ -44,18 +52,12 @@ class AuthLoading extends AuthState {
 }
 
 class Authenticated extends AuthState {
-  final String userId;
-  final String? email;
-  final String? displayName;
+  final AuthUser user;
 
-  const Authenticated({
-    required this.userId,
-    this.email,
-    this.displayName,
-  });
+  const Authenticated({required this.user});
 
   @override
-  List<Object?> get props => [userId, email, displayName];
+  List<Object?> get props => [user];
 }
 
 class Unauthenticated extends AuthState {
@@ -71,19 +73,54 @@ class AuthError extends AuthState {
   List<Object?> get props => [message];
 }
 
-// BLoC (Offline guest by default, ready for Firebase Auth)
+// BLoC
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(const Unauthenticated()) {
-    on<AppStartedEvent>((event, emit) {
-      // In V1 offline-first mode, user operates seamlessly without forced login
-      emit(const Unauthenticated());
-    });
-    on<SignInRequestedEvent>((event, emit) async {
+  final AuthRepository authRepository;
+
+  AuthBloc({required this.authRepository}) : super(const AuthInitial()) {
+    on<AppStartedEvent>((event, emit) async {
       emit(const AuthLoading());
-      // Hook ready for: await FirebaseAuth.instance.signInWithEmailAndPassword(...)
-      emit(Authenticated(userId: 'local_user', email: event.email));
+      final user = await authRepository.getCurrentUser();
+      if (user != null) {
+        emit(Authenticated(user: user));
+      } else {
+        emit(const Unauthenticated());
+      }
     });
+
+    on<AuthUserChangedEvent>((event, emit) {
+      if (event.user != null) {
+        emit(Authenticated(user: event.user!));
+      } else {
+        emit(const Unauthenticated());
+      }
+    });
+
+    on<SignInWithGoogleRequestedEvent>((event, emit) async {
+      emit(const AuthLoading());
+      try {
+        final user = await authRepository.signInWithGoogle();
+        emit(Authenticated(user: user));
+      } catch (e) {
+        emit(AuthError('Failed to sign in with Google: $e'));
+        emit(const Unauthenticated());
+      }
+    });
+
+    on<SignInWithAppleRequestedEvent>((event, emit) async {
+      emit(const AuthLoading());
+      try {
+        final user = await authRepository.signInWithApple();
+        emit(Authenticated(user: user));
+      } catch (e) {
+        emit(AuthError('Failed to sign in with Apple: $e'));
+        emit(const Unauthenticated());
+      }
+    });
+
     on<SignOutRequestedEvent>((event, emit) async {
+      emit(const AuthLoading());
+      await authRepository.signOut();
       emit(const Unauthenticated());
     });
   }

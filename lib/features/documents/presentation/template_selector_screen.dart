@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../business_profile/bloc/business_profile_bloc.dart';
+import '../../business_profile/bloc/business_profile_event.dart';
+import '../../business_profile/bloc/business_profile_state.dart';
+import '../../business_profile/domain/business_profile_model.dart';
 import '../../pdf_engine/template_registry.dart';
+import '../domain/document_model.dart';
+import 'template_preview_screen.dart';
 import 'widgets/template_thumbnail_card.dart';
 
 class TemplateSelectorScreen extends StatelessWidget {
@@ -12,6 +19,11 @@ class TemplateSelectorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final profileState = context.watch<BusinessProfileBloc>().state;
+    final profile = profileState is BusinessProfileLoaded
+        ? profileState.profile
+        : const BusinessProfile(id: '');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Template Gallery'),
@@ -34,7 +46,20 @@ class TemplateSelectorScreen extends StatelessWidget {
             template: t,
             isSelected: isSelected,
             onTap: () {
-              Navigator.of(context).pop(t.id);
+              TemplatePreviewScreen.show(
+                context: context,
+                template: t,
+                documentType: DocumentType.invoice,
+                profile: profile,
+                isDefault: isSelected,
+                onSetDefault: () {
+                  final updatedProfile = profile.copyWith(
+                    defaultInvoiceTemplateId: t.id,
+                  );
+                  context.read<BusinessProfileBloc>().add(UpdateBusinessProfileEvent(updatedProfile));
+                  Navigator.of(context).pop(t.id);
+                },
+              );
             },
           );
         },

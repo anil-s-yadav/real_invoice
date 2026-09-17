@@ -18,6 +18,7 @@ import 'pdf_preview_screen.dart';
 import 'widgets/payment_entry_sheet.dart';
 import 'package:printing/printing.dart';
 import '../../pdf_engine/document_pdf_generator.dart';
+import '../../pdf_engine/template_registry.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 
@@ -594,42 +595,33 @@ class _DocumentListItemCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Doc Type & Number, Status, Actions
+            // Top Row: Doc Type & Number, Template Tag, Status, Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        document.docType.displayName.toUpperCase(),
+                Expanded(
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      _buildTypeBadge(document.docType),
+                      Text(
+                        document.docNumber,
                         style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      document.docNumber,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ],
+                      _buildTemplateChip(document.templateId),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     StatusBadge(status: effectiveStatus, isCompact: true),
                     const SizedBox(width: 4),
@@ -846,6 +838,74 @@ class _DocumentListItemCard extends StatelessWidget {
                   style: TextStyle(color: AppColors.statusOverdueText),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTypeBadge(DocumentType docType) {
+    final Color bgColor;
+    final Color textColor;
+
+    switch (docType) {
+      case DocumentType.invoice:
+        bgColor = const Color(0xFFEEF2FF);
+        textColor = const Color(0xFF4338CA);
+        break;
+      case DocumentType.quotation:
+        bgColor = const Color(0xFFFFFBEB);
+        textColor = const Color(0xFFB45309);
+        break;
+      case DocumentType.receipt:
+        bgColor = const Color(0xFFECFDF5);
+        textColor = const Color(0xFF047857);
+        break;
+      case DocumentType.proforma:
+        bgColor = const Color(0xFFF0F9FF);
+        textColor = const Color(0xFF0369A1);
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        docType.displayName.toUpperCase(),
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          color: textColor,
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTemplateChip(String templateId) {
+    final template = TemplateRegistry.getById(templateId);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.palette_outlined, size: 10, color: template.accentColor),
+          const SizedBox(width: 3),
+          Text(
+            template.name,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
             ),
           ),
         ],

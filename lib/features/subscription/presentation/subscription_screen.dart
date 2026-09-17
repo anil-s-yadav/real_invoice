@@ -12,7 +12,8 @@ class SubscriptionScreen extends StatefulWidget {
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   String _currency = 'INR';
-  int _selectedCompanyTier = 0; // 0: 1 Company, 1: 3 Companies, 2: 5 Companies, 3: 10 Companies
+  int _selectedCompanyTier =
+      0; // 0: 1 Company, 1: 3 Companies, 2: 5 Companies, 3: 10 Companies
   int _currentCardIndex = 1; // Default to 1 Year (index 1)
   late final PageController _pageController;
 
@@ -83,9 +84,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             'Advanced Tax & GST Reports',
             '100% Ad-Free Experience',
           ],
-          'missing': [
-            'Priority 24/7 Phone Support',
-          ],
+          'missing': ['Priority 24/7 Phone Support'],
         },
         {
           'id': '2yr',
@@ -156,10 +155,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             'PDF Export & WhatsApp Share',
             '100% Ad-Free Experience',
           ],
-          'missing': [
-            'Multi-Device Access',
-            'VIP Priority Phone Support',
-          ],
+          'missing': ['Multi-Device Access', 'VIP Priority Phone Support'],
         },
         {
           'id': '1yr',
@@ -251,9 +247,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             'PDF Export & WhatsApp Share',
             '100% Ad-Free Experience',
           ],
-          'missing': [
-            'VIP Dedicated Support',
-          ],
+          'missing': ['VIP Dedicated Support'],
         },
         {
           'id': '1yr',
@@ -590,7 +584,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'subtitle': 'Manage 5 companies.',
           'tag': null,
           'color': AppColors.primary,
-          'features': ['Up to 5 Company Profiles', 'Unlimited Documents', 'Cloud Backup'],
+          'features': [
+            'Up to 5 Company Profiles',
+            'Unlimited Documents',
+            'Cloud Backup',
+          ],
           'missing': ['Multi-Device Access'],
         },
         {
@@ -604,7 +602,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'subtitle': '5 companies full access.',
           'tag': 'MOST POPULAR',
           'color': AppColors.primary,
-          'features': ['Up to 5 Company Profiles', 'Multi-Device Sync', 'All 50+ Templates', '100% Ad-Free'],
+          'features': [
+            'Up to 5 Company Profiles',
+            'Multi-Device Sync',
+            'All 50+ Templates',
+            '100% Ad-Free',
+          ],
           'missing': [],
         },
         {
@@ -618,7 +621,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'subtitle': '2 Years for 5 companies.',
           'tag': 'EXTENDED VALUE',
           'color': Color(0xFFD97706),
-          'features': ['Up to 5 Company Profiles', 'Unlimited Everything', 'VIP Priority Support'],
+          'features': [
+            'Up to 5 Company Profiles',
+            'Unlimited Everything',
+            'VIP Priority Support',
+          ],
           'missing': [],
         },
         {
@@ -632,7 +639,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'subtitle': '5 Years enterprise access.',
           'tag': 'BEST VALUE',
           'color': Color(0xFF0D9488),
-          'features': ['Up to 5 Company Profiles for 5 Years', 'Unlimited Everything with VIP SLA'],
+          'features': [
+            'Up to 5 Company Profiles for 5 Years',
+            'Unlimited Everything with VIP SLA',
+          ],
           'missing': [],
         },
       ],
@@ -649,7 +659,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'subtitle': 'Up to 10 company profiles.',
           'tag': null,
           'color': AppColors.primary,
-          'features': ['Up to 10 Company Profiles', 'Unlimited Documents', 'Cloud Backup'],
+          'features': [
+            'Up to 10 Company Profiles',
+            'Unlimited Documents',
+            'Cloud Backup',
+          ],
           'missing': [],
         },
         {
@@ -663,7 +677,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'subtitle': 'Enterprise multi-entity suite.',
           'tag': 'MOST POPULAR',
           'color': AppColors.primary,
-          'features': ['Up to 10 Company Profiles', 'Multi-Device Sync', 'All 50+ Templates', '100% Ad-Free'],
+          'features': [
+            'Up to 10 Company Profiles',
+            'Multi-Device Sync',
+            'All 50+ Templates',
+            '100% Ad-Free',
+          ],
           'missing': [],
         },
         {
@@ -677,7 +696,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'subtitle': '2 Years multi-company access.',
           'tag': 'EXTENDED VALUE',
           'color': Color(0xFFD97706),
-          'features': ['Up to 10 Company Profiles', 'Unlimited Everything', 'VIP Priority Support'],
+          'features': [
+            'Up to 10 Company Profiles',
+            'Unlimited Everything',
+            'VIP Priority Support',
+          ],
           'missing': [],
         },
         {
@@ -691,7 +714,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'subtitle': 'Ultimate scale for 10 firms.',
           'tag': 'BEST VALUE',
           'color': Color(0xFF0D9488),
-          'features': ['Up to 10 Company Profiles for 5 Years', 'Unlimited Everything with VIP SLA'],
+          'features': [
+            'Up to 10 Company Profiles for 5 Years',
+            'Unlimited Everything with VIP SLA',
+          ],
           'missing': [],
         },
       ],
@@ -701,7 +727,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.86, initialPage: _currentCardIndex);
+    _pageController = PageController(
+      viewportFraction: 0.86,
+      initialPage: _currentCardIndex,
+    );
   }
 
   @override
@@ -729,28 +758,49 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Text(
                     'Select Billing Currency',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 ..._pricingMatrix.keys.map((curr) {
                   final isSelected = curr == _currency;
                   return ListTile(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     tileColor: isSelected ? AppColors.primaryLight : null,
                     leading: CircleAvatar(
-                      backgroundColor: isSelected ? AppColors.primary : AppColors.surfaceVariant,
-                      foregroundColor: isSelected ? Colors.white : AppColors.textPrimary,
-                      child: Text(_currencySymbols[curr] ?? curr, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    title: Text(
-                      curr == 'INR' ? 'INR (Indian Rupee - ₹)' : 'USD (US Dollar - \$)',
-                      style: TextStyle(
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                      backgroundColor: isSelected
+                          ? AppColors.primary
+                          : AppColors.surfaceVariant,
+                      foregroundColor: isSelected
+                          ? Colors.white
+                          : AppColors.textPrimary,
+                      child: Text(
+                        _currencySymbols[curr] ?? curr,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    trailing: isSelected ? const Icon(Icons.check, color: AppColors.primary) : null,
+                    title: Text(
+                      curr == 'INR'
+                          ? 'INR (Indian Rupee - ₹)'
+                          : 'USD (US Dollar - \$)',
+                      style: TextStyle(
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? const Icon(Icons.check, color: AppColors.primary)
+                        : null,
                     onTap: () {
                       setState(() => _currency = curr);
                       Navigator.pop(context);
@@ -783,7 +833,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Future<void> _sendEmail(String email) async {
-    final uri = Uri.parse('mailto:$email?subject=RedInvoice%20Subscription%20Query');
+    final uri = Uri.parse(
+      'mailto:$email?subject=RedInvoice%20Subscription%20Query',
+    );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
@@ -825,7 +877,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             const SizedBox(height: 6),
             Text(
               'Tier: ${_companyTiers[_selectedCompanyTier]}',
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
@@ -838,10 +893,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Total Amount:', style: TextStyle(color: AppColors.textSecondary)),
+                  const Text(
+                    'Total Amount:',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
                   Text(
                     plan['price'],
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ],
               ),
@@ -856,19 +918,26 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Activated ${plan['name']} (${plan['duration']}) successfully!'),
+                  content: Text(
+                    'Activated ${plan['name']} (${plan['duration']}) successfully!',
+                  ),
                   backgroundColor: AppColors.statusPaidText,
                 ),
               );
@@ -884,7 +953,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   Widget build(BuildContext context) {
     final currencyPlans = _pricingMatrix[_currency] ?? _pricingMatrix['INR']!;
-    final safeTierIndex = _selectedCompanyTier.clamp(0, currencyPlans.length - 1);
+    final safeTierIndex = _selectedCompanyTier.clamp(
+      0,
+      currencyPlans.length - 1,
+    );
     final currentPlans = currencyPlans[safeTierIndex];
 
     return Scaffold(
@@ -906,7 +978,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               borderRadius: BorderRadius.circular(20),
               onTap: _showCurrencySelector,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -924,15 +999,27 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   children: [
                     Text(
                       _currencySymbols[_currency] ?? '',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 13),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       _currency,
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     const SizedBox(width: 2),
-                    const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textSecondary),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    ),
                   ],
                 ),
               ),
@@ -950,11 +1037,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFFDE68A)), // Warm amber border
+                  border: Border.all(
+                    color: const Color(0xFFFDE68A),
+                  ), // Warm amber border
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFFF59E0B).withValues(alpha: 0.08),
@@ -995,7 +1087,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               ),
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 1,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFEF4444),
                                   borderRadius: BorderRadius.circular(6),
@@ -1044,21 +1139,30 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     final isSelected = _selectedCompanyTier == index;
                     return Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => _selectedCompanyTier = index),
+                        onTap: () =>
+                            setState(() => _selectedCompanyTier = index),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.textPrimary : Colors.transparent,
+                            color: isSelected
+                                ? AppColors.textPrimary
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            _companyTiers[index].split(' ').first, // Just 'Single', 'Three', 'Five', 'Unlimited'
+                            _companyTiers[index]
+                                .split(' ')
+                                .first, // Just 'Single', 'Three', 'Five', 'Unlimited'
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                              color: isSelected ? Colors.white : AppColors.textSecondary,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.textSecondary,
                             ),
                           ),
                         ),
@@ -1073,7 +1177,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             // Company count subtitle
             Text(
               'Selected Scope: ${_companyTiers[_selectedCompanyTier]}',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -1087,7 +1195,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 itemBuilder: (context, index) {
                   final plan = currentPlans[index];
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 8.0,
+                    ),
                     child: _buildPlanCard(plan),
                   );
                 },
@@ -1105,7 +1216,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   width: isCurrent ? 24 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: isCurrent ? AppColors.primary : AppColors.borderStrong,
+                    color: isCurrent
+                        ? AppColors.primary
+                        : AppColors.borderStrong,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );
@@ -1135,7 +1248,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.headset_mic_outlined, size: 20, color: AppColors.primary),
+                        const Icon(
+                          Icons.headset_mic_outlined,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(width: 8),
                         const Text(
                           'For any queries, contact us',
@@ -1143,18 +1260,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'Mon-Sat 9AM-8PM',
-                            style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
                           ),
                         ),
                       ],
@@ -1166,18 +1271,35 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () => _makePhoneCall('+918441061235'),
-                            icon: const Icon(Icons.phone_outlined, size: 16, color: AppColors.primary),
+                            icon: const Icon(
+                              Icons.phone_outlined,
+                              size: 16,
+                              color: AppColors.primary,
+                            ),
                             label: const Text(
                               '+91 8441061235',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
-                              backgroundColor: AppColors.primary.withValues(alpha: 0.04),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 8,
+                              ),
+                              side: BorderSide(
+                                color: AppColors.primary.withValues(alpha: 0.3),
+                              ),
+                              backgroundColor: AppColors.primary.withValues(
+                                alpha: 0.04,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                         ),
@@ -1185,19 +1307,39 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         // Email Support Button
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _sendEmail('support@redinvoice.app'),
-                            icon: const Icon(Icons.mail_outline, size: 16, color: Color(0xFF0D9488)),
+                            onPressed: () =>
+                                _sendEmail('support@redinvoice.app'),
+                            icon: const Icon(
+                              Icons.mail_outline,
+                              size: 16,
+                              color: Color(0xFF0D9488),
+                            ),
                             label: const Text(
                               'Email Support',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                              side: BorderSide(color: const Color(0xFF0D9488).withValues(alpha: 0.3)),
-                              backgroundColor: const Color(0xFF0D9488).withValues(alpha: 0.04),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 8,
+                              ),
+                              side: BorderSide(
+                                color: const Color(
+                                  0xFF0D9488,
+                                ).withValues(alpha: 0.3),
+                              ),
+                              backgroundColor: const Color(
+                                0xFF0D9488,
+                              ).withValues(alpha: 0.04),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                         ),
@@ -1215,20 +1357,40 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.verified_user_outlined, color: AppColors.textMuted, size: 15),
+                  const Icon(
+                    Icons.verified_user_outlined,
+                    color: AppColors.textMuted,
+                    size: 15,
+                  ),
                   const SizedBox(width: 5),
                   const Text(
                     '256-bit SSL Encrypted',
-                    style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  Container(width: 1, height: 10, color: AppColors.borderStrong),
+                  Container(
+                    width: 1,
+                    height: 10,
+                    color: AppColors.borderStrong,
+                  ),
                   const SizedBox(width: 12),
-                  const Icon(Icons.autorenew, color: AppColors.textMuted, size: 15),
+                  const Icon(
+                    Icons.autorenew,
+                    color: AppColors.textMuted,
+                    size: 15,
+                  ),
                   const SizedBox(width: 5),
                   const Text(
                     'Cancel Anytime',
-                    style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -1291,7 +1453,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               children: [
                 // Card Header
                 Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20, top: 22, bottom: 12),
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 22,
+                    bottom: 12,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1307,7 +1474,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: color.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
@@ -1342,7 +1512,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
                 // Pricing Section
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1372,7 +1545,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           const Spacer(),
                           // Monthly breakdown pill
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(10),
@@ -1405,11 +1581,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 // Features List (Scrollable)
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
+                    ),
                     physics: const BouncingScrollPhysics(),
                     children: [
                       ...features.map((f) => _buildCheckItem(f, true, color)),
-                      ...missing.map((m) => _buildCheckItem(m, false, AppColors.borderStrong)),
+                      ...missing.map(
+                        (m) =>
+                            _buildCheckItem(m, false, AppColors.borderStrong),
+                      ),
                     ],
                   ),
                 ),
@@ -1459,7 +1641,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             right: 0,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: color,
                   borderRadius: BorderRadius.circular(20),
@@ -1496,7 +1681,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           Container(
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
-              color: included ? iconColor.withValues(alpha: 0.12) : AppColors.surfaceVariant,
+              color: included
+                  ? iconColor.withValues(alpha: 0.12)
+                  : AppColors.surfaceVariant,
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -1513,7 +1700,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 fontSize: 12,
                 color: included ? AppColors.textPrimary : AppColors.textMuted,
                 height: 1.25,
-                decoration: included ? TextDecoration.none : TextDecoration.lineThrough,
+                decoration: included
+                    ? TextDecoration.none
+                    : TextDecoration.lineThrough,
               ),
             ),
           ),

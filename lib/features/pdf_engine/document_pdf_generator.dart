@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -23,11 +24,38 @@ class DocumentPdfGenerator {
 
     final selectedTemplate = templateId ?? document.templateId;
 
+    Uint8List? logoBytes;
+    if (profile.logoPath != null && profile.logoPath!.isNotEmpty) {
+      try {
+        final file = File(profile.logoPath!);
+        if (await file.exists()) {
+          logoBytes = await file.readAsBytes();
+        }
+      } catch (_) {}
+    }
+
+    Uint8List? signatureBytes;
+    if (profile.signaturePath != null && profile.signaturePath!.isNotEmpty) {
+      try {
+        final file = File(profile.signaturePath!);
+        if (await file.exists()) {
+          signatureBytes = await file.readAsBytes();
+        }
+      } catch (_) {}
+    }
+
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: _getMargins(selectedTemplate),
-        build: (context) => _buildTemplateContent(context, document, profile, selectedTemplate),
+        build: (context) => _buildTemplateContent(
+          context,
+          document,
+          profile,
+          selectedTemplate,
+          logoBytes: logoBytes,
+          signatureBytes: signatureBytes,
+        ),
       ),
     );
 
@@ -45,9 +73,13 @@ class DocumentPdfGenerator {
     pw.Context context,
     DocumentModel doc,
     BusinessProfile profile,
-    String templateId,
-  ) {
+    String templateId, {
+    Uint8List? logoBytes,
+    Uint8List? signatureBytes,
+  }) {
     switch (templateId) {
+      case TemplateRegistry.sunsetOrange:
+        return _buildSunsetOrange(context, doc, profile, logoBytes: logoBytes, signatureBytes: signatureBytes);
       case TemplateRegistry.minimal:
         return _buildMinimal(context, doc, profile);
       case TemplateRegistry.corporate:
@@ -760,5 +792,494 @@ class DocumentPdfGenerator {
         style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: color),
       ),
     );
+  }
+
+  // 7. SUNSET ORANGE (Quotation template with peach party cards & bold orange banner)
+  static List<pw.Widget> _buildSunsetOrange(
+    pw.Context context,
+    DocumentModel doc,
+    BusinessProfile profile, {
+    Uint8List? logoBytes,
+    Uint8List? signatureBytes,
+  }) {
+    final orangeColor = PdfColor.fromHex('F26522');
+    final lightPeachBg = PdfColor.fromHex('FFF3EC');
+    final darkColor = PdfColor.fromHex('1F2937');
+    final grayColor = PdfColor.fromHex('5A6065');
+    final greenColor = PdfColor.fromHex('16A34A');
+    final borderColor = PdfColor.fromHex('FED7AA');
+
+    // Determine place of supply
+    String placeOfSupply = 'Karnataka';
+    if (doc.customerSnapshot?.billingAddress != null && doc.customerSnapshot!.billingAddress!.isNotEmpty) {
+      final parts = doc.customerSnapshot!.billingAddress!.split(',');
+      if (parts.isNotEmpty) {
+        placeOfSupply = parts.last.trim();
+      }
+    } else if (profile.address != null && profile.address!.isNotEmpty) {
+      final parts = profile.address!.split(',');
+      if (parts.isNotEmpty) {
+        placeOfSupply = parts.last.trim();
+      }
+    }
+
+    return [
+      // Centered Top Title (e.g. Quotation)
+      pw.Center(
+        child: pw.Text(
+          doc.docType.displayName,
+          style: pw.TextStyle(
+            fontSize: 22,
+            fontWeight: pw.FontWeight.bold,
+            color: orangeColor,
+          ),
+        ),
+      ),
+      pw.SizedBox(height: 12),
+
+      // Brand Logo / Name (Left) and Meta Data (Right)
+      pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
+        children: [
+          // Left: Brand Logo & Name
+          pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
+            children: [
+              if (logoBytes != null) ...[
+                pw.Container(
+                  width: 44,
+                  height: 44,
+                  child: pw.Image(pw.MemoryImage(logoBytes), fit: pw.BoxFit.contain),
+                ),
+                pw.SizedBox(width: 10),
+              ],
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    profile.businessName.isNotEmpty ? profile.businessName.toUpperCase() : 'YOUR BUSINESS',
+                    style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: darkColor, letterSpacing: 0.5),
+                  ),
+                  if (profile.website != null && profile.website!.isNotEmpty)
+                    pw.Text(profile.website!, style: pw.TextStyle(fontSize: 8.5, color: grayColor)),
+                ],
+              ),
+            ],
+          ),
+          // Right: Document meta
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.end,
+            children: [
+              pw.Row(
+                mainAxisSize: pw.MainAxisSize.min,
+                children: [
+                  pw.Text('${doc.docType.displayName}#', style: pw.TextStyle(fontSize: 9, color: grayColor)),
+                  pw.SizedBox(width: 14),
+                  pw.Text(doc.docNumber, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                ],
+              ),
+              pw.SizedBox(height: 3),
+              pw.Row(
+                mainAxisSize: pw.MainAxisSize.min,
+                children: [
+                  pw.Text('${doc.docType.displayName} Date', style: pw.TextStyle(fontSize: 9, color: grayColor)),
+                  pw.SizedBox(width: 14),
+                  pw.Text(DateFormatter.format(doc.issueDate).toUpperCase(), style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                ],
+              ),
+              pw.SizedBox(height: 3),
+              pw.Row(
+                mainAxisSize: pw.MainAxisSize.min,
+                children: [
+                  pw.Text('Due Date', style: pw.TextStyle(fontSize: 9, color: grayColor)),
+                  pw.SizedBox(width: 14),
+                  pw.Text(DateFormatter.format(doc.dueDate).toUpperCase(), style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      pw.SizedBox(height: 16),
+
+      // Two Peach Tinted Party Cards
+      pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          // Left: Quotation by
+          pw.Expanded(
+            child: pw.Container(
+              padding: const pw.EdgeInsets.all(10),
+              decoration: pw.BoxDecoration(
+                color: lightPeachBg,
+                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+                border: pw.Border.all(color: borderColor, width: 0.5),
+              ),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    '${doc.docType.displayName} by',
+                    style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: orangeColor),
+                  ),
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    profile.businessName.isNotEmpty ? profile.businessName : 'Your Business Name',
+                    style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: darkColor),
+                  ),
+                  if (profile.address != null && profile.address!.isNotEmpty) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Text(profile.address!, style: pw.TextStyle(fontSize: 8, color: grayColor)),
+                  ],
+                  if (profile.phone != null || profile.email != null) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Text([profile.phone, profile.email].whereType<String>().join('  |  '), style: pw.TextStyle(fontSize: 8, color: grayColor)),
+                  ],
+                  if (profile.gstin != null && profile.gstin!.isNotEmpty) ...[
+                    pw.SizedBox(height: 4),
+                    pw.Row(
+                      children: [
+                        pw.SizedBox(width: 36, child: pw.Text('GSTIN', style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold, color: darkColor))),
+                        pw.Text(profile.gstin!, style: pw.TextStyle(fontSize: 7.5, color: darkColor)),
+                      ],
+                    ),
+                  ],
+                  if (profile.pan != null && profile.pan!.isNotEmpty) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Row(
+                      children: [
+                        pw.SizedBox(width: 36, child: pw.Text('PAN', style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold, color: darkColor))),
+                        pw.Text(profile.pan!, style: pw.TextStyle(fontSize: 7.5, color: darkColor)),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          pw.SizedBox(width: 12),
+          // Right: Quotation to
+          pw.Expanded(
+            child: pw.Container(
+              padding: const pw.EdgeInsets.all(10),
+              decoration: pw.BoxDecoration(
+                color: lightPeachBg,
+                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+                border: pw.Border.all(color: borderColor, width: 0.5),
+              ),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    '${doc.docType.displayName} to',
+                    style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: orangeColor),
+                  ),
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    doc.customerSnapshot?.name ?? 'Valued Customer',
+                    style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: darkColor),
+                  ),
+                  if (doc.customerSnapshot?.billingAddress != null && doc.customerSnapshot!.billingAddress!.isNotEmpty) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Text(doc.customerSnapshot!.billingAddress!, style: pw.TextStyle(fontSize: 8, color: grayColor)),
+                  ],
+                  if (doc.customerSnapshot?.phone != null) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Text('Phone: ${doc.customerSnapshot!.phone!}', style: pw.TextStyle(fontSize: 8, color: grayColor)),
+                  ],
+                  if (doc.customerSnapshot?.gstin != null && doc.customerSnapshot!.gstin!.isNotEmpty) ...[
+                    pw.SizedBox(height: 4),
+                    pw.Row(
+                      children: [
+                        pw.SizedBox(width: 36, child: pw.Text('GSTIN', style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold, color: darkColor))),
+                        pw.Text(doc.customerSnapshot!.gstin!, style: pw.TextStyle(fontSize: 7.5, color: darkColor)),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      pw.SizedBox(height: 6),
+
+      // Place of Supply & Country of Supply Row
+      pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Row(
+            children: [
+              pw.Text('Place of Supply   ', style: pw.TextStyle(fontSize: 8, color: grayColor)),
+              pw.Text(placeOfSupply, style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: darkColor)),
+            ],
+          ),
+          pw.Row(
+            children: [
+              pw.Text('Country of Supply   ', style: pw.TextStyle(fontSize: 8, color: grayColor)),
+              pw.Text('India', style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: darkColor)),
+            ],
+          ),
+        ],
+      ),
+      pw.SizedBox(height: 12),
+
+      // Items Table with alternating rows
+      pw.Table(
+        columnWidths: {
+          0: const pw.FlexColumnWidth(5),
+          1: const pw.FixedColumnWidth(40),
+          2: const pw.FixedColumnWidth(65),
+          3: const pw.FixedColumnWidth(75),
+        },
+        children: [
+          // Table Header
+          pw.TableRow(
+            decoration: pw.BoxDecoration(color: orangeColor),
+            children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: pw.Text('Item # / Item description', style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColors.white)),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                child: pw.Text('Qty.', textAlign: pw.TextAlign.right, style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColors.white)),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                child: pw.Text('Rate', textAlign: pw.TextAlign.right, style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColors.white)),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: pw.Text('Amount', textAlign: pw.TextAlign.right, style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColors.white)),
+              ),
+            ],
+          ),
+          // Table Rows
+          ...doc.items.asMap().entries.map((entry) {
+            final idx = entry.key + 1;
+            final item = entry.value;
+            final isPeachRow = entry.key % 2 == 1;
+            return pw.TableRow(
+              decoration: pw.BoxDecoration(color: isPeachRow ? lightPeachBg : PdfColors.white),
+              children: [
+                pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('$idx. ${item.title}', style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                      if (item.description != null && item.description!.isNotEmpty)
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.only(top: 1),
+                          child: pw.Text(item.description!, style: pw.TextStyle(fontSize: 7.5, color: grayColor)),
+                        ),
+                    ],
+                  ),
+                ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                  child: pw.Text(
+                    '${item.quantity % 1 == 0 ? item.quantity.toInt() : item.quantity}',
+                    textAlign: pw.TextAlign.right,
+                    style: pw.TextStyle(fontSize: 8.5, color: darkColor),
+                  ),
+                ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                  child: pw.Text(
+                    _fmt(item.unitPrice, profile),
+                    textAlign: pw.TextAlign.right,
+                    style: pw.TextStyle(fontSize: 8.5, color: darkColor),
+                  ),
+                ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  child: pw.Text(
+                    _fmt(item.lineTotal, profile),
+                    textAlign: pw.TextAlign.right,
+                    style: pw.TextStyle(fontSize: 8.5, color: darkColor),
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+      pw.SizedBox(height: 16),
+
+      // Bottom Area: Left (Terms, Notes, Enquiry, Bank/UPI) | Right (Totals, In Words, Signature)
+      pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          // Left Column
+          pw.Expanded(
+            flex: 5,
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                if (doc.terms != null && doc.terms!.isNotEmpty) ...[
+                  pw.Text('Terms and Conditions', style: pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold, color: orangeColor)),
+                  pw.SizedBox(height: 4),
+                  pw.Text(doc.terms!, style: pw.TextStyle(fontSize: 7.5, color: darkColor, lineSpacing: 1.4)),
+                  pw.SizedBox(height: 10),
+                ],
+                if (doc.notes != null && doc.notes!.isNotEmpty) ...[
+                  pw.Text('Additional Notes', style: pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold, color: orangeColor)),
+                  pw.SizedBox(height: 4),
+                  pw.Text(doc.notes!, style: pw.TextStyle(fontSize: 7.5, color: darkColor, lineSpacing: 1.4)),
+                  pw.SizedBox(height: 10),
+                ],
+                if (doc.includePaymentDetails) ...[
+                  _buildBankAndUpiBlock(profile, doc, orangeColor, isCompact: true),
+                  pw.SizedBox(height: 10),
+                ],
+                if (profile.email != null || profile.phone != null) ...[
+                  pw.SizedBox(height: 4),
+                  pw.RichText(
+                    text: pw.TextSpan(
+                      style: pw.TextStyle(fontSize: 7.5, color: darkColor),
+                      children: [
+                        const pw.TextSpan(text: 'For any enquiries, email us on '),
+                        if (profile.email != null)
+                          pw.TextSpan(text: profile.email!, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        if (profile.email != null && profile.phone != null)
+                          const pw.TextSpan(text: ' or call us on '),
+                        if (profile.phone != null)
+                          pw.TextSpan(text: profile.phone!, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          pw.SizedBox(width: 24),
+          // Right Column
+          pw.Expanded(
+            flex: 4,
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
+                // Sub Total
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text('Sub Total', style: pw.TextStyle(fontSize: 9, color: darkColor)),
+                    pw.Text(_fmt(doc.subtotal, profile), style: pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                  ],
+                ),
+                if (doc.overallDiscountAmount > 0) ...[
+                  pw.SizedBox(height: 4),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        'Discount(${doc.overallDiscountValue % 1 == 0 ? doc.overallDiscountValue.toInt() : doc.overallDiscountValue}%)',
+                        style: pw.TextStyle(fontSize: 8.5, color: greenColor, fontWeight: pw.FontWeight.bold),
+                      ),
+                      pw.Text(
+                        '- ${_fmt(doc.overallDiscountAmount, profile)}',
+                        style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: greenColor),
+                      ),
+                    ],
+                  ),
+                ],
+                if (doc.totalTaxAmount > 0) ...[
+                  pw.SizedBox(height: 4),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('Tax Amount', style: pw.TextStyle(fontSize: 8.5, color: darkColor)),
+                      pw.Text('+ ${_fmt(doc.totalTaxAmount, profile)}', style: pw.TextStyle(fontSize: 9, color: darkColor)),
+                    ],
+                  ),
+                ],
+                if (doc.shippingCharges > 0) ...[
+                  pw.SizedBox(height: 4),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('Shipping Charges', style: pw.TextStyle(fontSize: 8.5, color: darkColor)),
+                      pw.Text('+ ${_fmt(doc.shippingCharges, profile)}', style: pw.TextStyle(fontSize: 9, color: darkColor)),
+                    ],
+                  ),
+                ],
+                if (doc.roundOff.abs() > 0.001) ...[
+                  pw.SizedBox(height: 4),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('Round Off', style: pw.TextStyle(fontSize: 8.5, color: grayColor)),
+                      pw.Text(doc.roundOff > 0 ? '+ ${_fmt(doc.roundOff, profile)}' : '- ${_fmt(doc.roundOff.abs(), profile)}', style: pw.TextStyle(fontSize: 8.5, color: grayColor)),
+                    ],
+                  ),
+                ],
+                pw.SizedBox(height: 8),
+                pw.Divider(thickness: 0.8, color: PdfColors.grey300),
+                pw.SizedBox(height: 4),
+                // Total
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text('Total', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                    pw.Text(_fmt(doc.totalAmount, profile), style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                  ],
+                ),
+                pw.SizedBox(height: 6),
+                // In words
+                pw.Text('Invoice Total (In words)', style: pw.TextStyle(fontSize: 7, color: grayColor)),
+                pw.SizedBox(height: 2),
+                pw.Text(CurrencyFormatter.toWords(doc.totalAmount), style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                
+                if (doc.totalPaid > 0) ...[
+                  pw.SizedBox(height: 6),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('Amount Paid:', style: pw.TextStyle(fontSize: 8, color: grayColor)),
+                      pw.Text(_fmt(doc.totalPaid, profile), style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold)),
+                    ],
+                  ),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('Balance Due:', style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: orangeColor)),
+                      pw.Text(_fmt(doc.balanceDue, profile), style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: orangeColor)),
+                    ],
+                  ),
+                ],
+
+                // Signature block
+                pw.SizedBox(height: 20),
+                pw.Align(
+                  alignment: pw.Alignment.centerRight,
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      if (signatureBytes != null)
+                        pw.Container(
+                          height: 38,
+                          child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain),
+                        )
+                      else
+                        pw.Container(
+                          height: 28,
+                          width: 80,
+                          alignment: pw.Alignment.bottomCenter,
+                          child: pw.Divider(thickness: 0.5, color: darkColor),
+                        ),
+                      pw.SizedBox(height: 3),
+                      pw.Text('Authorized Signature', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: darkColor)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ];
   }
 }

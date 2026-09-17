@@ -7,6 +7,7 @@ import '../domain/document_item_model.dart';
 import '../domain/document_model.dart';
 import '../domain/payment_record_model.dart';
 import '../../settings/data/invoice_settings_repository.dart';
+import 'sample_documents_seeder.dart';
 
 class SummaryStats {
   final double unpaidTotal;
@@ -31,9 +32,42 @@ class SummaryStats {
 class DocumentRepository {
   final AppDatabase _appDatabase;
   final _uuid = const Uuid();
+  bool _hasCheckedSeeding = false;
 
   DocumentRepository({AppDatabase? appDatabase})
       : _appDatabase = appDatabase ?? AppDatabase.instance;
+
+  Future<void> checkAndSeedSampleDocuments() async {
+    if (_hasCheckedSeeding) return;
+    _hasCheckedSeeding = true;
+
+    try {
+      final db = await _appDatabase.database;
+      final sampleDocs = SampleDocumentsSeeder.generateSampleDocuments();
+
+      for (final doc in sampleDocs) {
+        final existing = await db.query(
+          DatabaseTables.documents,
+          columns: ['id'],
+          where: 'id = ?',
+          whereArgs: [doc.id],
+          limit: 1,
+        );
+        if (existing.isEmpty) {
+          if (doc.customerSnapshot != null) {
+            await db.insert(
+              DatabaseTables.customers,
+              doc.customerSnapshot!.toMap(),
+              conflictAlgorithm: ConflictAlgorithm.ignore,
+            );
+          }
+          await saveDocument(doc);
+        }
+      }
+    } catch (_) {
+      // Ignore seeding errors in transient or mock states
+    }
+  }
 
   Future<List<DocumentModel>> getAllDocuments({
     DocumentType? type,
@@ -43,6 +77,7 @@ class DocumentRepository {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
+    await checkAndSeedSampleDocuments();
     final db = await _appDatabase.database;
 
     final whereClauses = <String>[];
@@ -430,6 +465,7 @@ class DocumentRepository {
   }
 
   Future<SummaryStats> getSummaryStats() async {
+    await checkAndSeedSampleDocuments();
     final db = await _appDatabase.database;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day).toIso8601String();

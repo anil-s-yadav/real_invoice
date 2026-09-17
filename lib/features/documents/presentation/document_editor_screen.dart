@@ -70,7 +70,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           : '',
     );
     _issueDate = doc?.issueDate ?? DateTime.now();
-    _includePaymentDetails = doc?.includePaymentDetails ?? true;
+    _includePaymentDetails = doc?.includePaymentDetails ?? false;
     _dueDate = doc?.dueDate ?? DateTime.now().add(const Duration(days: 15));
     _selectedCustomer = doc?.customerSnapshot;
     _items = doc?.items != null ? List.from(doc!.items) : [];

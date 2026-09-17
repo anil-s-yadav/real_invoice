@@ -45,6 +45,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _gstinController = TextEditingController();
+  final _panController = TextEditingController();
+  final _websiteController = TextEditingController();
 
   final List<String> _languages = ['English', 'Spanish', 'French', 'German', 'Hindi', 'Arabic'];
   final List<Map<String, String>> _countries = [
@@ -66,6 +68,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _phoneController.dispose();
     _addressController.dispose();
     _gstinController.dispose();
+    _panController.dispose();
+    _websiteController.dispose();
     super.dispose();
   }
 
@@ -113,6 +117,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           phone: _phoneController.text.trim(),
           address: _addressController.text.trim(),
           gstin: _gstinController.text.trim(),
+          pan: _panController.text.trim(),
+          website: _websiteController.text.trim(),
           currencyCode: _selectedCurrencyCode,
           currencySymbol: _selectedCurrencySymbol,
           logoPath: _logoPath,
@@ -127,6 +133,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           phone: _phoneController.text.trim(),
           address: _addressController.text.trim(),
           gstin: _gstinController.text.trim(),
+          pan: _panController.text.trim(),
+          website: _websiteController.text.trim(),
           currencyCode: _selectedCurrencyCode,
           currencySymbol: _selectedCurrencySymbol,
           logoPath: _logoPath,
@@ -529,6 +537,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               label: 'GSTIN / Tax Number',
               controller: _gstinController,
               prefix: const Icon(Icons.receipt_long_outlined),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: 'PAN (Permanent Account Number)',
+              controller: _panController,
+              textCapitalization: TextCapitalization.characters,
+              prefix: const Icon(Icons.credit_card_outlined),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: 'Website (Optional)',
+              controller: _websiteController,
+              keyboardType: TextInputType.url,
+              prefix: const Icon(Icons.language_outlined),
             ),
             const SizedBox(height: 16),
             AppTextField(

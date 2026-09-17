@@ -7,6 +7,8 @@ import 'core/bloc/app_bloc_observer.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/auth/bloc/auth_bloc.dart';
+import 'features/auth/data/auth_repository.dart';
+import 'features/auth/presentation/sign_in_screen.dart';
 import 'features/business_profile/bloc/business_profile_bloc.dart';
 import 'features/business_profile/bloc/business_profile_event.dart';
 import 'features/business_profile/data/business_profile_repository.dart';
@@ -47,6 +49,7 @@ class RedInvoiceRoot extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<AuthRepository>(create: (_) => DummyAuthRepository()),
         RepositoryProvider(create: (_) => BusinessProfileRepository()),
         RepositoryProvider(create: (_) => CustomerRepository()),
         RepositoryProvider(create: (_) => ProductRepository()),
@@ -81,7 +84,7 @@ class RedInvoiceRoot extends StatelessWidget {
               businessProfileRepository: ctx.read<BusinessProfileRepository>(),
             )..add(const LoadHomeDataEvent()),
           ),
-          BlocProvider(create: (_) => AuthBloc()..add(const AppStartedEvent())),
+          BlocProvider(create: (ctx) => AuthBloc(authRepository: ctx.read<AuthRepository>())..add(const AppStartedEvent())),
           BlocProvider(
             create: (_) =>
                 SubscriptionBloc()..add(const CheckSubscriptionStatusEvent()),
@@ -105,17 +108,28 @@ class RedInvoiceApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
-        return BlocBuilder<OnboardingCubit, bool>(
-          builder: (context, hasCompletedOnboarding) {
-            return MaterialApp(
-              title: 'RedInvoice',
-              debugShowCheckedModeBanner: false,
-              themeMode: themeMode,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              home: hasCompletedOnboarding
-                  ? const MainNavScaffold()
-                  : const OnboardingScreen(),
+        return BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, authState) {
+            return BlocBuilder<OnboardingCubit, bool>(
+              builder: (context, hasCompletedOnboarding) {
+                Widget homeWidget;
+                if (authState is AuthInitial || authState is AuthLoading) {
+                  homeWidget = const Scaffold(body: Center(child: CircularProgressIndicator()));
+                } else if (authState is Authenticated) {
+                  homeWidget = hasCompletedOnboarding ? const MainNavScaffold() : const OnboardingScreen();
+                } else {
+                  homeWidget = const SignInScreen();
+                }
+
+                return MaterialApp(
+                  title: 'RedInvoice',
+                  debugShowCheckedModeBanner: false,
+                  themeMode: themeMode,
+                  theme: AppTheme.lightTheme,
+                  darkTheme: AppTheme.darkTheme,
+                  home: homeWidget,
+                );
+              },
             );
           },
         );
