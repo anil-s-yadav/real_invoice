@@ -9,7 +9,9 @@ import '../../business_profile/presentation/manage_company_list_screen.dart';
 import '../../subscription/presentation/subscription_screen.dart';
 import 'default_templates_screen.dart';
 import 'help_support_screen.dart';
+import 'invoice_numbering_screen.dart';
 import 'payment_details_list_screen.dart';
+import 'tax_discount_settings_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -31,17 +33,17 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.lg,
-          vertical: AppDimensions.md,
+          // vertical: AppDimensions.md,
         ),
         children: [
-          _buildSectionHeader('ACCOUNT & BUSINESS'),
+          _buildSectionHeader('BUSINESS'),
           AppCard(
             padding: EdgeInsets.zero,
             child: Column(
               children: [
                 SettingsTile(
-                  title: 'Manage Company',
-                  subtitle: 'Update business details, logo & GSTIN',
+                  title: 'Company Profile',
+                  subtitle: 'Business details, logo & GSTIN',
                   icon: Icons.storefront_outlined,
                   color: AppColors.primary,
                   isFirst: true,
@@ -59,8 +61,26 @@ class SettingsScreen extends StatelessWidget {
                   indent: 56,
                 ),
                 SettingsTile(
-                  title: 'Manage Subscription',
-                  subtitle: 'Current Plan: Free Plan',
+                  title: 'Payment Profiles',
+                  subtitle: 'Bank accounts & UPI details',
+                  icon: Icons.account_balance_outlined,
+                  color: Colors.teal,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PaymentDetailsListScreen(),
+                      ),
+                    );
+                  },
+                ),
+                Divider(
+                  height: 1,
+                  color: AppColors.border.withValues(alpha: 0.5),
+                  indent: 56,
+                ),
+                SettingsTile(
+                  title: 'Subscription',
+                  subtitle: 'Free Plan',
                   icon: Icons.workspace_premium_outlined,
                   color: AppColors.premiumGold,
                   isLast: true,
@@ -75,16 +95,16 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          _buildSectionHeader('INVOICING & TAXES'),
+          _buildSectionHeader('PREFERENCES'),
           AppCard(
             padding: EdgeInsets.zero,
             child: Column(
               children: [
                 SettingsTile(
                   title: 'Default Templates',
-                  subtitle: 'Manage invoice & quotation styles',
+                  subtitle: 'Invoice & quotation styles',
                   icon: Icons.dashboard_customize_outlined,
                   color: Colors.indigo,
                   isFirst: true,
@@ -97,10 +117,16 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 SettingsTile(
                   title: 'Invoice Numbering',
-                  subtitle: 'Customize prefixes (e.g. INV-)',
+                  subtitle: 'Prefixes & sequence',
                   icon: Icons.numbers_rounded,
                   color: Colors.orange,
-                  onTap: () => _showComingSoon(context, 'Invoice Numbering'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const InvoiceNumberingScreen(),
+                      ),
+                    );
+                  },
                 ),
                 Divider(
                   height: 1,
@@ -108,89 +134,32 @@ class SettingsScreen extends StatelessWidget {
                   indent: 56,
                 ),
                 SettingsTile(
-                  title: 'Tax & Discount Defaults',
-                  subtitle: 'Set default GST or discount rates',
+                  title: 'Tax & Discounts',
+                  subtitle: 'Default GST & discount rates',
                   icon: Icons.receipt_long_outlined,
                   color: Colors.purple,
-                  isLast: true,
-                  onTap: () => _showComingSoon(context, 'Tax Defaults'),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          _buildSectionHeader('PAYMENTS'),
-          AppCard(
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                SettingsTile(
-                  title: 'Payment Profiles',
-                  subtitle: 'Manage Banking Details',
-                  icon: Icons.account_balance_outlined,
-                  color: Colors.teal,
-                  isFirst: true,
                   isLast: true,
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const PaymentDetailsListScreen(),
+                        builder: (_) => const TaxDiscountSettingsScreen(),
                       ),
                     );
                   },
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          _buildSectionHeader('DATA & PRIVACY'),
-          AppCard(
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                SettingsTile(
-                  title: 'Privacy & Security',
-                  icon: Icons.security,
-                  color: Colors.green,
-                  isFirst: true,
-                  isLast: true,
-                  trailing: const Icon(
-                    Icons.info_outline,
-                    size: 20,
-                    color: AppColors.textMuted,
-                  ),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'All data is securely stored on your device only.',
-                        ),
-                        backgroundColor: AppColors.primary,
-                      ),
-                    );
-                  },
+                Divider(
+                  height: 1,
+                  color: AppColors.border.withValues(alpha: 0.5),
+                  indent: 56,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          _buildSectionHeader('APP PREFERENCES'),
-          AppCard(
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: [
                 BlocBuilder<ThemeCubit, ThemeMode>(
                   builder: (context, themeMode) {
                     return SettingsTile(
                       title: 'Appearance',
-
+                      subtitle: 'Theme & visual mode',
                       icon: Icons.palette_outlined,
                       color: Colors.pinkAccent,
                       isFirst: true,
-                      isLast: true,
                       trailing: DropdownButton<ThemeMode>(
                         value: themeMode,
                         underline: const SizedBox(),
@@ -233,16 +202,44 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
 
-          _buildSectionHeader('ABOUT'),
+          const SizedBox(height: 20),
+
+          _buildSectionHeader('SUPPORT & ABOUT'),
           AppCard(
             padding: EdgeInsets.zero,
             child: Column(
               children: [
                 SettingsTile(
+                  title: 'Privacy Policy & Terms',
+
+                  icon: Icons.security,
+                  color: Colors.green,
+                  isLast: true,
+                  trailing: const Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: AppColors.textMuted,
+                  ),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'All data is securely stored on your device only.',
+                        ),
+                        backgroundColor: AppColors.primary,
+                      ),
+                    );
+                  },
+                ),
+                Divider(
+                  height: 1,
+                  color: AppColors.border.withValues(alpha: 0.5),
+                  indent: 56,
+                ),
+                SettingsTile(
                   title: 'Help & Support',
-                  subtitle: 'FAQs, contact, and email support',
+                  subtitle: 'FAQs, contact & email',
                   icon: Icons.help_outline,
                   color: Colors.blueGrey,
                   isFirst: true,
@@ -261,7 +258,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 SettingsTile(
                   title: 'Rate Us',
-                  subtitle: 'Love the app? Leave a review!',
+                  subtitle: 'Share your feedback',
                   icon: Icons.star_outline,
                   color: Colors.amber,
                   onTap: () => _showComingSoon(context, 'Rate Us'),
@@ -272,18 +269,24 @@ class SettingsScreen extends StatelessWidget {
                   indent: 56,
                 ),
                 SettingsTile(
-                  title: 'Version',
-                  subtitle: '1.0.0 (Build 1)',
+                  title: 'App Version',
                   icon: Icons.info_outline,
                   color: Colors.grey,
                   isLast: true,
-                  trailing: const SizedBox.shrink(),
+                  trailing: const Text(
+                    '1.0.0',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
                   onTap: () {},
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: 36),
         ],
       ),
     );
@@ -295,9 +298,9 @@ class SettingsScreen extends StatelessWidget {
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.2,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
           color: AppColors.textSecondary,
         ),
       ),

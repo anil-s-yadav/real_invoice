@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../products/domain/product_model.dart';
+import '../../../settings/data/invoice_settings_repository.dart';
 import '../../domain/document_item_model.dart';
 import 'product_select_sheet.dart';
 
@@ -74,6 +75,32 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
     _selectedUnit = item?.unit ?? 'pcs';
     _taxPercent = item?.taxPercent ?? 18.0;
     _selectedProductId = item?.productId;
+
+    if (item == null) {
+      _loadDefaults();
+    }
+  }
+
+  Future<void> _loadDefaults() async {
+    final settingsRepo = InvoiceSettingsRepository();
+    final taxEnabled = await settingsRepo.getDefaultTaxEnabled();
+    final defaultTax = taxEnabled ? await settingsRepo.getDefaultTaxRate() : 0.0;
+    final defaultDiscount = await settingsRepo.getDefaultDiscountRate();
+
+    if (mounted) {
+      setState(() {
+        _taxPercent = defaultTax;
+        if (!_taxRates.contains(_taxPercent)) {
+          _taxRates.add(_taxPercent);
+          _taxRates.sort();
+        }
+        if (defaultDiscount > 0) {
+          _discountController.text = defaultDiscount.toStringAsFixed(
+            defaultDiscount.truncateToDouble() == defaultDiscount ? 0 : 1,
+          );
+        }
+      });
+    }
   }
 
   @override

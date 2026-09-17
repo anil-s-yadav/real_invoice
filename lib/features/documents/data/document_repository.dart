@@ -6,6 +6,7 @@ import '../../../core/widgets/status_badge.dart';
 import '../domain/document_item_model.dart';
 import '../domain/document_model.dart';
 import '../domain/payment_record_model.dart';
+import '../../settings/data/invoice_settings_repository.dart';
 
 class SummaryStats {
   final double unpaidTotal;
@@ -278,7 +279,13 @@ class DocumentRepository {
   Future<String> getNextDocumentNumber(DocumentType type) async {
     final db = await _appDatabase.database;
     final currentYear = DateTime.now().year;
-    final prefix = '${type.prefix}$currentYear-';
+
+    final settingsRepo = InvoiceSettingsRepository();
+    final customPrefix = await settingsRepo.getPrefixForType(type);
+    final includeYear = await settingsRepo.getIncludeYear();
+    final padding = await settingsRepo.getPaddingDigits();
+
+    final prefix = includeYear ? '$customPrefix$currentYear-' : customPrefix;
 
     final results = await db.query(
       DatabaseTables.documents,
@@ -290,13 +297,13 @@ class DocumentRepository {
     );
 
     if (results.isEmpty) {
-      return '${prefix}0001';
+      return '$prefix${1.toString().padLeft(padding, '0')}';
     }
 
     final lastNumberStr = results.first['docNumber'] as String;
     final suffix = lastNumberStr.replaceFirst(prefix, '');
     final number = int.tryParse(suffix) ?? 0;
-    final nextNumber = (number + 1).toString().padLeft(4, '0');
+    final nextNumber = (number + 1).toString().padLeft(padding, '0');
     return '$prefix$nextNumber';
   }
 
