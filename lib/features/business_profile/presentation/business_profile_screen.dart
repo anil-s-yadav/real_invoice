@@ -17,7 +17,8 @@ import '../../navigation/main_nav_scaffold.dart';
 
 class BusinessProfileScreen extends StatefulWidget {
   final bool isOnboarding;
-  const BusinessProfileScreen({super.key, this.isOnboarding = false});
+  final String? profileId;
+  const BusinessProfileScreen({super.key, this.isOnboarding = false, this.profileId});
 
   @override
   State<BusinessProfileScreen> createState() => _BusinessProfileScreenState();

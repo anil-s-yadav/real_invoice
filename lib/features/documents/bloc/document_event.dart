@@ -13,19 +13,19 @@ class LoadDocumentsEvent extends DocumentEvent {
   final DocumentType? type;
   final DocumentStatus? status;
   final String searchQuery;
-  final int? month;
-  final int? year;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
   const LoadDocumentsEvent({
     this.type,
     this.status,
     this.searchQuery = '',
-    this.month,
-    this.year,
+    this.startDate,
+    this.endDate,
   });
 
   @override
-  List<Object?> get props => [type, status, searchQuery, month, year];
+  List<Object?> get props => [type, status, searchQuery, startDate, endDate];
 }
 
 class SaveDocumentEvent extends DocumentEvent {

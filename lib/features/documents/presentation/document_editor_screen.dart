@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
@@ -79,7 +79,6 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   Future<void> _initializeDefaults() async {
     if (_isInitialized) return;
 
-    // If new document, prefill document number and default notes/terms from profile
     if (widget.initialDocument == null) {
       final repo = context.read<DocumentRepository>();
       final nextNumber = await repo.getNextDocumentNumber(_docType);
@@ -183,6 +182,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please add at least one line item to this document.'),
+          backgroundColor: AppColors.statusOverdueText,
         ),
       );
       return null;
@@ -235,7 +235,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   Future<void> _handleSaveAndPreview() async {
     final doc = await _buildAndSaveDocument();
     if (doc != null && mounted) {
-      Navigator.of(context).push(
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => PdfPreviewScreen(document: doc)),
       );
     }
@@ -259,18 +259,27 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: Text(
           widget.initialDocument != null
               ? 'Edit ${_docType.displayName}'
               : 'New ${_docType.displayName}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
+        backgroundColor: AppColors.canvas,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0,
         actions: [
           TextButton(
             onPressed: _isSaving ? null : _handleSaveDraft,
             child: const Text(
               'Save Draft',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+              ),
             ),
           ),
         ],
@@ -278,43 +287,62 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
-            AppDimensions.lg,
-            AppDimensions.sm,
-            AppDimensions.lg,
-            100, // Room for bottom sticky bar
+            16,
+            8,
+            16,
+            120, // Room for bottom sticky bar
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // 1. Document Type Switcher Pills
               _buildDocTypePills(),
-              const SizedBox(height: AppDimensions.lg),
+              const SizedBox(height: 16),
 
               // 2. Document Meta Card (Number + Dates)
               _buildMetaCard(),
-              const SizedBox(height: AppDimensions.lg),
+              const SizedBox(height: 24),
 
               // 3. Customer Section
+              _buildSectionTitle('BILLED TO'),
               _buildCustomerSection(),
-              const SizedBox(height: AppDimensions.lg),
+              const SizedBox(height: 24),
 
               // 4. Line Items Section
+              _buildSectionTitle('LINE ITEMS'),
               _buildItemsSection(),
-              const SizedBox(height: AppDimensions.lg),
+              const SizedBox(height: 24),
 
               // 5. Totals & Tax Summary Card
               if (_items.isNotEmpty) ...[
+                _buildSectionTitle('SUMMARY'),
                 _buildSummaryCard(),
-                const SizedBox(height: AppDimensions.lg),
+                const SizedBox(height: 24),
               ],
 
               // 6. Notes & Terms Accordion
+              _buildSectionTitle('ADDITIONAL INFO'),
               _buildNotesTermsSection(),
             ],
           ),
         ),
       ),
       bottomSheet: _buildBottomStickyBar(),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 1.2,
+          color: AppColors.textSecondary,
+        ),
+      ),
     );
   }
 
@@ -326,22 +354,9 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           final isSelected = _docType == type;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(type.displayName),
-              selected: isSelected,
-              selectedColor: AppColors.primary,
-              backgroundColor: AppColors.surface,
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : AppColors.textPrimary,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                fontSize: 13,
-              ),
-              side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.border,
-                width: 1.2,
-              ),
-              onSelected: (selected) async {
-                if (selected && _docType != type) {
+            child: GestureDetector(
+              onTap: () async {
+                if (!isSelected) {
                   setState(() => _docType = type);
                   final nextNum = await context
                       .read<DocumentRepository>()
@@ -351,6 +366,38 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   }
                 }
               },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : AppColors.border,
+                    width: 1,
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Text(
+                  type.displayName,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
             ),
           );
         }).toList(),
@@ -360,16 +407,52 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
   Widget _buildMetaCard() {
     return AppCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          AppTextField(
-            controller: _docNumberController,
-            label: '${_docType.displayName} Number',
-            hint: 'e.g. INV-2026-0001',
-            textCapitalization: TextCapitalization.characters,
-            prefix: const Icon(Icons.tag, size: 18, color: AppColors.textMuted),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.tag,
+                  size: 20,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: TextField(
+                  controller: _docNumberController,
+                  textCapitalization: TextCapitalization.characters,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: AppColors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: '${_docType.displayName} Number',
+                    labelStyle: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
+                    ),
+                    hintText: 'e.g. INV-2026-0001',
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppDimensions.md),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Divider(height: 1, color: AppColors.border),
+          ),
           Row(
             children: [
               Expanded(
@@ -377,10 +460,15 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   label: '${_docType.displayName} Date',
                   dateStr: DateFormatter.format(_issueDate),
                   onTap: _selectIssueDate,
-                  icon: Icons.calendar_today_outlined,
+                  icon: Icons.calendar_today_rounded,
                 ),
               ),
-              const SizedBox(width: AppDimensions.md),
+              Container(
+                width: 1,
+                height: 40,
+                color: AppColors.border,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+              ),
               Expanded(
                 child: _buildDateTile(
                   label: _docType == DocumentType.quotation
@@ -388,7 +476,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                       : 'Due Date',
                   dateStr: DateFormatter.format(_dueDate),
                   onTap: _selectDueDate,
-                  icon: Icons.event_available_outlined,
+                  icon: Icons.event_available_rounded,
                 ),
               ),
             ],
@@ -406,130 +494,155 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: AppDimensions.roundedMd,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceVariant,
-          borderRadius: AppDimensions.roundedMd,
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: AppTypography.bodySmall.copyWith(fontSize: 11)),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(icon, size: 14, color: AppColors.primary),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    dateStr,
-                    style: AppTypography.titleSmall.copyWith(fontSize: 13),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+      borderRadius: BorderRadius.circular(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14, color: AppColors.textMuted),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            dateStr,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
-          ],
-        ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildCustomerSection() {
-    return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    if (_selectedCustomer == null) {
+      return GestureDetector(
+        onTap: () async {
+          final customer = await CustomerSelectSheet.show(context);
+          if (customer != null) {
+            setState(() => _selectedCustomer = customer);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.3),
+              style: BorderStyle.solid,
+              width: 1.5,
+            ),
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Billed To (Customer)',
-                style: AppTypography.titleSmall.copyWith(fontSize: 13),
+              Icon(
+                Icons.person_add_alt_1_rounded,
+                color: AppColors.primary,
+                size: 24,
               ),
-              if (_selectedCustomer != null)
-                TextButton(
-                  onPressed: () async {
-                    final customer = await CustomerSelectSheet.show(
-                      context,
-                      current: _selectedCustomer,
-                    );
-                    if (customer != null) {
-                      setState(() => _selectedCustomer = customer);
-                    }
-                  },
-                  child: const Text('Change', style: TextStyle(fontSize: 12)),
+              SizedBox(width: 12),
+              Text(
+                'Add Customer / Client',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
                 ),
+              ),
             ],
           ),
-          const SizedBox(height: 6),
-          if (_selectedCustomer == null)
-            AppButton(
-              label: 'Select or Add Customer',
-              variant: AppButtonVariant.outline,
-              icon: Icons.person_add_outlined,
-              onPressed: () async {
-                final customer = await CustomerSelectSheet.show(context);
-                if (customer != null) {
-                  setState(() => _selectedCustomer = customer);
-                }
-              },
-            )
-          else
-            Container(
-              padding: const EdgeInsets.all(AppDimensions.md),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: AppDimensions.roundedMd,
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 18,
-                    backgroundColor: AppColors.primaryLight,
-                    child: Icon(
-                      Icons.person,
-                      color: AppColors.primary,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AppDimensions.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _selectedCustomer!.name,
-                          style: AppTypography.titleMedium,
-                        ),
-                        if (_selectedCustomer!.phone != null)
-                          Text(
-                            _selectedCustomer!.phone!,
-                            style: AppTypography.bodySmall,
-                          ),
-                        if (_selectedCustomer!.gstin != null)
-                          Text(
-                            'GSTIN: ${_selectedCustomer!.gstin}',
-                            style: AppTypography.bodySmall,
-                          ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.close,
-                      size: 18,
-                      color: AppColors.textMuted,
-                    ),
-                    onPressed: () => setState(() => _selectedCustomer = null),
-                  ),
-                ],
+        ),
+      );
+    }
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              _selectedCustomer!.name
+                  .substring(0, _selectedCustomer!.name.length.clamp(1, 2))
+                  .toUpperCase(),
+              style: const TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _selectedCustomer!.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: AppColors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                if (_selectedCustomer!.phone != null &&
+                    _selectedCustomer!.phone!.isNotEmpty)
+                  Text(
+                    _selectedCustomer!.phone!,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
+                  )
+                else if (_selectedCustomer!.email != null &&
+                    _selectedCustomer!.email!.isNotEmpty)
+                  Text(
+                    _selectedCustomer!.email!,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.swap_horiz_rounded,
+              color: AppColors.primary,
+            ),
+            onPressed: () async {
+              final customer = await CustomerSelectSheet.show(context);
+              if (customer != null) {
+                setState(() => _selectedCustomer = customer);
+              }
+            },
+            tooltip: 'Change Customer',
+          ),
         ],
       ),
     );
@@ -537,143 +650,136 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
   Widget _buildItemsSection() {
     return AppCard(
+      padding: EdgeInsets.zero,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Items & Services (${_items.length})',
-                style: AppTypography.titleSmall.copyWith(fontSize: 13),
-              ),
-              Text(
-                'Subtotal: ${CurrencyFormatter.format(_subtotal)}',
-                style: AppTypography.tabularNumbers.copyWith(
-                  fontSize: 13,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.md),
-          if (_items.isEmpty)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.receipt_long_outlined,
-                    size: 36,
-                    color: AppColors.borderStrong,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'No items added yet',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: 180,
-                    child: AppButton(
-                      label: 'Add First Item',
-                      icon: Icons.add,
-                      variant: AppButtonVariant.primary,
-                      height: 38,
-                      onPressed: () async {
-                        final item = await ItemEntrySheet.show(
-                          context,
-                          documentId: _documentId,
-                        );
-                        if (item != null) setState(() => _items.add(item));
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else ...[
+          if (_items.isNotEmpty)
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _items.length,
-              separatorBuilder: (context, index) => const Divider(height: 16),
+              separatorBuilder: (context, index) =>
+                  const Divider(height: 1, color: AppColors.border),
               itemBuilder: (context, index) {
                 final item = _items[index];
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          final updated = await ItemEntrySheet.show(
-                            context,
-                            documentId: _documentId,
-                            item: item,
-                          );
-                          if (updated != null) {
-                            setState(() => _items[index] = updated);
-                          }
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                return InkWell(
+                  onTap: () async {
+                    final updatedItem = await ItemEntrySheet.show(
+                      context,
+                      documentId: _documentId,
+                      item: item,
+                    );
+                    if (updatedItem != null) {
+                      setState(() => _items[index] = updatedItem);
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${item.quantity} x ${CurrencyFormatter.format(item.unitPrice)}',
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              item.title,
-                              style: AppTypography.titleMedium.copyWith(
+                              CurrencyFormatter.format(item.lineTotal),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
                                 fontSize: 15,
+                                color: AppColors.textPrimary,
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${item.quantity % 1 == 0 ? item.quantity.toInt() : item.quantity} ${item.unit} × ${CurrencyFormatter.format(item.unitPrice)}'
-                              '${item.taxPercent > 0 ? " + GST ${item.taxPercent.toStringAsFixed(0)}%" : ""}'
-                              '${item.discountPercent > 0 ? " (${item.discountPercent.toStringAsFixed(0)}% off)" : ""}',
-                              style: AppTypography.bodySmall,
-                            ),
+                            if (item.taxPercent > 0) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                '+ ${item.taxPercent.toStringAsFixed(0)}% Tax',
+                                style: const TextStyle(
+                                  color: AppColors.textMuted,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => setState(() => _items.removeAt(index)),
+                          child: const Icon(
+                            Icons.remove_circle_outline,
+                            color: AppColors.statusOverdueText,
+                            size: 20,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      CurrencyFormatter.format(item.lineTotal),
-                      style: AppTypography.moneyMedium,
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.delete_outline,
-                        size: 18,
-                        color: AppColors.statusOverdueText,
-                      ),
-                      padding: const EdgeInsets.only(left: 8),
-                      constraints: const BoxConstraints(),
-                      onPressed: () {
-                        setState(() => _items.removeAt(index));
-                      },
-                    ),
-                  ],
+                  ),
                 );
               },
             ),
-            const SizedBox(height: AppDimensions.md),
-            AppButton(
-              label: 'Add Another Item',
-              icon: Icons.add,
-              variant: AppButtonVariant.outline,
-              height: 40,
-              onPressed: () async {
-                final item = await ItemEntrySheet.show(
-                  context,
-                  documentId: _documentId,
-                );
-                if (item != null) setState(() => _items.add(item));
-              },
+
+          // Add Item Button inside the card
+          InkWell(
+            onTap: () async {
+              final newItem = await ItemEntrySheet.show(
+                context,
+                documentId: _documentId,
+              );
+              if (newItem != null) {
+                setState(() => _items.add(newItem));
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                border: _items.isNotEmpty
+                    ? const Border(top: BorderSide(color: AppColors.border))
+                    : null,
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_circle_outline,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Add Line Item',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ],
       ),
     );
@@ -681,235 +787,287 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
   Widget _buildSummaryCard() {
     return AppCard(
-      backgroundColor: AppColors.surfaceVariant,
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Subtotal', style: AppTypography.bodyMedium),
-              Text(
-                CurrencyFormatter.format(_subtotal),
-                style: AppTypography.tabularNumbers,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // Overall Discount
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
+          _buildSummaryRow('Subtotal', CurrencyFormatter.format(_subtotal)),
+
+          if (_overallDiscountAmount > 0 || _items.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: _showDiscountDialog,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Discount', style: AppTypography.bodyMedium),
-                  const SizedBox(width: 8),
-                  InkWell(
-                    onTap: _showDiscountDialog,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Text(
-                        _overallDiscountValue > 0
-                            ? (_overallDiscountType == DiscountType.percentage
-                                  ? '${_overallDiscountValue.toStringAsFixed(0)}% (Tap to edit)'
-                                  : '₹${_overallDiscountValue.toStringAsFixed(0)} (Tap to edit)')
-                            : '+ Add',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                  Row(
+                    children: [
+                      const Text(
+                        'Discount',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
                         ),
                       ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.edit_outlined,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
+                      if (_overallDiscountValue > 0)
+                        Text(
+                          _overallDiscountType == DiscountType.percentage
+                              ? ' (${_overallDiscountValue.toStringAsFixed(1)}%)'
+                              : ' (Flat)',
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                    ],
+                  ),
+                  Text(
+                    '- ${CurrencyFormatter.format(_overallDiscountAmount)}',
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                 ],
               ),
-              if (_overallDiscountAmount > 0)
-                Text(
-                  '- ${CurrencyFormatter.format(_overallDiscountAmount)}',
-                  style: AppTypography.tabularNumbers.copyWith(
-                    color: AppColors.statusOverdueText,
-                  ),
-                )
-              else
-                const Text('₹ 0.00', style: AppTypography.tabularNumbers),
-            ],
-          ),
+            ),
+          ],
+
           if (_taxTotal > 0) ...[
-            const SizedBox(height: 8),
-            Row(
+            const SizedBox(height: 12),
+            _buildSummaryRow(
+              'Tax',
+              '+ ${CurrencyFormatter.format(_taxTotal)}',
+              valueColor: AppColors.textSecondary,
+            ),
+          ],
+
+          if (_roundOff != 0) ...[
+            const SizedBox(height: 12),
+            _buildSummaryRow(
+              'Round Off',
+              _roundOff > 0
+                  ? '+ ${CurrencyFormatter.format(_roundOff)}'
+                  : CurrencyFormatter.format(_roundOff),
+            ),
+          ],
+
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(height: 1, color: AppColors.border),
+          ),
+
+          // Grand Total
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withValues(alpha: 0.8),
+                  AppColors.primary,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Total GST (Taxes)',
-                  style: AppTypography.bodyMedium,
+                  'Grand Total',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 Text(
-                  '+ ${CurrencyFormatter.format(_taxTotal)}',
-                  style: AppTypography.tabularNumbers.copyWith(
-                    color: AppColors.accentNavy,
+                  CurrencyFormatter.format(_finalTotal),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
             ),
-          ],
-          if (_roundOff.abs() > 0.001) ...[
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Round Off', style: AppTypography.bodySmall),
-                Text(
-                  _roundOff > 0
-                      ? '+ ₹${_roundOff.toStringAsFixed(2)}'
-                      : '- ₹${_roundOff.abs().toStringAsFixed(2)}',
-                  style: AppTypography.tabularNumbers.copyWith(fontSize: 12),
-                ),
-              ],
-            ),
-          ],
-          const Divider(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total Amount',
-                style: AppTypography.titleLarge.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text(
-                CurrencyFormatter.format(_finalTotal),
-                style: AppTypography.moneyHero.copyWith(
-                  color: AppColors.primaryDark,
-                ),
-              ),
-            ],
           ),
         ],
       ),
     );
   }
 
-  void _showDiscountDialog() {
-    final controller = TextEditingController(
-      text: _overallDiscountValue > 0 ? _overallDiscountValue.toString() : '',
+  Widget _buildSummaryRow(String label, String value, {Color? valueColor}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: valueColor ?? AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
+      ],
     );
+  }
+
+  void _showDiscountDialog() {
+    double tempValue = _overallDiscountValue;
     DiscountType tempType = _overallDiscountType;
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Overall Document Discount'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: ChoiceChip(
-                      label: const Text('Percentage (%)'),
-                      selected: tempType == DiscountType.percentage,
-                      onSelected: (s) {
-                        if (s) {
-                          setDialogState(
-                            () => tempType = DiscountType.percentage,
-                          );
-                        }
-                      },
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateSB) {
+          return AlertDialog(
+            title: const Text(
+              'Apply Discount',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<DiscountType>(
+                        title: const Text(
+                          '%',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        value: DiscountType.percentage,
+                        groupValue: tempType,
+                        contentPadding: EdgeInsets.zero,
+                        onChanged: (val) => setStateSB(() => tempType = val!),
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<DiscountType>(
+                        title: const Text(
+                          'Flat',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        value: DiscountType.fixed,
+                        groupValue: tempType,
+                        contentPadding: EdgeInsets.zero,
+                        onChanged: (val) => setStateSB(() => tempType = val!),
+                      ),
+                    ),
+                  ],
+                ),
+                TextFormField(
+                  initialValue: tempValue > 0 ? tempValue.toString() : '',
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Discount Value',
+                    prefixIcon: tempType == DiscountType.fixed
+                        ? const Icon(Icons.currency_rupee, size: 16)
+                        : const Icon(Icons.percent, size: 16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ChoiceChip(
-                      label: const Text('Flat Amount (₹)'),
-                      selected: tempType == DiscountType.fixed,
-                      onSelected: (s) {
-                        if (s) {
-                          setDialogState(() => tempType = DiscountType.fixed);
-                        }
-                      },
-                    ),
-                  ),
-                ],
+                  onChanged: (val) {
+                    tempValue = double.tryParse(val) ?? 0.0;
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: controller,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _overallDiscountValue = tempValue;
+                    _overallDiscountType = tempType;
+                  });
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
                 ),
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: tempType == DiscountType.percentage
-                      ? 'Discount %'
-                      : 'Discount Amount (₹)',
-                  hintText: '0',
-                ),
+                child: const Text('Apply'),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _overallDiscountValue = 0.0;
-                });
-                Navigator.of(ctx).pop();
-              },
-              child: const Text('Remove Discount'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final val = double.tryParse(controller.text.trim()) ?? 0.0;
-                setState(() {
-                  _overallDiscountValue = val;
-                  _overallDiscountType = tempType;
-                });
-                Navigator.of(ctx).pop();
-              },
-              child: const Text('Apply'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildNotesTermsSection() {
     return AppCard(
-      child: ExpansionTile(
-        tilePadding: EdgeInsets.zero,
-        title: Text(
-          'Payment Terms & Notes',
-          style: AppTypography.titleSmall.copyWith(fontSize: 14),
-        ),
-        subtitle: const Text(
-          'Add bank details, payment instructions or thanks',
-          style: AppTypography.bodySmall,
-        ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
         children: [
-          const SizedBox(height: AppDimensions.sm),
-          AppTextField(
-            controller: _termsController,
-            label: 'Terms & Conditions',
-            hint: 'e.g. Payment due in 15 days; Late fees apply',
-            maxLines: 3,
-          ),
-          const SizedBox(height: AppDimensions.md),
-          AppTextField(
+          TextField(
             controller: _notesController,
-            label: 'Notes / Remarks for Customer',
-            hint: 'e.g. Thank you for your business!',
-            maxLines: 2,
+            maxLines: 3,
+            minLines: 1,
+            decoration: InputDecoration(
+              labelText: 'Notes to Customer',
+              alignLabelWithHint: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _termsController,
+            maxLines: 4,
+            minLines: 1,
+            decoration: InputDecoration(
+              labelText: 'Terms & Conditions',
+              alignLabelWithHint: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -919,45 +1077,51 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   Widget _buildBottomStickyBar() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(top: BorderSide(color: AppColors.border)),
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            offset: const Offset(0, -2),
-            blurRadius: 6,
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.lg,
-        vertical: AppDimensions.md,
-      ),
-      child: Row(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Total Payable', style: AppTypography.bodySmall),
-              Text(
-                CurrencyFormatter.format(_finalTotal),
-                style: AppTypography.moneyLarge.copyWith(
-                  color: AppColors.primaryDark,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: SafeArea(
+        child: Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: _isSaving ? null : _handleSaveAndPreview,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.picture_as_pdf_rounded),
+                label: Text(_isSaving ? 'Saving...' : 'Save & Preview'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 4,
+                  shadowColor: AppColors.primary.withValues(alpha: 0.5),
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(width: AppDimensions.lg),
-          Expanded(
-            child: AppButton(
-              label: 'Preview & PDF',
-              icon: Icons.picture_as_pdf_outlined,
-              isLoading: _isSaving,
-              onPressed: _items.isNotEmpty ? _handleSaveAndPreview : null,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

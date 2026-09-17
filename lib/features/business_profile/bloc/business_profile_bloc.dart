@@ -17,7 +17,7 @@ class BusinessProfileBloc extends Bloc<BusinessProfileEvent, BusinessProfileStat
   ) async {
     emit(const BusinessProfileLoading());
     try {
-      final profile = await repository.getProfile();
+      final profile = await repository.getProfile(event.profileId);
       emit(BusinessProfileLoaded(profile));
     } catch (e) {
       emit(BusinessProfileError(e.toString()));
@@ -30,8 +30,8 @@ class BusinessProfileBloc extends Bloc<BusinessProfileEvent, BusinessProfileStat
   ) async {
     emit(const BusinessProfileLoading());
     try {
-      await repository.saveProfile(event.profile);
-      emit(BusinessProfileLoaded(event.profile));
+      final savedProfile = await repository.saveProfile(event.profile);
+      emit(BusinessProfileLoaded(savedProfile));
     } catch (e) {
       emit(BusinessProfileError(e.toString()));
     }

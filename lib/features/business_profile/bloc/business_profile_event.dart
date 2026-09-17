@@ -9,7 +9,11 @@ abstract class BusinessProfileEvent extends Equatable {
 }
 
 class LoadBusinessProfileEvent extends BusinessProfileEvent {
-  const LoadBusinessProfileEvent();
+  final String? profileId;
+  const LoadBusinessProfileEvent([this.profileId]);
+
+  @override
+  List<Object?> get props => [profileId];
 }
 
 class UpdateBusinessProfileEvent extends BusinessProfileEvent {

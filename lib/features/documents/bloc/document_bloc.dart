@@ -25,16 +25,16 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         type: event.type,
         status: event.status,
         searchQuery: event.searchQuery,
-        month: event.month,
-        year: event.year,
+        startDate: event.startDate,
+        endDate: event.endDate,
       );
       emit(DocumentLoaded(
         documents,
         typeFilter: event.type,
         statusFilter: event.status,
         searchQuery: event.searchQuery,
-        monthFilter: event.month,
-        yearFilter: event.year,
+        startDateFilter: event.startDate,
+        endDateFilter: event.endDate,
       ));
     } catch (e) {
       emit(DocumentError(e.toString()));
@@ -52,16 +52,16 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         type: currentLoaded?.typeFilter,
         status: currentLoaded?.statusFilter,
         searchQuery: currentLoaded?.searchQuery,
-        month: currentLoaded?.monthFilter,
-        year: currentLoaded?.yearFilter,
+        startDate: currentLoaded?.startDateFilter,
+        endDate: currentLoaded?.endDateFilter,
       );
       emit(DocumentLoaded(
         documents,
         typeFilter: currentLoaded?.typeFilter,
         statusFilter: currentLoaded?.statusFilter,
         searchQuery: currentLoaded?.searchQuery ?? '',
-        monthFilter: currentLoaded?.monthFilter,
-        yearFilter: currentLoaded?.yearFilter,
+        startDateFilter: currentLoaded?.startDateFilter,
+        endDateFilter: currentLoaded?.endDateFilter,
       ));
     } catch (e) {
       emit(DocumentError(e.toString()));
@@ -79,16 +79,16 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         type: currentLoaded?.typeFilter,
         status: currentLoaded?.statusFilter,
         searchQuery: currentLoaded?.searchQuery,
-        month: currentLoaded?.monthFilter,
-        year: currentLoaded?.yearFilter,
+        startDate: currentLoaded?.startDateFilter,
+        endDate: currentLoaded?.endDateFilter,
       );
       emit(DocumentLoaded(
         documents,
         typeFilter: currentLoaded?.typeFilter,
         statusFilter: currentLoaded?.statusFilter,
         searchQuery: currentLoaded?.searchQuery ?? '',
-        monthFilter: currentLoaded?.monthFilter,
-        yearFilter: currentLoaded?.yearFilter,
+        startDateFilter: currentLoaded?.startDateFilter,
+        endDateFilter: currentLoaded?.endDateFilter,
       ));
     } catch (e) {
       emit(DocumentError(e.toString()));
@@ -124,8 +124,8 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         type: currentLoaded?.typeFilter,
         status: currentLoaded?.statusFilter,
         searchQuery: currentLoaded?.searchQuery,
-        month: currentLoaded?.monthFilter,
-        year: currentLoaded?.yearFilter,
+        startDate: currentLoaded?.startDateFilter,
+        endDate: currentLoaded?.endDateFilter,
       );
       emit(DocumentActionSuccess(
         'Payment recorded',
@@ -133,8 +133,8 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         typeFilter: currentLoaded?.typeFilter,
         statusFilter: currentLoaded?.statusFilter,
         searchQuery: currentLoaded?.searchQuery ?? '',
-        monthFilter: currentLoaded?.monthFilter,
-        yearFilter: currentLoaded?.yearFilter,
+        startDateFilter: currentLoaded?.startDateFilter,
+        endDateFilter: currentLoaded?.endDateFilter,
         resultingDocument: receiptDoc,
       ));
     } catch (e) {
@@ -153,8 +153,8 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         type: currentLoaded?.typeFilter,
         status: currentLoaded?.statusFilter,
         searchQuery: currentLoaded?.searchQuery,
-        month: currentLoaded?.monthFilter,
-        year: currentLoaded?.yearFilter,
+        startDate: currentLoaded?.startDateFilter,
+        endDate: currentLoaded?.endDateFilter,
       );
       emit(DocumentActionSuccess(
         'Quotation converted to Invoice',
@@ -162,8 +162,8 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         typeFilter: currentLoaded?.typeFilter,
         statusFilter: currentLoaded?.statusFilter,
         searchQuery: currentLoaded?.searchQuery ?? '',
-        monthFilter: currentLoaded?.monthFilter,
-        yearFilter: currentLoaded?.yearFilter,
+        startDateFilter: currentLoaded?.startDateFilter,
+        endDateFilter: currentLoaded?.endDateFilter,
         resultingDocument: invoice,
       ));
     } catch (e) {

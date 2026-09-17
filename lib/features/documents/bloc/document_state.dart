@@ -22,8 +22,9 @@ class DocumentLoaded extends DocumentState {
   final DocumentType? typeFilter;
   final DocumentStatus? statusFilter;
   final String searchQuery;
-  final int? monthFilter;
-  final int? yearFilter;
+  final DateTime? startDateFilter;
+  final DateTime? endDateFilter;
+  
   final DocumentModel? resultingDocument;
 
   const DocumentLoaded(
@@ -31,8 +32,9 @@ class DocumentLoaded extends DocumentState {
     this.typeFilter,
     this.statusFilter,
     this.searchQuery = '',
-    this.monthFilter,
-    this.yearFilter,
+    this.startDateFilter,
+    this.endDateFilter,
+    
     this.resultingDocument,
   });
 
@@ -42,8 +44,8 @@ class DocumentLoaded extends DocumentState {
     typeFilter,
     statusFilter,
     searchQuery,
-    monthFilter,
-    yearFilter,
+    startDateFilter,
+    endDateFilter,
     resultingDocument,
   ];
 }
@@ -57,16 +59,16 @@ class DocumentActionSuccess extends DocumentLoaded {
     DocumentType? typeFilter,
     DocumentStatus? statusFilter,
     String searchQuery = '',
-    int? monthFilter,
-    int? yearFilter,
+    DateTime? startDateFilter,
+    DateTime? endDateFilter,
     DocumentModel? resultingDocument,
   }) : super(
           documents,
           typeFilter: typeFilter,
           statusFilter: statusFilter,
           searchQuery: searchQuery,
-          monthFilter: monthFilter,
-          yearFilter: yearFilter,
+          startDateFilter: startDateFilter,
+          endDateFilter: endDateFilter,
           resultingDocument: resultingDocument,
         );
 
@@ -77,8 +79,8 @@ class DocumentActionSuccess extends DocumentLoaded {
     typeFilter,
     statusFilter,
     searchQuery,
-    monthFilter,
-    yearFilter,
+    startDateFilter,
+    endDateFilter,
     resultingDocument,
   ];
 }

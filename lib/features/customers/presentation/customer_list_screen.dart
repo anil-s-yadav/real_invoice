@@ -36,7 +36,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
       body: BlocBuilder<CustomerBloc, CustomerState>(
         builder: (context, state) {
           if (state is CustomerLoading) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
 
           if (state is CustomerLoaded) {
@@ -54,7 +56,8 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
               return EmptyStateView(
                 icon: Icons.people_outline,
                 title: 'No clients yet',
-                description: 'Save your clients once and add them to invoices in seconds.',
+                description:
+                    'Save your clients once and add them to invoices in seconds.',
                 actionLabel: 'Add Client',
                 onAction: () => CustomerEditorSheet.show(context),
               );
@@ -69,11 +72,16 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                     height: 44,
                     child: TextField(
                       controller: _searchController,
-                      onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                      onChanged: (val) =>
+                          setState(() => _searchQuery = val.trim()),
                       decoration: InputDecoration(
                         hintText: 'Search by name, phone, or GSTIN...',
                         hintStyle: const TextStyle(color: AppColors.textMuted),
-                        prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.textMuted),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          size: 20,
+                          color: AppColors.textMuted,
+                        ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
                                 icon: const Icon(Icons.clear, size: 18),
@@ -85,9 +93,22 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                             : null,
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.5))),
-                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primary)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0,
+                          horizontal: 16,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.border.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -101,7 +122,10 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                           ),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           itemCount: filtered.length,
                           itemBuilder: (context, index) {
                             final customer = filtered[index];
@@ -117,7 +141,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
             return Center(
               child: Text(
                 'Unable to load clients: ${state.message}',
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.statusOverdueText),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.statusOverdueText,
+                ),
               ),
             );
           }
@@ -146,7 +172,10 @@ class _CustomerItemCard extends StatelessWidget {
   String _getInitials(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
     if (parts.isEmpty) return '';
-    if (parts.length == 1) return parts.first.substring(0, parts.first.length.clamp(1, 2)).toUpperCase();
+    if (parts.length == 1)
+      return parts.first
+          .substring(0, parts.first.length.clamp(1, 2))
+          .toUpperCase();
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
@@ -183,28 +212,53 @@ class _CustomerItemCard extends StatelessWidget {
                 children: [
                   Text(
                     customer.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textPrimary),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: AppColors.textPrimary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   if (customer.phone != null && customer.phone!.isNotEmpty)
-                    Text(customer.phone!, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13))
+                    Text(
+                      customer.phone!,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    )
                   else if (customer.email != null && customer.email!.isNotEmpty)
-                    Text(customer.email!, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13))
+                    Text(
+                      customer.email!,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    )
                   else
                     const Text(
                       'No contact info provided',
-                      style: TextStyle(color: AppColors.textMuted, fontStyle: FontStyle.italic, fontSize: 13),
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 13,
+                      ),
                     ),
                   if (customer.gstin != null && customer.gstin!.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceVariant,
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                        border: Border.all(
+                          color: AppColors.border.withValues(alpha: 0.5),
+                        ),
                       ),
                       child: Text(
                         'GSTIN: ${customer.gstin}',
@@ -221,9 +275,15 @@ class _CustomerItemCard extends StatelessWidget {
               ),
             ),
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textMuted),
+              icon: const Icon(
+                Icons.more_vert,
+                size: 20,
+                color: AppColors.textMuted,
+              ),
               padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               onSelected: (val) async {
                 if (val == 'edit') {
                   CustomerEditorSheet.show(context, customer: customer);
@@ -231,23 +291,45 @@ class _CustomerItemCard extends StatelessWidget {
                   final confirmed = await ConfirmDialog.show(
                     context,
                     title: 'Delete Client?',
-                    message: 'Are you sure you want to delete "${customer.name}"? Past documents created for this client will retain their details.',
+                    message:
+                        'Are you sure you want to delete "${customer.name}"? Past documents created for this client will retain their details.',
                     confirmLabel: 'Delete',
                     isDestructive: true,
                   );
                   if (confirmed && context.mounted) {
-                    context.read<CustomerBloc>().add(DeleteCustomerEvent(customer.id));
+                    context.read<CustomerBloc>().add(
+                      DeleteCustomerEvent(customer.id),
+                    );
                   }
                 }
               },
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'edit',
-                  child: Row(children: [Icon(Icons.edit_outlined, size: 18), SizedBox(width: 12), Text('Edit')]),
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit_outlined, size: 18),
+                      SizedBox(width: 12),
+                      Text('Edit'),
+                    ],
+                  ),
                 ),
                 const PopupMenuItem(
                   value: 'delete',
-                  child: Row(children: [Icon(Icons.delete_outline, size: 18, color: AppColors.statusOverdueText), SizedBox(width: 12), Text('Delete', style: TextStyle(color: AppColors.statusOverdueText))]),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete_outline,
+                        size: 18,
+                        color: AppColors.statusOverdueText,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        'Delete',
+                        style: TextStyle(color: AppColors.statusOverdueText),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

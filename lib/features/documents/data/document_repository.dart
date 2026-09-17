@@ -39,8 +39,8 @@ class DocumentRepository {
     DocumentStatus? status,
     String? searchQuery,
     int? limit,
-    int? month,
-    int? year,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     final db = await _appDatabase.database;
 
@@ -57,13 +57,16 @@ class DocumentRepository {
       whereArgs.add(status.name);
     }
 
-    if (month != null && year != null) {
-      // issueDate is ISO8601 string: YYYY-MM-DDTHH:mm:ss.mmm
-      // SQLite strftime('%Y-%m', issueDate) works.
-      final monthStr = month.toString().padLeft(2, '0');
-      final yearStr = year.toString();
-      whereClauses.add('issueDate LIKE ?');
-      whereArgs.add('$yearStr-$monthStr-%');
+    if (startDate != null) {
+      whereClauses.add('issueDate >= ?');
+      whereArgs.add(startDate.toIso8601String());
+    }
+    
+    if (endDate != null) {
+      whereClauses.add('issueDate <= ?');
+      // Add 1 day and subtract 1 millisecond to include the entire end date
+      final endOfDay = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999);
+      whereArgs.add(endOfDay.toIso8601String());
     }
 
     if (searchQuery != null && searchQuery.trim().isNotEmpty) {

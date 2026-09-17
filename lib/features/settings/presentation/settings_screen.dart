@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
-import '../../../core/constants/app_typography.dart';
 import '../../../core/theme/theme_cubit.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/settings_tile.dart';
-import '../../business_profile/bloc/business_profile_bloc.dart';
-import '../../business_profile/bloc/business_profile_state.dart';
-import '../../business_profile/domain/business_profile_model.dart';
-import '../../business_profile/presentation/business_profile_screen.dart';
+import '../../business_profile/presentation/manage_company_list_screen.dart';
+import '../../subscription/presentation/subscription_screen.dart';
 import 'default_templates_screen.dart';
 import 'payment_details_list_screen.dart';
 
@@ -18,15 +15,9 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
-      builder: (context, profileState) {
-        final profile = profileState is BusinessProfileLoaded
-            ? profileState.profile
-            : const BusinessProfile();
-
-        return Scaffold(
-          backgroundColor: AppColors.canvas,
-          appBar: AppBar(
+    return Scaffold(
+      backgroundColor: AppColors.canvas,
+      appBar: AppBar(
             title: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
             centerTitle: true,
             backgroundColor: AppColors.canvas,
@@ -36,77 +27,147 @@ class SettingsScreen extends StatelessWidget {
           body: ListView(
             padding: const EdgeInsets.symmetric(horizontal: AppDimensions.lg, vertical: AppDimensions.md),
             children: [
-              // Business Profile Header Card
-              AppCard(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const BusinessProfileScreen()),
-                  );
-                },
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: AppColors.primaryLight,
-                      child: Text(
-                        profile.businessName.isNotEmpty
-                            ? profile.businessName.substring(0, profile.businessName.length.clamp(1, 2)).toUpperCase()
-                            : 'BIZ',
-                        style: AppTypography.titleMedium.copyWith(
-                          color: AppColors.primaryDark,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppDimensions.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            profile.businessName.isNotEmpty ? profile.businessName : 'Setup Business Profile',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textPrimary),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            profile.businessName.isNotEmpty
-                                ? [profile.phone, profile.gstin != null ? "GST: ${profile.gstin}" : null]
-                                    .whereType<String>()
-                                    .join(' • ')
-                                : 'Add name, logo, phone, address & GSTIN',
-                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.chevron_right, color: AppColors.textMuted),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppDimensions.xl),
-
-              // Settings Group
-              const Padding(
-                padding: EdgeInsets.only(left: 4, bottom: 12),
-                child: Text(
-                  'PREFERENCES',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: AppColors.textSecondary),
-                ),
-              ),
+              _buildSectionHeader('ACCOUNT & BUSINESS'),
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
-                    // Theme Switcher
+                    SettingsTile(
+                      title: 'Manage Company',
+                      subtitle: 'Update business details, logo & GSTIN',
+                      icon: Icons.storefront_outlined,
+                      color: AppColors.primary,
+                      isFirst: true,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const ManageCompanyListScreen()),
+                        );
+                      },
+                    ),
+                    Divider(height: 1, color: AppColors.border.withValues(alpha: 0.5), indent: 56),
+                    SettingsTile(
+                      title: 'Manage Subscription',
+                      subtitle: 'Current Plan: Free Plan',
+                      icon: Icons.workspace_premium_outlined,
+                      color: AppColors.premiumGold,
+                      isLast: true,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+
+
+              _buildSectionHeader('INVOICING & TAXES'),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    SettingsTile(
+                      title: 'Document Templates',
+                      subtitle: 'Manage invoice & quotation styles',
+                      icon: Icons.dashboard_customize_outlined,
+                      color: Colors.indigo,
+                      isFirst: true,
+                      onTap: () => _showTemplatesSheet(context),
+                    ),
+                    Divider(height: 1, color: AppColors.border.withValues(alpha: 0.5), indent: 56),
+                    SettingsTile(
+                      title: 'Invoice Numbering',
+                      subtitle: 'Customize prefixes (e.g. INV-)',
+                      icon: Icons.numbers_rounded,
+                      color: Colors.orange,
+                      onTap: () => _showComingSoon(context, 'Invoice Numbering'),
+                    ),
+                    Divider(height: 1, color: AppColors.border.withValues(alpha: 0.5), indent: 56),
+                    SettingsTile(
+                      title: 'Tax & Discount Defaults',
+                      subtitle: 'Set default GST or discount rates',
+                      icon: Icons.receipt_long_outlined,
+                      color: Colors.purple,
+                      isLast: true,
+                      onTap: () => _showComingSoon(context, 'Tax Defaults'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              _buildSectionHeader('PAYMENTS'),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    SettingsTile(
+                      title: 'Bank & UPI Details',
+                      subtitle: 'Set up default payment methods',
+                      icon: Icons.account_balance_outlined,
+                      color: Colors.teal,
+                      isFirst: true,
+                      isLast: true,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const PaymentDetailsListScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              _buildSectionHeader('DATA & BACKUP'),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    SettingsTile(
+                      title: 'Backup & Restore',
+                      subtitle: 'Export or import your offline database',
+                      icon: Icons.cloud_upload_outlined,
+                      color: Colors.blueAccent,
+                      isFirst: true,
+                      onTap: () => _showComingSoon(context, 'Backup & Restore'),
+                    ),
+                    Divider(height: 1, color: AppColors.border.withValues(alpha: 0.5), indent: 56),
+                    SettingsTile(
+                      title: 'Privacy & Security',
+                      subtitle: '100% Offline-First (Local Storage)',
+                      icon: Icons.security,
+                      color: Colors.green,
+                      isLast: true,
+                      trailing: const Icon(Icons.info_outline, size: 20, color: AppColors.textMuted),
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('All data is securely stored on your device only.'), backgroundColor: AppColors.primary),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              _buildSectionHeader('APP PREFERENCES'),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
                     BlocBuilder<ThemeCubit, ThemeMode>(
                       builder: (context, themeMode) {
                         return SettingsTile(
                           title: 'Appearance',
                           subtitle: 'System, Light, or Dark',
                           icon: Icons.palette_outlined,
-                          color: Colors.blue,
+                          color: Colors.pinkAccent,
                           isFirst: true,
+                          isLast: true,
                           trailing: DropdownButton<ThemeMode>(
                             value: themeMode,
                             underline: const SizedBox(),
@@ -127,58 +188,31 @@ class SettingsScreen extends StatelessWidget {
                         );
                       },
                     ),
-                    Divider(height: 1, color: AppColors.border.withValues(alpha: 0.5), indent: 56),
-                    
-                    SettingsTile(
-                      title: 'Document Templates',
-                      subtitle: 'Manage invoice & quotation styles',
-                      icon: Icons.dashboard_customize_outlined,
-                      color: Colors.indigo,
-                      onTap: () => _showTemplatesSheet(context),
-                    ),
-                    Divider(height: 1, color: AppColors.border.withValues(alpha: 0.5), indent: 56),
-
-                    SettingsTile(
-                      title: 'Bank & UPI Details',
-                      subtitle: 'Set up default payment methods',
-                      icon: Icons.account_balance_outlined,
-                      color: Colors.teal,
-                      isLast: true,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const PaymentDetailsListScreen()),
-                        );
-                      },
-                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: AppDimensions.xl),
+              const SizedBox(height: 24),
 
-              // App Info
-              const Padding(
-                padding: EdgeInsets.only(left: 4, bottom: 12),
-                child: Text(
-                  'ABOUT & SECURITY',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: AppColors.textSecondary),
-                ),
-              ),
+              _buildSectionHeader('ABOUT'),
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
                     SettingsTile(
-                      title: 'Privacy & Security',
-                      subtitle: '100% Offline-First (Local Storage)',
-                      icon: Icons.security,
-                      color: Colors.green,
+                      title: 'Help & Support',
+                      subtitle: 'Contact developer or report a bug',
+                      icon: Icons.help_outline,
+                      color: Colors.blueGrey,
                       isFirst: true,
-                      trailing: const Icon(Icons.info_outline, size: 20, color: AppColors.textMuted),
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('All data is securely stored on your device only.')),
-                        );
-                      },
+                      onTap: () => _showComingSoon(context, 'Help & Support'),
+                    ),
+                    Divider(height: 1, color: AppColors.border.withValues(alpha: 0.5), indent: 56),
+                    SettingsTile(
+                      title: 'Rate Us',
+                      subtitle: 'Love the app? Leave a review!',
+                      icon: Icons.star_outline,
+                      color: Colors.amber,
+                      onTap: () => _showComingSoon(context, 'Rate Us'),
                     ),
                     Divider(height: 1, color: AppColors.border.withValues(alpha: 0.5), indent: 56),
                     SettingsTile(
@@ -193,17 +227,40 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: AppDimensions.xxxl),
+              const SizedBox(height: 48),
             ],
           ),
         );
-      },
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 1.2,
+          color: AppColors.textSecondary,
+        ),
+      ),
     );
   }
 
   void _showTemplatesSheet(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const DefaultTemplatesScreen()),
+    );
+  }
+
+  void _showComingSoon(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature is coming soon!'),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 }
