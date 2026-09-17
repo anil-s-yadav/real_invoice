@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_dimensions.dart';
-import '../../../core/constants/app_typography.dart';
 import '../../customers/bloc/customer_bloc.dart';
 import '../../customers/bloc/customer_state.dart';
 import '../../customers/presentation/customer_list_screen.dart';
@@ -19,90 +17,141 @@ class CatalogScreen extends StatefulWidget {
   State<CatalogScreen> createState() => _CatalogScreenState();
 }
 
-class _CatalogScreenState extends State<CatalogScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-      initialIndex: widget.initialTabIndex,
-    );
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
+class _CatalogScreenState extends State<CatalogScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CustomerBloc, CustomerState>(
       builder: (context, customerState) {
-        final customersCount = customerState is CustomerLoaded ? customerState.customers.length : 0;
+        final customersCount = customerState is CustomerLoaded
+            ? customerState.customers.length
+            : 0;
         return BlocBuilder<ProductBloc, ProductState>(
           builder: (context, productState) {
-            final productsCount = productState is ProductLoaded ? productState.products.length : 0;
+            final productsCount = productState is ProductLoaded
+                ? productState.products.length
+                : 0;
 
-            return Scaffold(
-              backgroundColor: AppColors.canvas,
-              appBar: AppBar(
-                title: const Text('Directory', style: TextStyle(fontWeight: FontWeight.bold)),
-                centerTitle: true,
+            return DefaultTabController(
+              length: 2,
+              initialIndex: widget.initialTabIndex,
+              child: Scaffold(
                 backgroundColor: AppColors.canvas,
-                foregroundColor: AppColors.textPrimary,
-                elevation: 0,
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(60),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: AppDimensions.lg, vertical: 8),
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.05),
-                      borderRadius: AppDimensions.roundedMd,
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
-                    ),
-                    child: TabBar(
-                      controller: _tabController,
-                      indicator: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                appBar: AppBar(
+                  // backgroundColor: AppColors.darkTextSecondary,
+                  title: TabBar(
+                    indicator: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(
+                        color: AppColors.border.withValues(alpha: 0.5),
+                        width: 0.5,
                       ),
-                      labelColor: AppColors.primary,
-                      unselectedLabelColor: AppColors.textSecondary,
-                      labelStyle: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w700),
-                      unselectedLabelStyle: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.w600),
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      dividerColor: Colors.transparent,
-                      tabs: [
-                        Tab(text: 'Clients ($customersCount)'),
-                        Tab(text: 'Items ($productsCount)'),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 5,
+                          offset: const Offset(0, 1.5),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.02),
+                          blurRadius: 2,
+                          offset: const Offset(0, 0.5),
+                        ),
                       ],
                     ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    splashFactory: NoSplash.splashFactory,
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
+                    labelPadding: EdgeInsets.zero,
+                    tabs: [
+                      Tab(
+                        child: _buildTabItem(
+                          icon: Icons.people_alt_rounded,
+                          label: 'Clients',
+                          count: customersCount,
+                          color: const Color(0xFF2563EB),
+                          lightColor: const Color(0xFFEFF6FF),
+                        ),
+                      ),
+                      Tab(
+                        child: _buildTabItem(
+                          icon: Icons.inventory_2_rounded,
+                          label: 'Items',
+                          count: productsCount,
+                          color: const Color(0xFFEA580C),
+                          lightColor: const Color(0xFFFFF7ED),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              body: TabBarView(
-                controller: _tabController,
-                children: const [
-                  CustomerListScreen(),
-                  ProductListScreen(),
-                ],
+                body: SafeArea(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: TabBarView(
+                          children: const [
+                            CustomerListScreen(),
+                            ProductListScreen(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             );
           },
         );
       },
+    );
+  }
+
+  Widget _buildTabItem({
+    required IconData icon,
+    required String label,
+    required int count,
+    required Color color,
+    required Color lightColor,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 7),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w700,
+            color: color,
+            letterSpacing: -0.2,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+          decoration: BoxDecoration(
+            color: lightColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: color.withValues(alpha: 0.25),
+              width: 0.8,
+            ),
+          ),
+          child: Text(
+            '$count',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: color,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

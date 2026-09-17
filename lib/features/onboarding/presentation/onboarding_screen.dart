@@ -1,11 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_typography.dart';
+import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_text_field.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_event.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
-import '../../business_profile/presentation/business_profile_screen.dart';
+import '../../navigation/main_nav_scaffold.dart';
+import '../../business_profile/domain/business_profile_model.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -17,13 +23,30 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  final int _totalPages = 5;
 
+  final ImagePicker _picker = ImagePicker();
+
+  // Step 1: Localization
   String _selectedLanguage = 'English';
   String _selectedCountry = 'India';
   String _selectedCurrencyCode = 'INR';
   String _selectedCurrencySymbol = '₹';
 
-  final List<String> _languages = ['English', 'Spanish', 'French', 'German'];
+  // Step 2, 3, 4: Images
+  String? _logoPath;
+  String? _signaturePath;
+  String? _stampPath;
+
+  // Step 5: Business Info
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _gstinController = TextEditingController();
+
+  final List<String> _languages = ['English', 'Spanish', 'French', 'German', 'Hindi', 'Arabic'];
   final List<Map<String, String>> _countries = [
     {'name': 'India', 'currency': 'INR', 'symbol': '₹'},
     {'name': 'United States', 'currency': 'USD', 'symbol': '\$'},
@@ -31,51 +54,155 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {'name': 'Australia', 'currency': 'AUD', 'symbol': 'A\$'},
     {'name': 'Canada', 'currency': 'CAD', 'symbol': 'C\$'},
     {'name': 'Eurozone', 'currency': 'EUR', 'symbol': '€'},
+    {'name': 'UAE', 'currency': 'AED', 'symbol': 'AED'},
+    {'name': 'Singapore', 'currency': 'SGD', 'symbol': 'S\$'},
   ];
 
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _gstinController.dispose();
+    super.dispose();
+  }
+
   void _nextPage() {
-    if (_currentPage < 2) {
+    if (_currentPage < _totalPages - 1) {
+      // Validate step 5 form if we're on it before submitting?
+      // Actually we submit on step 5.
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      _finishOnboarding();
+      _submitOnboarding();
     }
   }
 
-  Future<void> _finishOnboarding() async {
-    // Save to SharedPreferences for Language/Country if needed
+  void _previousPage() {
+    if (_currentPage > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _skipOnboarding() {
+    _finishAndNavigate(BusinessProfile(id: '')); 
+    // passing empty ID allows the bloc to create a new blank profile, or use existing
+  }
+
+
+  Future<void> _submitOnboarding() async {
+    if (_nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Business Name is required')));
+      return;
+    }
+    
+    final state = context.read<BusinessProfileBloc>().state;
+
+      BusinessProfile profile;
+      if (state is BusinessProfileLoaded) {
+        profile = state.profile.copyWith(
+          businessName: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          phone: _phoneController.text.trim(),
+          address: _addressController.text.trim(),
+          gstin: _gstinController.text.trim(),
+          currencyCode: _selectedCurrencyCode,
+          currencySymbol: _selectedCurrencySymbol,
+          logoPath: _logoPath,
+          signaturePath: _signaturePath,
+          stampPath: _stampPath,
+        );
+      } else {
+        profile = BusinessProfile(
+          id: '',
+          businessName: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          phone: _phoneController.text.trim(),
+          address: _addressController.text.trim(),
+          gstin: _gstinController.text.trim(),
+          currencyCode: _selectedCurrencyCode,
+          currencySymbol: _selectedCurrencySymbol,
+          logoPath: _logoPath,
+          signaturePath: _signaturePath,
+          stampPath: _stampPath,
+        );
+      }
+
+      _finishAndNavigate(profile);
+  }
+
+  Future<void> _finishAndNavigate(BusinessProfile profile) async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_completed_onboarding', true);
     await prefs.setString('app_language', _selectedLanguage);
     await prefs.setString('app_country', _selectedCountry);
 
-    // Update Business Profile with currency
     if (mounted) {
-      final state = context.read<BusinessProfileBloc>().state;
-      if (state is BusinessProfileLoaded) {
-        final profile = state.profile.copyWith(
-          currencyCode: _selectedCurrencyCode,
-          currencySymbol: _selectedCurrencySymbol,
-        );
+      if (profile.businessName.isNotEmpty) {
         context.read<BusinessProfileBloc>().add(UpdateBusinessProfileEvent(profile));
       }
-      
-      // Navigate to Business Setup (which will complete onboarding on save)
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => const BusinessProfileScreen(isOnboarding: true),
-        ),
+        MaterialPageRoute(builder: (_) => const MainNavScaffold()),
       );
+    }
+  }
+
+  Future<void> _pickImage(int step) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        if (step == 1) _logoPath = image.path;
+        if (step == 2) _signaturePath = image.path;
+        if (step == 3) _stampPath = image.path;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.canvas,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: _skipOnboarding,
+            child: const Text('Skip', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
+            // Progress Indicator
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Row(
+                children: List.generate(_totalPages, (index) {
+                  return Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: index <= _currentPage ? AppColors.primary : AppColors.border,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Page Content
             Expanded(
               child: PageView(
                 controller: _pageController,
@@ -86,322 +213,331 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   });
                 },
                 children: [
-                  _buildLanguageSelection(),
-                  _buildCountrySelection(),
-                  _buildCurrencySelection(),
+                  _buildStep1Localization(),
+                  _buildStepImageUpload(1, 'Upload Company Logo', 'A professional logo builds trust with your clients.', _logoPath),
+                  _buildStepImageUpload(2, 'Upload Signature', 'Digital signatures make your invoices authentic and legally compliant.', _signaturePath),
+                  _buildStepImageUpload(3, 'Upload Company Stamp', 'Optional. Add an official company stamp/seal.', _stampPath, isOptional: true),
+                  _buildStep5BusinessInfo(),
                 ],
               ),
             ),
-            _buildBottomControls(),
+
+            // Bottom Controls
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  if (_currentPage > 0) ...[
+                    OutlinedButton(
+                      onPressed: _previousPage,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                    ),
+                    const SizedBox(width: 16),
+                  ],
+                  Expanded(
+                    child: AppButton(
+                      label: _currentPage == _totalPages - 1 ? 'Complete Setup' : 'Continue',
+                      onPressed: _nextPage,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLanguageSelection() {
-    return _buildAnimatedPage(
-      icon: Icons.language,
-      title: 'Welcome to RedInvoice',
-      subtitle: 'Choose your preferred language to get started.',
-      child: ListView.builder(
-        itemCount: _languages.length,
-        itemBuilder: (context, index) {
-          final lang = _languages[index];
-          final isSelected = lang == _selectedLanguage;
-          return _buildOptionCard(
-            title: lang,
-            isSelected: isSelected,
-            onTap: () {
-              setState(() {
-                _selectedLanguage = lang;
-              });
-              Future.delayed(const Duration(milliseconds: 300), _nextPage);
-            },
-          );
-        },
-      ),
-    );
-  }
+  Widget _buildStep1Localization() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.public, size: 48, color: AppColors.primary),
+          const SizedBox(height: 16),
+          const Text('Regional Settings', style: AppTypography.displayMedium),
+          const SizedBox(height: 8),
+          const Text('Choose your preferred language, operating country, and default currency.', style: AppTypography.bodyMedium),
+          const SizedBox(height: 32),
 
-  Widget _buildCountrySelection() {
-    return _buildAnimatedPage(
-      icon: Icons.public,
-      title: 'Where are you located?',
-      subtitle: 'We use this to set up default settings for your business.',
-      child: ListView.builder(
-        itemCount: _countries.length,
-        itemBuilder: (context, index) {
-          final countryMap = _countries[index];
-          final country = countryMap['name']!;
-          final isSelected = country == _selectedCountry;
-          return _buildOptionCard(
-            title: country,
-            subtitle: 'Currency: ${countryMap['currency']}',
-            isSelected: isSelected,
-            onTap: () {
-              setState(() {
-                _selectedCountry = country;
-                _selectedCurrencyCode = countryMap['currency']!;
-                _selectedCurrencySymbol = countryMap['symbol']!;
-              });
-              Future.delayed(const Duration(milliseconds: 300), _nextPage);
-            },
-          );
-        },
-      ),
-    );
-  }
+          // Language
+          const Text('App Language', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          const SizedBox(height: 8),
+          _buildSearchableDropdown(
+            value: _selectedLanguage,
+            items: _languages,
+            onChanged: (val) => setState(() => _selectedLanguage = val),
+            icon: Icons.language,
+          ),
+          const SizedBox(height: 24),
 
-  Widget _buildCurrencySelection() {
-    final currencies = _countries.map((c) => {'code': c['currency']!, 'symbol': c['symbol']!}).toSet().toList();
-    if (!currencies.any((c) => c['code'] == 'JPY')) currencies.add({'code': 'JPY', 'symbol': '¥'});
-    if (!currencies.any((c) => c['code'] == 'CNY')) currencies.add({'code': 'CNY', 'symbol': '¥'});
-
-    return _buildAnimatedPage(
-      icon: Icons.payments,
-      title: 'Confirm Currency',
-      subtitle: 'You can always change this later in settings.',
-      child: ListView.builder(
-        itemCount: currencies.length,
-        itemBuilder: (context, index) {
-          final currency = currencies[index];
-          final isSelected = currency['code'] == _selectedCurrencyCode;
-          return _buildOptionCard(
-            title: '${currency['code']} (${currency['symbol']})',
-            isSelected: isSelected,
-            onTap: () {
+          // Country & Currency
+          const Text('Operating Country & Currency', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          const SizedBox(height: 8),
+          _buildSearchableDropdown(
+            value: _selectedCountry,
+            items: _countries.map((c) => c['name']!).toList(),
+            onChanged: (val) {
               setState(() {
-                _selectedCurrencyCode = currency['code']!;
-                _selectedCurrencySymbol = currency['symbol']!;
+                _selectedCountry = val;
+                final country = _countries.firstWhere((c) => c['name'] == val);
+                _selectedCurrencyCode = country['currency']!;
+                _selectedCurrencySymbol = country['symbol']!;
               });
             },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildAnimatedPage({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Widget child,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0.0, end: 1.0),
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeOutCubic,
-        builder: (context, value, _) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
-              Transform.scale(
-                scale: 0.8 + (0.2 * value),
-                child: Opacity(
-                  opacity: value,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(icon, size: 48, color: AppColors.primary),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Opacity(
-                opacity: value,
-                child: Transform.translate(
-                  offset: Offset(0, 20 * (1 - value)),
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primaryDark,
-                          letterSpacing: -0.5,
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Opacity(
-                opacity: value,
-                child: Transform.translate(
-                  offset: Offset(0, 20 * (1 - value)),
-                  child: Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Expanded(
-                child: Opacity(
-                  opacity: value,
-                  child: Transform.translate(
-                    offset: Offset(0, 40 * (1 - value)),
-                    child: child,
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildOptionCard({
-    required String title,
-    String? subtitle,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.border,
-          width: isSelected ? 2 : 1,
-        ),
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                )
-              ]
-            : [],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            icon: Icons.location_on_outlined,
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
             child: Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                          color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
-                        ),
-                      ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                AnimatedScale(
-                  scale: isSelected ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(Icons.check_circle, color: AppColors.primary, size: 28),
-                ),
+                const Icon(Icons.payments_outlined, color: AppColors.textSecondary, size: 20),
+                const SizedBox(width: 12),
+                const Expanded(child: Text('Default Currency', style: TextStyle(color: AppColors.textSecondary))),
+                Text('$_selectedCurrencyCode ($_selectedCurrencySymbol)', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchableDropdown({
+    required String value,
+    required List<String> items,
+    required Function(String) onChanged,
+    required IconData icon,
+  }) {
+    return InkWell(
+      onTap: () {
+        _showSearchBottomSheet(
+          title: 'Select Option',
+          items: items,
+          onSelected: onChanged,
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.primary, size: 20),
+            const SizedBox(width: 12),
+            Expanded(child: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))),
+            const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildBottomControls() {
-    return Container(
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Progress Bar
-            Expanded(
-              child: Row(
-                children: List.generate(
-                  3,
-                  (index) => Expanded(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.only(right: 8),
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: index <= _currentPage
-                            ? AppColors.primary
-                            : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(3),
+  void _showSearchBottomSheet({
+    required String title,
+    required List<String> items,
+    required Function(String) onSelected,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.5,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            String searchQuery = '';
+            return StatefulBuilder(
+              builder: (context, setModalState) {
+                final filtered = items.where((item) => item.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search...',
+                          prefixIcon: const Icon(Icons.search),
+                          filled: true,
+                          fillColor: AppColors.surfaceVariant,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        ),
+                        onChanged: (val) => setModalState(() => searchQuery = val),
                       ),
                     ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 24),
-            
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: ElevatedButton(
-                key: ValueKey<int>(_currentPage),
-                onPressed: _nextPage,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(130, 52), // Override theme infinity width
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _currentPage == 2 ? 'Let\'s Go' : 'Continue',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      _currentPage == 2 ? Icons.rocket_launch : Icons.arrow_forward_rounded, 
-                      size: 20
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: filtered.length,
+                        itemBuilder: (context, index) {
+                          final item = filtered[index];
+                          return ListTile(
+                            title: Text(item),
+                            onTap: () {
+                              onSelected(item);
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ],
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildStepImageUpload(int step, String title, String subtitle, String? imagePath, {bool isOptional = false}) {
+    final IconData icon = step == 1 ? Icons.business : (step == 2 ? Icons.draw : Icons.verified);
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 48, color: AppColors.primary),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Text(title, style: AppTypography.displayMedium),
+              if (isOptional)
+                const Padding(
+                  padding: EdgeInsets.only(left: 8),
+                  child: Text('(Optional)', style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
                 ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(subtitle, style: AppTypography.bodyMedium),
+          const SizedBox(height: 48),
+          
+          Center(
+            child: GestureDetector(
+              onTap: () => _pickImage(step),
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2, style: BorderStyle.solid),
+                  boxShadow: [
+                    BoxShadow(color: AppColors.primary.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10)),
+                  ],
+                ),
+                child: imagePath != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(22),
+                        child: Image.file(File(imagePath), fit: BoxFit.contain),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_a_photo_outlined, size: 48, color: AppColors.primary.withValues(alpha: 0.5)),
+                          const SizedBox(height: 16),
+                          const Text('Tap to Upload', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
               ),
             ),
+          ),
+          if (imagePath != null)
+            Center(
+              child: TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    if (step == 1) _logoPath = null;
+                    if (step == 2) _signaturePath = null;
+                    if (step == 3) _stampPath = null;
+                  });
+                },
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                label: const Text('Remove Image', style: TextStyle(color: Colors.red)),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStep5BusinessInfo() {
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.storefront, size: 48, color: AppColors.primary),
+            const SizedBox(height: 16),
+            const Text('Business Information', style: AppTypography.displayMedium),
+            const SizedBox(height: 8),
+            const Text('Almost done! Enter your primary business details.', style: AppTypography.bodyMedium),
+            const SizedBox(height: 32),
+
+            AppTextField(
+              label: 'Business Name',
+              controller: _nameController,
+              prefix: const Icon(Icons.business),
+              onChanged: (val) { if(val.isNotEmpty) setState((){}); },
+              
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: 'Email Address',
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              prefix: const Icon(Icons.email_outlined),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: 'Phone Number',
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              prefix: const Icon(Icons.phone_outlined),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: 'GSTIN / Tax Number',
+              controller: _gstinController,
+              prefix: const Icon(Icons.receipt_long_outlined),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: 'Address',
+              controller: _addressController,
+              prefix: const Icon(Icons.location_on_outlined),
+              maxLines: 3,
+            ),
+            const SizedBox(height: 48), // Padding for keyboard
           ],
         ),
       ),

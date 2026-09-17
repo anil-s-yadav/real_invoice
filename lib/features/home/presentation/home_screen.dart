@@ -186,6 +186,83 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Premium Welcome Offer Banner
+                  if (!isProfileConfigured)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.border),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const BusinessProfileScreen(),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.info_outline_rounded,
+                                    color: AppColors.primary,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Complete Profile',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.textPrimary,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Add your business details and logo to start creating professional invoices.',
+                                          style: TextStyle(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 13,
+                                            height: 1.3,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: AppColors.textMuted,
+                                    size: 24,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
                   if (_showPromoBanner) ...[
                     _buildPremiumPromoBanner(context),
                     const SizedBox(height: AppDimensions.xl),
@@ -224,25 +301,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildBigQuickAction(
                         context,
                         'Invoice',
-                        'assets/icons/invoice.jpg',
+                        'assets/icons/invoice.png',
                         DocumentType.invoice,
+                        fit: BoxFit.contain,
+                        imagePadding: 14.0,
                       ),
                       _buildBigQuickAction(
                         context,
                         'Quotation',
-                        'assets/icons/quotation.jpg',
+                        'assets/icons/quotation.png',
                         DocumentType.quotation,
+                        fit: BoxFit.contain,
+                        imagePadding: 14.0,
                       ),
                       _buildBigQuickAction(
                         context,
                         'Receipt',
-                        'assets/icons/receipt.jpg',
+                        'assets/icons/receipt.png',
                         DocumentType.receipt,
                       ),
                       _buildBigQuickAction(
                         context,
                         'Proforma',
-                        'assets/icons/proforma.jpg',
+                        'assets/icons/proforma.png',
                         DocumentType.proforma,
                       ),
                     ],
@@ -326,8 +407,8 @@ class _HomeScreenState extends State<HomeScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primary.withValues(alpha: 0.85),
-            AppColors.primary.withValues(alpha: 0.65),
+            AppColors.primaryDark,
+            AppColors.primaryDark.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -409,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         CurrencyFormatter.formatCompact(stats.overdueTotal),
                         style: const TextStyle(
-                          color: Color(0xFFFF6B6B),
+                          color: Colors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                         ),
@@ -460,7 +541,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         CurrencyFormatter.formatCompact(stats.paidTotal),
                         style: const TextStyle(
-                          color: Color(0xFF6EE7B7),
+                          color: Colors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                         ),
@@ -480,8 +561,10 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context,
     String label,
     String imagePath,
-    DocumentType type,
-  ) {
+    DocumentType type, {
+    BoxFit fit = BoxFit.cover,
+    double imagePadding = 0.0,
+  }) {
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -494,24 +577,27 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: AspectRatio(
                 aspectRatio: 1,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                        color: Colors.black.withValues(alpha: 0.12),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(imagePath, fit: BoxFit.cover),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: EdgeInsets.all(imagePadding),
+                      child: Image.asset(imagePath, fit: fit),
+                    ),
                   ),
                 ),
               ),
@@ -521,7 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label,
               style: const TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
               textAlign: TextAlign.center,
@@ -534,7 +620,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-// The _buildSettingsTile method was removed since we are now using the globally shared SettingsTile.
+  // The _buildSettingsTile method was removed since we are now using the globally shared SettingsTile.
 
   Widget _buildPremiumPromoBanner(BuildContext context) {
     return Stack(
@@ -588,7 +674,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         children: [
                           const Text(
-                            '1 Year Free Premium',
+                            'Welcome Offer!',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -606,7 +692,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: const Text(
-                              'LIMITED',
+                              'LIMITED TIME OFFER',
                               style: TextStyle(
                                 color: Color(0xFFDD2476),
                                 fontSize: 9,
@@ -619,10 +705,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Welcome offer! Tap to claim your free access.',
+                        '1 Year Free Premium, Tap to claim!.',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.9),
-                          fontSize: 12,
+                          fontSize: 13,
                         ),
                       ),
                     ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_card.dart';
@@ -37,7 +36,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
       body: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
           if (state is ProductLoading) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
 
           if (state is ProductLoaded) {
@@ -54,7 +55,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
               return EmptyStateView(
                 icon: Icons.inventory_2_outlined,
                 title: 'No items or services yet',
-                description: 'Add your offerings once to insert them into invoices with one tap.',
+                description:
+                    'Add your offerings once to insert them into invoices with one tap.',
                 actionLabel: 'Add Product / Service',
                 onAction: () => ProductEditorSheet.show(context),
               );
@@ -69,11 +71,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     height: 44,
                     child: TextField(
                       controller: _searchController,
-                      onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                      onChanged: (val) =>
+                          setState(() => _searchQuery = val.trim()),
                       decoration: InputDecoration(
                         hintText: 'Search items, services, HSN...',
                         hintStyle: const TextStyle(color: AppColors.textMuted),
-                        prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.textMuted),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          size: 20,
+                          color: AppColors.textMuted,
+                        ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
                                 icon: const Icon(Icons.clear, size: 18),
@@ -85,9 +92,22 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             : null,
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.5))),
-                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primary)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0,
+                          horizontal: 16,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.border.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -101,7 +121,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           ),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           itemCount: filtered.length,
                           itemBuilder: (context, index) {
                             final product = filtered[index];
@@ -117,7 +140,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
             return Center(
               child: Text(
                 'Unable to load items: ${state.message}',
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.statusOverdueText),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.statusOverdueText,
+                ),
               ),
             );
           }
@@ -145,8 +170,11 @@ class _ProductItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isService = product.unit == 'hrs' || product.unit == 'service' || product.unit == 'days';
-    
+    final isService =
+        product.unit == 'hrs' ||
+        product.unit == 'service' ||
+        product.unit == 'days';
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: AppCard(
@@ -159,12 +187,16 @@ class _ProductItemCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: (isService ? Colors.purple : Colors.blue).withValues(alpha: 0.1),
+                color: (isService ? Colors.purple : Colors.blue).withValues(
+                  alpha: 0.1,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
               child: Icon(
-                isService ? Icons.design_services_outlined : Icons.inventory_2_outlined,
+                isService
+                    ? Icons.design_services_outlined
+                    : Icons.inventory_2_outlined,
                 color: isService ? Colors.purple : Colors.blue,
                 size: 24,
               ),
@@ -180,7 +212,11 @@ class _ProductItemCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           product.title,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textPrimary),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: AppColors.textPrimary,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -188,15 +224,23 @@ class _ProductItemCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         CurrencyFormatter.format(product.unitPrice),
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.primary),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ],
                   ),
-                  if (product.description != null && product.description!.isNotEmpty) ...[
+                  if (product.description != null &&
+                      product.description!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       product.description!,
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -207,41 +251,71 @@ class _ProductItemCard extends StatelessWidget {
                     runSpacing: 4,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                          border: Border.all(
+                            color: AppColors.border.withValues(alpha: 0.5),
+                          ),
                         ),
                         child: Text(
-                          isService ? 'Service (${product.unit})' : 'Product (${product.unit})',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                          isService
+                              ? 'Service (${product.unit})'
+                              : 'Product (${product.unit})',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
-                      if (product.hsnSacCode != null && product.hsnSacCode!.isNotEmpty)
+                      if (product.hsnSacCode != null &&
+                          product.hsnSacCode!.isNotEmpty)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                            border: Border.all(
+                              color: AppColors.border.withValues(alpha: 0.5),
+                            ),
                           ),
                           child: Text(
                             '${isService ? 'SAC' : 'HSN'}: ${product.hsnSacCode}',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ),
                       if (product.defaultTaxPercent > 0)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                            border: Border.all(
+                              color: AppColors.border.withValues(alpha: 0.5),
+                            ),
                           ),
                           child: Text(
                             'GST ${product.defaultTaxPercent.toStringAsFixed(0)}%',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ),
                     ],
@@ -250,9 +324,15 @@ class _ProductItemCard extends StatelessWidget {
               ),
             ),
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textMuted),
+              icon: const Icon(
+                Icons.more_vert,
+                size: 20,
+                color: AppColors.textMuted,
+              ),
               padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               onSelected: (val) async {
                 if (val == 'edit') {
                   ProductEditorSheet.show(context, product: product);
@@ -260,23 +340,45 @@ class _ProductItemCard extends StatelessWidget {
                   final confirmed = await ConfirmDialog.show(
                     context,
                     title: 'Delete Item?',
-                    message: 'Are you sure you want to delete "${product.title}"? Past documents will remain unaffected.',
+                    message:
+                        'Are you sure you want to delete "${product.title}"? Past documents will remain unaffected.',
                     confirmLabel: 'Delete',
                     isDestructive: true,
                   );
                   if (confirmed && context.mounted) {
-                    context.read<ProductBloc>().add(DeleteProductEvent(product.id));
+                    context.read<ProductBloc>().add(
+                      DeleteProductEvent(product.id),
+                    );
                   }
                 }
               },
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'edit',
-                  child: Row(children: [Icon(Icons.edit_outlined, size: 18), SizedBox(width: 12), Text('Edit')]),
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit_outlined, size: 18),
+                      SizedBox(width: 12),
+                      Text('Edit'),
+                    ],
+                  ),
                 ),
                 const PopupMenuItem(
                   value: 'delete',
-                  child: Row(children: [Icon(Icons.delete_outline, size: 18, color: AppColors.statusOverdueText), SizedBox(width: 12), Text('Delete', style: TextStyle(color: AppColors.statusOverdueText))]),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete_outline,
+                        size: 18,
+                        color: AppColors.statusOverdueText,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        'Delete',
+                        style: TextStyle(color: AppColors.statusOverdueText),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

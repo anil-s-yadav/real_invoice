@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_event.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 import '../../business_profile/domain/business_profile_model.dart';
-import 'package:uuid/uuid.dart';
 
 class PaymentDetailsListScreen extends StatefulWidget {
   const PaymentDetailsListScreen({super.key});
@@ -51,13 +51,269 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
     );
   }
 
+  Widget _buildSamplePreviewCard(
+    BusinessProfile profile,
+    List<PaymentDetail> details,
+  ) {
+    final hasDetails = details.isNotEmpty;
+    final bankDetails = details.where((p) => p.type == 'Bank').toList();
+    final upiDetails = details.where((p) => p.type == 'UPI').toList();
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: hasDetails
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : AppColors.border,
+          width: hasDetails ? 1.5 : 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header strip
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: hasDetails
+                  ? AppColors.primary.withValues(alpha: 0.05)
+                  : AppColors.surfaceVariant.withValues(alpha: 0.6),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(15),
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: hasDetails
+                      ? AppColors.primary.withValues(alpha: 0.1)
+                      : AppColors.border,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      hasDetails
+                          ? Icons.verified_rounded
+                          : Icons.visibility_outlined,
+                      size: 16,
+                      color: hasDetails
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      hasDetails
+                          ? 'Document Preview (Live)'
+                          : 'Sample Preview (On Documents)',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: hasDetails
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: hasDetails
+                        ? AppColors.primary.withValues(alpha: 0.1)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: hasDetails
+                          ? AppColors.primary.withValues(alpha: 0.2)
+                          : AppColors.border,
+                    ),
+                  ),
+                  child: Text(
+                    hasDetails ? 'ACTIVE' : 'SAMPLE',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                      color: hasDetails
+                          ? AppColors.primary
+                          : AppColors.textMuted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Simulated document payment block
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // QR Box Mock
+                Column(
+                  children: [
+                    Container(
+                      width: 68,
+                      height: 68,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: AppColors.borderStrong,
+                          width: 1,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.qr_code_2_rounded,
+                        size: 56,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Scan to Pay (UPI)',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+
+                // Details column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'PAYMENT DETAILS',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      if (hasDetails) ...[
+                        if (upiDetails.isNotEmpty)
+                          ...upiDetails.map(
+                            (u) => Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                'UPI (${u.title}): ${u.details}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (bankDetails.isNotEmpty)
+                          ...bankDetails.map(
+                            (b) => Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Bank: ${b.title}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  'A/C: ${b.details}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                if (b.extra != null && b.extra!.isNotEmpty)
+                                  Text(
+                                    'IFSC: ${b.extra}',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                const SizedBox(height: 4),
+                              ],
+                            ),
+                          ),
+                      ] else ...[
+                        const Text(
+                          'UPI (GPay / PhonePe): merchant@okaxis',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Bank: HDFC Bank',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const Text(
+                          'A/C: 50200012345678',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const Text(
+                          'IFSC: HDFC0001234',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: const Text(
-          'Payment Methods',
+          'Payment Profiles & QR Code',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -77,153 +333,228 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
               : const BusinessProfile();
           final details = profile.paymentDetails;
 
-          if (details.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.account_balance_wallet_outlined,
-                      size: 48,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'No payment methods added',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Add a bank account or UPI ID to get paid faster.',
-                    style: TextStyle(color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton.icon(
-                    onPressed: () => _showAddPaymentSheet(context, profile),
-                    icon: const Icon(Icons.add),
-                    label: const Text(
-                      'Add Payment Method',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: details.length,
-            itemBuilder: (context, index) {
-              final item = details[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.border.withValues(alpha: 0.5),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.02),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        item.type == 'Bank'
-                            ? Icons.account_balance
-                            : Icons.qr_code,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    title: Text(
-                      item.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        item.type == 'Bank'
-                            ? 'A/C: ${item.details}${item.extra != null ? '\nIFSC: ${item.extra}' : ''}'
-                            : 'UPI: ${item.details}',
-                        style: const TextStyle(
+          return CustomScrollView(
+            slivers: [
+              // 1. Informational header
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Your banking information and instant UPI payment QR code are printed automatically at the bottom of your invoices, quotations, and receipts.',
+                        style: TextStyle(
+                          fontSize: 13,
                           color: AppColors.textSecondary,
                           height: 1.4,
                         ),
                       ),
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      onPressed: () =>
-                          _deletePayment(context, profile, item.id),
-                    ),
-                    isThreeLine:
-                        item.type == 'Bank' &&
-                        item.extra != null &&
-                        item.extra!.isNotEmpty,
+                    ],
                   ),
                 ),
-              );
-            },
+              ),
+
+              // 2. Sample Preview Card
+              SliverToBoxAdapter(
+                child: _buildSamplePreviewCard(profile, details),
+              ),
+
+              // 3. Section Title & Add Action
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'ADDED METHODS (${details.length})',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.8,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      if (details.isNotEmpty)
+                        TextButton.icon(
+                          onPressed: () =>
+                              _showAddPaymentSheet(context, profile),
+                          icon: const Icon(Icons.add_circle_outline, size: 16),
+                          label: const Text(
+                            'Add New',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 4. List of Added Methods or Empty State (properly wrapped in Slivers)
+              if (details.isEmpty)
+                SliverToBoxAdapter(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Column(
+                      children: [
+                        const Icon(
+                          Icons.account_balance_wallet_outlined,
+                          size: 40,
+                          color: AppColors.textMuted,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'No Payment Profiles added yet',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Add your bank account or UPI ID to make it easy for your clients to pay you directly.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          onPressed: () =>
+                              _showAddPaymentSheet(context, profile),
+                          icon: const Icon(Icons.add_rounded, size: 20),
+                          label: const Text(
+                            'Add Bank Account or UPI',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 14,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else ...[
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final item = details[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppColors.border.withValues(alpha: 0.8),
+                            ),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            leading: Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.08,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              alignment: Alignment.center,
+                              child: Icon(
+                                item.type == 'Bank'
+                                    ? Icons.account_balance_rounded
+                                    : Icons.qr_code_rounded,
+                                color: AppColors.primary,
+                                size: 22,
+                              ),
+                            ),
+                            title: Text(
+                              item.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 3),
+                              child: Text(
+                                item.type == 'Bank'
+                                    ? 'A/C: ${item.details}${item.extra != null && item.extra!.isNotEmpty ? '  •  IFSC: ${item.extra}' : ''}'
+                                    : 'UPI: ${item.details}',
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: Colors.redAccent,
+                                size: 22,
+                              ),
+                              onPressed: () =>
+                                  _deletePayment(context, profile, item.id),
+                            ),
+                          ),
+                        ),
+                      );
+                    }, childCount: details.length),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showAddPaymentSheet(context, profile),
+                      icon: const Icon(Icons.add_rounded),
+                      label: const Text(
+                        'Add Another Method',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: const BorderSide(color: AppColors.primary),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
           );
         },
       ),
-      floatingActionButton:
-          BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
-            builder: (context, state) {
-              final profile = state is BusinessProfileLoaded
-                  ? state.profile
-                  : const BusinessProfile();
-              if (profile.paymentDetails.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              return FloatingActionButton(
-                onPressed: () => _showAddPaymentSheet(context, profile),
-                backgroundColor: AppColors.primary,
-                child: const Icon(Icons.add, color: Colors.white),
-              );
-            },
-          ),
     );
   }
 }
@@ -282,7 +613,7 @@ class _AddPaymentSheetState extends State<_AddPaymentSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Add Payment Method',
+              'Add Payment Profile',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
@@ -331,7 +662,7 @@ class _AddPaymentSheetState extends State<_AddPaymentSheet> {
                 ),
               ),
               child: const Text(
-                'Save Payment Method',
+                'Save Payment Profile',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),

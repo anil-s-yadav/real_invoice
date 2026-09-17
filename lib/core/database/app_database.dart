@@ -27,7 +27,7 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 5,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
@@ -39,7 +39,7 @@ class AppDatabase {
         await db.execute(DatabaseTables.createDocumentItems);
         await db.execute(DatabaseTables.createPaymentRecords);
       },
-      onUpgrade: (db, oldVersion, newVersion) async {
+            onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           try {
             await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultInvoiceTemplateId TEXT');
@@ -47,9 +47,24 @@ class AppDatabase {
             await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultReceiptTemplateId TEXT');
             await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultProformaTemplateId TEXT');
             await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN paymentDetailsJson TEXT');
-          } catch (_) {
-            // Ignore if columns already exist
-          }
+          } catch (_) {}
+        }
+        if (oldVersion < 3) {
+          try {
+            await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN stampPath TEXT');
+          } catch (_) {}
+        }
+        if (oldVersion < 4) {
+          try {
+            await db.execute('ALTER TABLE  ADD COLUMN poNumber TEXT');
+            await db.execute('ALTER TABLE  ADD COLUMN subject TEXT');
+            await db.execute('ALTER TABLE  ADD COLUMN shippingCharges REAL DEFAULT 0.0');
+          } catch (_) {}
+        }
+        if (oldVersion < 5) {
+          try {
+            await db.execute('ALTER TABLE  ADD COLUMN includePaymentDetails INTEGER DEFAULT 1');
+          } catch (_) {}
         }
       },
     );

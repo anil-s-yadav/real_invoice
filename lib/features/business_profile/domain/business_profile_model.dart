@@ -51,6 +51,7 @@ class BusinessProfile {
   final String? ifscCode;
   final String? upiId;
   final String? signaturePath;
+  final String? stampPath;
   final String defaultTerms;
   final String defaultNotes;
   final String currencyCode;
@@ -76,6 +77,7 @@ class BusinessProfile {
     this.ifscCode,
     this.upiId,
     this.signaturePath,
+    this.stampPath,
     this.defaultTerms = '1. Payment is due within 15 days of invoice date.\n2. Please mention invoice number in bank transfer/UPI notes.',
     this.defaultNotes = 'Thank you for your business!',
     this.currencyCode = 'INR',
@@ -104,6 +106,7 @@ class BusinessProfile {
     String? ifscCode,
     String? upiId,
     String? signaturePath,
+    String? stampPath,
     String? defaultTerms,
     String? defaultNotes,
     String? currencyCode,
@@ -129,6 +132,7 @@ class BusinessProfile {
       ifscCode: ifscCode ?? this.ifscCode,
       upiId: upiId ?? this.upiId,
       signaturePath: signaturePath ?? this.signaturePath,
+      stampPath: stampPath ?? this.stampPath,
       defaultTerms: defaultTerms ?? this.defaultTerms,
       defaultNotes: defaultNotes ?? this.defaultNotes,
       currencyCode: currencyCode ?? this.currencyCode,
@@ -157,6 +161,7 @@ class BusinessProfile {
       'ifscCode': ifscCode,
       'upiId': upiId,
       'signaturePath': signaturePath,
+      'stampPath': stampPath,
       'defaultTerms': defaultTerms,
       'defaultNotes': defaultNotes,
       'currencyCode': currencyCode,
@@ -195,6 +200,7 @@ class BusinessProfile {
       ifscCode: map['ifscCode'] as String?,
       upiId: map['upiId'] as String?,
       signaturePath: map['signaturePath'] as String?,
+      stampPath: map['stampPath'] as String?,
       defaultTerms: map['defaultTerms'] as String? ?? '1. Payment is due within 15 days.',
       defaultNotes: map['defaultNotes'] as String? ?? 'Thank you for your business!',
       currencyCode: map['currencyCode'] as String? ?? 'INR',

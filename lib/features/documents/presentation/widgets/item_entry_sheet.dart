@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -9,10 +8,9 @@ import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
-import '../../../products/bloc/product_bloc.dart';
-import '../../../products/bloc/product_state.dart';
 import '../../../products/domain/product_model.dart';
 import '../../domain/document_item_model.dart';
+import 'product_select_sheet.dart';
 
 class ItemEntrySheet extends StatefulWidget {
   final String documentId;
@@ -141,6 +139,28 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
     Navigator.of(context).pop(item);
   }
 
+  InputDecoration _dropdownDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -153,43 +173,41 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Quick catalog chips if available
-          BlocBuilder<ProductBloc, ProductState>(
-            builder: (context, state) {
-              if (state is ProductLoaded && state.products.isNotEmpty) {
-                final products = state.products;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Quick Pick from Catalog',
-                      style: AppTypography.titleSmall.copyWith(fontSize: 12, color: AppColors.textSecondary),
-                    ),
-                    const SizedBox(height: 6),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: products.map((p) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 6),
-                            child: ActionChip(
-                              avatar: const Icon(Icons.bolt, size: 14, color: AppColors.accentGold),
-                              label: Text('${p.title} (${CurrencyFormatter.format(p.unitPrice, decimalDigits: 0)})'),
-                              backgroundColor: AppColors.surfaceVariant,
-                              side: const BorderSide(color: AppColors.border),
-                              onPressed: () => _onSelectProductFromCatalog(p),
-                            ),
-                          );
-                        }).toList(),
+          // Search Saved Items Action
+          InkWell(
+            onTap: () async {
+              final product = await ProductSelectSheet.show(context);
+              if (product != null) {
+                _onSelectProductFromCatalog(product);
+              }
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.search, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Search saved items from catalog...',
+                      style: AppTypography.titleSmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: AppDimensions.md),
-                  ],
-                );
-              }
-              return const SizedBox.shrink();
-            },
+                  ),
+                  const Icon(Icons.chevron_right, color: AppColors.primary, size: 20),
+                ],
+              ),
+            ),
           ),
+          const SizedBox(height: AppDimensions.xl),
 
           // Title
           AppTextField(
@@ -208,69 +226,19 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Quantity with stepper
               Expanded(
-                flex: 4,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Quantity *', style: AppTypography.titleSmall.copyWith(fontSize: 13)),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        IconButton.filledTonal(
-                          icon: const Icon(Icons.remove, size: 16),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppColors.surfaceVariant,
-                            padding: const EdgeInsets.all(8),
-                            minimumSize: const Size(36, 36),
-                          ),
-                          onPressed: () {
-                            final current = _currentQty;
-                            if (current > 1) {
-                              setState(() {
-                                _qtyController.text = (current - 1).toString();
-                              });
-                            }
-                          },
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: TextField(
-                            controller: _qtyController,
-                            textAlign: TextAlign.center,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            onChanged: (_) => setState(() {}),
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(vertical: 10),
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        IconButton.filledTonal(
-                          icon: const Icon(Icons.add, size: 16),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppColors.surfaceVariant,
-                            padding: const EdgeInsets.all(8),
-                            minimumSize: const Size(36, 36),
-                          ),
-                          onPressed: () {
-                            final current = _currentQty;
-                            setState(() {
-                              _qtyController.text = (current + 1).toString();
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                flex: 2,
+                child: AppTextField(
+                  controller: _qtyController,
+                  label: 'Qty *',
+                  hint: '1',
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (_) => setState(() {}),
                 ),
               ),
               const SizedBox(width: AppDimensions.md),
-              // Unit price
               Expanded(
-                flex: 5,
+                flex: 3,
                 child: AppTextField(
                   controller: _priceController,
                   label: 'Unit Price *',
@@ -291,34 +259,34 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
           ),
           const SizedBox(height: AppDimensions.md),
 
-          // Units
-          Text('Unit', style: AppTypography.titleSmall.copyWith(fontSize: 13)),
-          const SizedBox(height: 6),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _commonUnits.map((unit) {
-                final isSelected = _selectedUnit == unit;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: ChoiceChip(
-                    label: Text(unit),
-                    selected: isSelected,
-                    selectedColor: AppColors.primaryLight,
-                    backgroundColor: AppColors.surface,
-                    labelStyle: TextStyle(
-                      color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                      fontSize: 12,
-                    ),
-                    side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
-                    onSelected: (selected) {
-                      if (selected) setState(() => _selectedUnit = unit);
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
+          // Unit & Tax Rate
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: _selectedUnit,
+                  decoration: _dropdownDecoration('Unit'),
+                  items: _commonUnits.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
+                  onChanged: (val) {
+                    if (val != null) setState(() => _selectedUnit = val);
+                  },
+                ),
+              ),
+              const SizedBox(width: AppDimensions.md),
+              Expanded(
+                child: DropdownButtonFormField<double>(
+                  value: _taxPercent,
+                  decoration: _dropdownDecoration('GST Tax'),
+                  items: _taxRates.map((r) => DropdownMenuItem(
+                    value: r, 
+                    child: Text(r == 0 ? 'Exempt (0%)' : '%'),
+                  )).toList(),
+                  onChanged: (val) {
+                    if (val != null) setState(() => _taxPercent = val);
+                  },
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: AppDimensions.md),
 
@@ -351,32 +319,6 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
           ),
           const SizedBox(height: AppDimensions.md),
 
-          // GST Tax Rate Chips
-          Text('GST Tax Rate', style: AppTypography.titleSmall.copyWith(fontSize: 13)),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 6,
-            children: _taxRates.map((rate) {
-              final isSelected = _taxPercent == rate;
-              return ChoiceChip(
-                label: Text(rate == 0 ? 'Exempt (0%)' : '${rate.toStringAsFixed(0)}%'),
-                selected: isSelected,
-                selectedColor: AppColors.primaryLight,
-                backgroundColor: AppColors.surface,
-                labelStyle: TextStyle(
-                  color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  fontSize: 12,
-                ),
-                side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
-                onSelected: (selected) {
-                  if (selected) setState(() => _taxPercent = rate);
-                },
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: AppDimensions.md),
-
           AppTextField(
             controller: _descController,
             label: 'Description / Inclusions (Optional)',
@@ -406,9 +348,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('GST ($_taxPercent%)', style: AppTypography.bodySmall),
+                      Text('GST (%)', style: AppTypography.bodySmall),
                       Text(
-                        '+ ${CurrencyFormatter.format(_taxAmount)}',
+                        '+ ',
                         style: AppTypography.tabularNumbers.copyWith(fontSize: 13, color: AppColors.accentNavy),
                       ),
                     ],

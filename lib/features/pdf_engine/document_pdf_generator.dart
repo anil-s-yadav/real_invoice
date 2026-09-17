@@ -648,6 +648,8 @@ class DocumentPdfGenerator {
     PdfColor accentColor, {
     bool isCompact = false,
   }) {
+    if (!doc.includePaymentDetails) return pw.Container();
+
     // Extract payment details
     final bankDetails = profile.paymentDetails.where((p) => p.type == 'Bank').toList();
     final upiDetails = profile.paymentDetails.where((p) => p.type == 'UPI').toList();
@@ -666,7 +668,7 @@ class DocumentPdfGenerator {
     final hasUpi = upiDetails.isNotEmpty;
 
     if (!hasBank && !hasUpi) {
-      return pw.SizedBox.shrink();
+      return pw.Container();
     }
 
     // Generate UPI QR for the first UPI ID found

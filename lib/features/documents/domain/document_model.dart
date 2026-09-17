@@ -55,6 +55,10 @@ class DocumentModel {
   final List<PaymentRecord> payments;
   final double overallDiscountValue;
   final DiscountType overallDiscountType;
+  final String? poNumber;
+  final String? subject;
+  final double shippingCharges;
+  final bool includePaymentDetails;
   final String templateId; // 'modern_crimson', 'minimal', 'professional', 'elegant', 'compact', 'bold'
   final String? notes;
   final String? terms;
@@ -75,6 +79,10 @@ class DocumentModel {
     this.payments = const [],
     this.overallDiscountValue = 0.0,
     this.overallDiscountType = DiscountType.percentage,
+    this.poNumber,
+    this.subject,
+    this.shippingCharges = 0.0,
+    this.includePaymentDetails = true,
     this.templateId = 'modern_crimson',
     this.notes,
     this.terms,
@@ -108,7 +116,7 @@ class DocumentModel {
   double get totalTaxAmount => items.fold(0.0, (sum, item) => sum + item.taxAmount);
 
   /// Net amount before roundoff
-  double get rawTotalAmount => taxableAmount + totalTaxAmount;
+  double get rawTotalAmount => taxableAmount + totalTaxAmount + shippingCharges;
 
   /// Round-off adjustment to nearest integer (standard in Indian invoices)
   double get roundOff => (rawTotalAmount.roundToDouble() - rawTotalAmount);
@@ -159,6 +167,10 @@ class DocumentModel {
     List<PaymentRecord>? payments,
     double? overallDiscountValue,
     DiscountType? overallDiscountType,
+    String? poNumber,
+    String? subject,
+    double? shippingCharges,
+    bool? includePaymentDetails,
     String? templateId,
     String? notes,
     String? terms,
@@ -179,6 +191,10 @@ class DocumentModel {
       payments: payments ?? this.payments,
       overallDiscountValue: overallDiscountValue ?? this.overallDiscountValue,
       overallDiscountType: overallDiscountType ?? this.overallDiscountType,
+      poNumber: poNumber ?? this.poNumber,
+      subject: subject ?? this.subject,
+      shippingCharges: shippingCharges ?? this.shippingCharges,
+      includePaymentDetails: includePaymentDetails ?? this.includePaymentDetails,
       templateId: templateId ?? this.templateId,
       notes: notes ?? this.notes,
       terms: terms ?? this.terms,
@@ -200,6 +216,10 @@ class DocumentModel {
       'status': status.name,
       'overallDiscountValue': overallDiscountValue,
       'overallDiscountType': overallDiscountType.name,
+      'poNumber': poNumber,
+      'subject': subject,
+      'shippingCharges': shippingCharges,
+      'includePaymentDetails': includePaymentDetails ? 1 : 0,
       'templateId': templateId,
       'notes': notes,
       'terms': terms,
@@ -249,6 +269,10 @@ class DocumentModel {
         (e) => e.name == map['overallDiscountType'],
         orElse: () => DiscountType.percentage,
       ),
+      poNumber: map['poNumber'] as String?,
+      subject: map['subject'] as String?,
+      shippingCharges: (map['shippingCharges'] as num?)?.toDouble() ?? 0.0,
+      includePaymentDetails: (map['includePaymentDetails'] as int? ?? 1) == 1,
       templateId: map['templateId'] as String? ?? 'modern_crimson',
       notes: map['notes'] as String?,
       terms: map['terms'] as String?,

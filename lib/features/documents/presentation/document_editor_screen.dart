@@ -1,12 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_dimensions.dart';
-import '../../../core/constants/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
-import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/status_badge.dart';
@@ -42,6 +39,9 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   late String _documentId;
   late DocumentType _docType;
   late TextEditingController _docNumberController;
+  late TextEditingController _poNumberController;
+  late TextEditingController _subjectController;
+  late TextEditingController _shippingController;
   late DateTime _issueDate;
   late DateTime _dueDate;
   Customer? _selectedCustomer;
@@ -53,6 +53,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   late String _templateId;
   bool _isSaving = false;
   bool _isInitialized = false;
+  bool _includePaymentDetails = false;
 
   @override
   void initState() {
@@ -61,7 +62,15 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     _documentId = doc?.id ?? const Uuid().v4();
     _docType = doc?.docType ?? widget.initialType;
     _docNumberController = TextEditingController(text: doc?.docNumber ?? '');
+    _poNumberController = TextEditingController(text: doc?.poNumber ?? '');
+    _subjectController = TextEditingController(text: doc?.subject ?? '');
+    _shippingController = TextEditingController(
+      text: doc != null && doc.shippingCharges > 0
+          ? doc.shippingCharges.toStringAsFixed(2)
+          : '',
+    );
     _issueDate = doc?.issueDate ?? DateTime.now();
+    _includePaymentDetails = doc?.includePaymentDetails ?? true;
     _dueDate = doc?.dueDate ?? DateTime.now().add(const Duration(days: 15));
     _selectedCustomer = doc?.customerSnapshot;
     _items = doc?.items != null ? List.from(doc!.items) : [];
@@ -123,6 +132,9 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   @override
   void dispose() {
     _docNumberController.dispose();
+    _poNumberController.dispose();
+    _subjectController.dispose();
+    _shippingController.dispose();
     _notesController.dispose();
     _termsController.dispose();
     super.dispose();
@@ -212,6 +224,14 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
       overallDiscountValue: _overallDiscountValue,
       overallDiscountType: _overallDiscountType,
       templateId: _templateId,
+      includePaymentDetails: _includePaymentDetails,
+      poNumber: _poNumberController.text.trim().isNotEmpty
+          ? _poNumberController.text.trim()
+          : null,
+      subject: _subjectController.text.trim().isNotEmpty
+          ? _subjectController.text.trim()
+          : null,
+      shippingCharges: double.tryParse(_shippingController.text) ?? 0.0,
       notes: _notesController.text.trim().isNotEmpty
           ? _notesController.text.trim()
           : null,
@@ -230,6 +250,32 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     }
 
     return document;
+  }
+
+  void _onTogglePaymentDetails(bool val) {
+    if (val) {
+      final profileState = context.read<BusinessProfileBloc>().state;
+      if (profileState is BusinessProfileLoaded) {
+        final p = profileState.profile;
+        final hasDetails =
+            p.paymentDetails.isNotEmpty ||
+            (p.bankName != null && p.bankName!.isNotEmpty) ||
+            (p.upiId != null && p.upiId!.isNotEmpty);
+        if (!hasDetails) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Please add bank or UPI details in Business Profile first.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          setState(() => _includePaymentDetails = false);
+          return;
+        }
+      }
+    }
+    setState(() => _includePaymentDetails = val);
   }
 
   Future<void> _handleSaveAndPreview() async {
@@ -296,8 +342,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // 1. Document Type Switcher Pills
-              _buildDocTypePills(),
-              const SizedBox(height: 16),
+              // _buildDocTypePills(),
+              // const SizedBox(height: 16),
 
               // 2. Document Meta Card (Number + Dates)
               _buildMetaCard(),
@@ -311,6 +357,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               // 4. Line Items Section
               _buildSectionTitle('LINE ITEMS'),
               _buildItemsSection(),
+              const SizedBox(height: 24),
+
+              _buildSectionTitle('DETAILS (OPTIONAL)'),
+              _buildOptionalFields(),
               const SizedBox(height: 24),
 
               // 5. Totals & Tax Summary Card
@@ -346,108 +396,118 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     );
   }
 
-  Widget _buildDocTypePills() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: DocumentType.values.map((type) {
-          final isSelected = _docType == type;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () async {
-                if (!isSelected) {
-                  setState(() => _docType = type);
-                  final nextNum = await context
-                      .read<DocumentRepository>()
-                      .getNextDocumentNumber(type);
-                  if (mounted) {
-                    setState(() => _docNumberController.text = nextNum);
-                  }
-                }
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isSelected ? AppColors.primary : AppColors.border,
-                    width: 1,
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Text(
-                  type.displayName,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.textPrimary,
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+  // Widget _buildDocTypePills() {
+  //   return SingleChildScrollView(
+  //     scrollDirection: Axis.horizontal,
+  //     child: Row(
+  //       children: DocumentType.values.map((type) {
+  //         final isSelected = _docType == type;
+  //         return Padding(
+  //           padding: const EdgeInsets.only(right: 8),
+  //           child: GestureDetector(
+  //             onTap: () async {
+  //               if (!isSelected) {
+  //                 setState(() => _docType = type);
+  //                 final nextNum = await context
+  //                     .read<DocumentRepository>()
+  //                     .getNextDocumentNumber(type);
+  //                 if (mounted) {
+  //                   setState(() => _docNumberController.text = nextNum);
+  //                 }
+  //               }
+  //             },
+  //             child: AnimatedContainer(
+  //               duration: const Duration(milliseconds: 200),
+  //               padding: const EdgeInsets.symmetric(
+  //                 horizontal: 16,
+  //                 vertical: 8,
+  //               ),
+  //               decoration: BoxDecoration(
+  //                 color: isSelected ? AppColors.primary : Colors.white,
+  //                 borderRadius: BorderRadius.circular(20),
+  //                 border: Border.all(
+  //                   color: isSelected ? AppColors.primary : AppColors.border,
+  //                   width: 1,
+  //                 ),
+  //                 boxShadow: isSelected
+  //                     ? [
+  //                         BoxShadow(
+  //                           color: AppColors.primary.withValues(alpha: 0.3),
+  //                           blurRadius: 8,
+  //                           offset: const Offset(0, 4),
+  //                         ),
+  //                       ]
+  //                     : [],
+  //               ),
+  //               child: Text(
+  //                 type.displayName,
+  //                 style: TextStyle(
+  //                   color: isSelected ? Colors.white : AppColors.textPrimary,
+  //                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+  //                   fontSize: 13,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         );
+  //       }).toList(),
+  //     ),
+  //   );
+  // }
 
   Widget _buildMetaCard() {
     return AppCard(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.tag,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.tag_rounded,
                   size: 20,
-                  color: AppColors.primary,
+                  color: AppColors.textMuted,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextField(
-                  controller: _docNumberController,
-                  textCapitalization: TextCapitalization.characters,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: '${_docType.displayName} Number',
-                    labelStyle: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 12,
-                    ),
-                    hintText: 'e.g. INV-2026-0001',
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${_docType.displayName} No',
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      TextField(
+                        controller: _docNumberController,
+                        textCapitalization: TextCapitalization.characters,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          color: AppColors.textPrimary,
+                          letterSpacing: 0.5,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: 'e.g. INV-2026-0001',
+                          hintStyle: TextStyle(
+                            color: AppColors.textMuted,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 15,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 8),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
@@ -524,6 +584,43 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildOptionalFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AppTextField(
+          controller: _subjectController,
+          label: 'Subject / Title (Optional)',
+          hint: 'e.g. Website Redesign Project',
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: AppTextField(
+                controller: _poNumberController,
+                label: 'PO Number (Optional)',
+                hint: 'e.g. PO-1234',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: AppTextField(
+                controller: _shippingController,
+                label: 'Shipping Charges',
+                hint: '0.00',
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -1022,55 +1119,190 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   }
 
   Widget _buildNotesTermsSection() {
-    return AppCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          TextField(
-            controller: _notesController,
-            maxLines: 3,
-            minLines: 1,
-            decoration: InputDecoration(
-              labelText: 'Notes to Customer',
-              alignLabelWithHint: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.border.withValues(alpha: 0.5),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // 1. Payment Profile & QR Code Toggle Card
+        AppCard(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.qr_code_2_rounded,
+                size: 26,
+                color: AppColors.primary,
+              ),
+
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Payment Profile & QR',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _includePaymentDetails
+                          ? 'Bank details & UPI QR printed on document'
+                          : 'Payment info hidden on document',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.border.withValues(alpha: 0.5),
-                ),
+              Switch.adaptive(
+                value: _includePaymentDetails,
+                activeTrackColor: AppColors.primary,
+                onChanged: _onTogglePaymentDetails,
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _termsController,
-            maxLines: 4,
-            minLines: 1,
-            decoration: InputDecoration(
-              labelText: 'Terms & Conditions',
-              alignLabelWithHint: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.border.withValues(alpha: 0.5),
+        ),
+        const SizedBox(height: 14),
+
+        // 2. Customer Notes & Terms Grouped Card
+        AppCard(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Notes Header & Field
+              const Row(
+                children: [
+                  Icon(
+                    Icons.sticky_note_2_outlined,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Notes to Customer',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _notesController,
+                maxLines: 2,
+                minLines: 1,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textPrimary,
+                ),
+                decoration: InputDecoration(
+                  hintText:
+                      'e.g. Thank you for your business! Please feel free to reach out with any questions.',
+                  hintStyle: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textMuted,
+                  ),
+                  isDense: true,
+                  filled: true,
+                  fillColor: AppColors.surfaceVariant.withValues(alpha: 0.35),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
                 ),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.border.withValues(alpha: 0.5),
+
+              // const Padding(
+              //   padding: EdgeInsets.symmetric(vertical: 14),
+              //   child: Divider(height: 1, color: AppColors.border),
+              // ),
+              SizedBox(height: 10),
+              // Terms & Conditions Header & Field
+              const Row(
+                children: [
+                  Icon(
+                    Icons.description_outlined,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Terms & Conditions',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _termsController,
+                maxLines: 3,
+                minLines: 1,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textPrimary,
+                ),
+                decoration: InputDecoration(
+                  hintText:
+                      'e.g. Payment is due within 15 days of invoice date. Late payments incur a 1.5% monthly fee.',
+                  hintStyle: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textMuted,
+                  ),
+                  isDense: true,
+                  filled: true,
+                  fillColor: AppColors.surfaceVariant.withValues(alpha: 0.35),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

@@ -43,9 +43,8 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   Future<void> _showTemplateSelector() async {
     final selectedId = await Navigator.of(context).push<String>(
       MaterialPageRoute(
-        builder: (_) => TemplateSelectorScreen(
-          initialTemplateId: _currentTemplateId,
-        ),
+        builder: (_) =>
+            TemplateSelectorScreen(initialTemplateId: _currentTemplateId),
       ),
     );
 
@@ -127,6 +126,12 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       setState(() => _document = updated);
                     }
                   }
+                },
+              ),
+              TextButton(
+                child: Text("Done"),
+                onPressed: () {
+                  Navigator.of(context).pop();
                 },
               ),
             ],

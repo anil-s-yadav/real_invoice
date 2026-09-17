@@ -19,7 +19,10 @@ class PaymentEntrySheet extends StatefulWidget {
 
   const PaymentEntrySheet({super.key, required this.document});
 
-  static Future<bool?> show(BuildContext context, {required DocumentModel document}) {
+  static Future<bool?> show(
+    BuildContext context, {
+    required DocumentModel document,
+  }) {
     return AppBottomSheet.show<bool>(
       context: context,
       title: 'Record Payment',
@@ -41,13 +44,21 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
   bool _isProcessing = false;
   String? _amountError;
 
-  final List<String> _methods = ['UPI', 'Cash', 'Bank Transfer', 'Cheque', 'Card'];
+  final List<String> _methods = [
+    'UPI',
+    'Cash',
+    'Bank Transfer',
+    'Cheque',
+    'Card',
+  ];
 
   @override
   void initState() {
     super.initState();
     final balance = widget.document.balanceDue;
-    _amountController = TextEditingController(text: balance > 0 ? balance.toStringAsFixed(2) : '');
+    _amountController = TextEditingController(
+      text: balance > 0 ? balance.toStringAsFixed(2) : '',
+    );
     _refController = TextEditingController();
     _notesController = TextEditingController();
   }
@@ -75,23 +86,31 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
     final docBloc = context.read<DocumentBloc>();
     final homeBloc = context.read<HomeBloc>();
 
-    docBloc.add(RecordPaymentEvent(
-      documentId: widget.document.id,
-      amount: amount,
-      paymentMethod: _selectedMethod,
-      referenceNumber: _refController.text.trim().isNotEmpty ? _refController.text.trim() : null,
-      notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
-      generateReceipt: _generateReceipt,
-    ));
+    docBloc.add(
+      RecordPaymentEvent(
+        documentId: widget.document.id,
+        amount: amount,
+        paymentMethod: _selectedMethod,
+        referenceNumber: _refController.text.trim().isNotEmpty
+            ? _refController.text.trim()
+            : null,
+        notes: _notesController.text.trim().isNotEmpty
+            ? _notesController.text.trim()
+            : null,
+        generateReceipt: _generateReceipt,
+      ),
+    );
     homeBloc.add(const LoadHomeDataEvent());
 
     if (mounted) {
       Navigator.of(context).pop(true);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_generateReceipt
-              ? 'Payment recorded and Receipt generated!'
-              : 'Payment recorded successfully!'),
+          content: Text(
+            _generateReceipt
+                ? 'Payment recorded and Receipt generated!'
+                : 'Payment recorded successfully!',
+          ),
           backgroundColor: AppColors.statusPaidText,
         ),
       );
@@ -122,7 +141,9 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
                   children: [
                     Text(
                       widget.document.docNumber,
-                      style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
+                      style: AppTypography.titleMedium.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     Text(
                       widget.document.customerSnapshot?.name ?? 'Customer',
@@ -136,7 +157,9 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
                     const Text('Balance Due', style: AppTypography.bodySmall),
                     Text(
                       CurrencyFormatter.format(widget.document.balanceDue),
-                      style: AppTypography.moneyMedium.copyWith(color: AppColors.primaryDark),
+                      style: AppTypography.moneyMedium.copyWith(
+                        color: AppColors.primaryDark,
+                      ),
                     ),
                   ],
                 ),
@@ -155,7 +178,10 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
               padding: EdgeInsets.symmetric(horizontal: 12),
               child: Center(
                 widthFactor: 1.0,
-                child: Text('₹', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text(
+                  '₹',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             errorText: _amountError,
@@ -166,8 +192,11 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
           ),
           const SizedBox(height: AppDimensions.md),
 
-          // Payment Method Chips
-          Text('Payment Method', style: AppTypography.titleSmall.copyWith(fontSize: 13)),
+          // Payment Profile Chips
+          Text(
+            'Payment Profile',
+            style: AppTypography.titleSmall.copyWith(fontSize: 13),
+          ),
           const SizedBox(height: 6),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -182,8 +211,12 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
                     selectedColor: AppColors.primaryLight,
                     backgroundColor: AppColors.surface,
                     labelStyle: TextStyle(
-                      color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                     side: BorderSide(
                       color: isSelected ? AppColors.primary : AppColors.border,
@@ -218,7 +251,10 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
             value: _generateReceipt,
-            title: const Text('Generate & Save Receipt', style: AppTypography.titleSmall),
+            title: const Text(
+              'Generate & Save Receipt',
+              style: AppTypography.titleSmall,
+            ),
             subtitle: const Text(
               'Creates a matching Receipt document linked to this invoice.',
               style: AppTypography.bodySmall,
