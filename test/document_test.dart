@@ -134,8 +134,12 @@ void main() {
   });
 
   group('Template Registry & PDF Generation', () {
-    test('Template Registry contains all 6 promised styles', () {
-      expect(TemplateRegistry.allTemplates.length, equals(6));
+    test('Template Registry contains all 7 promised styles', () {
+      expect(
+        TemplateRegistry.allTemplates.length,
+        7,
+        reason: 'Should contain 7 template styles (Sunset Orange added)',
+      );
       final ids = TemplateRegistry.allTemplates.map((t) => t.id).toList();
       expect(ids, contains('modern_crimson'));
       expect(ids, contains('minimal'));

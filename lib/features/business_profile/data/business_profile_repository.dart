@@ -37,13 +37,7 @@ class BusinessProfileRepository {
     );
 
     if (results.isEmpty) {
-      final newProfile = BusinessProfile(id: targetId);
-      await db.insert(
-        DatabaseTables.businessProfiles,
-        newProfile.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      return newProfile;
+      return BusinessProfile(id: targetId);
     }
 
     return BusinessProfile.fromMap(results.first);
@@ -51,6 +45,12 @@ class BusinessProfileRepository {
 
   Future<List<BusinessProfile>> getAllProfiles() async {
     final db = await _appDatabase.database;
+    // Clean up any empty profiles that were auto-created by the old bug
+    await db.delete(
+      DatabaseTables.businessProfiles,
+      where: 'businessName = ? OR businessName IS NULL',
+      whereArgs: [''],
+    );
     final results = await db.query(DatabaseTables.businessProfiles);
     return results.map((e) => BusinessProfile.fromMap(e)).toList();
   }

@@ -6,7 +6,7 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/settings_tile.dart';
-import '../../business_profile/presentation/business_profile_screen.dart';
+import '../../business_profile/presentation/manage_company_list_screen.dart';
 import '../../documents/data/document_repository.dart';
 import '../../documents/domain/document_model.dart';
 import '../../documents/presentation/document_editor_screen.dart';
@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const BusinessProfileScreen(),
+                                  builder: (_) => const ManageCompanyListScreen(),
                                 ),
                               );
                             },
@@ -269,18 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
 
                   // 1. Overview Dashboard
-                  if (state is HomeLoaded)
-                    _buildOverviewDashboard(state.stats)
-                  else
-                    const SizedBox(
-                      height: 100,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
+                  _buildOverviewDashboard(state is HomeLoaded ? state.stats : null),
                   const SizedBox(height: AppDimensions.xxxl),
 
                   // 2. Create Document (Quick Actions - BIG)
@@ -380,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (_) => const BusinessProfileScreen(),
+                                builder: (_) => const ManageCompanyListScreen(),
                               ),
                             );
                           },
@@ -399,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildOverviewDashboard(SummaryStats stats) {
+  Widget _buildOverviewDashboard(SummaryStats? stats) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -437,7 +426,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            CurrencyFormatter.formatCompact(stats.unpaidTotal),
+            stats == null ? '-' : CurrencyFormatter.formatCompact(stats.unpaidTotal),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 36,
@@ -488,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        CurrencyFormatter.formatCompact(stats.overdueTotal),
+                        stats == null ? '-' : CurrencyFormatter.formatCompact(stats.overdueTotal),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -539,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        CurrencyFormatter.formatCompact(stats.paidTotal),
+                        stats == null ? '-' : CurrencyFormatter.formatCompact(stats.paidTotal),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -736,3 +725,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

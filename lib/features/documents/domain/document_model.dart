@@ -59,6 +59,8 @@ class DocumentModel {
   final String? subject;
   final double shippingCharges;
   final bool includePaymentDetails;
+  final String? selectedBankDetailId;
+  final String? selectedUpiDetailId;
   final String templateId; // 'modern_crimson', 'minimal', 'professional', 'elegant', 'compact', 'bold'
   final String? notes;
   final String? terms;
@@ -83,6 +85,8 @@ class DocumentModel {
     this.subject,
     this.shippingCharges = 0.0,
     this.includePaymentDetails = true,
+    this.selectedBankDetailId,
+    this.selectedUpiDetailId,
     this.templateId = 'modern_crimson',
     this.notes,
     this.terms,
@@ -171,6 +175,8 @@ class DocumentModel {
     String? subject,
     double? shippingCharges,
     bool? includePaymentDetails,
+    String? selectedBankDetailId,
+    String? selectedUpiDetailId,
     String? templateId,
     String? notes,
     String? terms,
@@ -195,6 +201,8 @@ class DocumentModel {
       subject: subject ?? this.subject,
       shippingCharges: shippingCharges ?? this.shippingCharges,
       includePaymentDetails: includePaymentDetails ?? this.includePaymentDetails,
+      selectedBankDetailId: selectedBankDetailId ?? this.selectedBankDetailId,
+      selectedUpiDetailId: selectedUpiDetailId ?? this.selectedUpiDetailId,
       templateId: templateId ?? this.templateId,
       notes: notes ?? this.notes,
       terms: terms ?? this.terms,
@@ -220,6 +228,8 @@ class DocumentModel {
       'subject': subject,
       'shippingCharges': shippingCharges,
       'includePaymentDetails': includePaymentDetails ? 1 : 0,
+      'selectedBankDetailId': selectedBankDetailId,
+      'selectedUpiDetailId': selectedUpiDetailId,
       'templateId': templateId,
       'notes': notes,
       'terms': terms,
@@ -273,6 +283,8 @@ class DocumentModel {
       subject: map['subject'] as String?,
       shippingCharges: (map['shippingCharges'] as num?)?.toDouble() ?? 0.0,
       includePaymentDetails: (map['includePaymentDetails'] as int? ?? 1) == 1,
+      selectedBankDetailId: map['selectedBankDetailId'] as String?,
+      selectedUpiDetailId: map['selectedUpiDetailId'] as String?,
       templateId: map['templateId'] as String? ?? 'modern_crimson',
       notes: map['notes'] as String?,
       terms: map['terms'] as String?,

@@ -11,6 +11,7 @@ import 'default_templates_screen.dart';
 import 'help_support_screen.dart';
 import 'invoice_numbering_screen.dart';
 import 'payment_details_list_screen.dart';
+import 'regional_settings_screen.dart';
 import 'tax_discount_settings_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -42,11 +43,29 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               children: [
                 SettingsTile(
+                  title: 'Change Language/Country/Currency',
+                  subtitle: 'App language and default currency',
+                  icon: Icons.public,
+                  color: Colors.blueAccent,
+                  isFirst: true,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => RegionalSettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                Divider(
+                  height: 1,
+                  color: AppColors.border.withValues(alpha: 0.5),
+                  indent: 56,
+                ),
+                SettingsTile(
                   title: 'Company Profile',
                   subtitle: 'Business details, logo & GSTIN',
                   icon: Icons.storefront_outlined,
                   color: AppColors.primary,
-                  isFirst: true,
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

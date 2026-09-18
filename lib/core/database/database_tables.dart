@@ -81,6 +81,8 @@ class DatabaseTables {
       subject TEXT,
       shippingCharges REAL NOT NULL DEFAULT 0.0,
       includePaymentDetails INTEGER NOT NULL DEFAULT 1,
+      selectedBankDetailId TEXT,
+      selectedUpiDetailId TEXT,
       notes TEXT,
       terms TEXT,
       relatedDocId TEXT,

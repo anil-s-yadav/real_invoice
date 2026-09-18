@@ -14,6 +14,7 @@ class TemplatePreviewScreen extends StatelessWidget {
   final BusinessProfile profile;
   final bool isDefault;
   final VoidCallback onSetDefault;
+  final bool showPaymentDetails;
 
   const TemplatePreviewScreen({
     super.key,
@@ -22,6 +23,7 @@ class TemplatePreviewScreen extends StatelessWidget {
     required this.profile,
     required this.isDefault,
     required this.onSetDefault,
+    this.showPaymentDetails = true,
   });
 
   static Future<void> show({
@@ -31,6 +33,7 @@ class TemplatePreviewScreen extends StatelessWidget {
     required BusinessProfile profile,
     required bool isDefault,
     required VoidCallback onSetDefault,
+    bool showPaymentDetails = true,
   }) {
     return Navigator.of(context).push(
       MaterialPageRoute(
@@ -41,6 +44,7 @@ class TemplatePreviewScreen extends StatelessWidget {
           profile: profile,
           isDefault: isDefault,
           onSetDefault: onSetDefault,
+          showPaymentDetails: showPaymentDetails,
         ),
       ),
     );
@@ -88,6 +92,7 @@ class TemplatePreviewScreen extends StatelessWidget {
         ),
       ],
       templateId: template.id,
+      includePaymentDetails: showPaymentDetails,
       notes: 'Thank you for choosing our services!',
       terms:
           '1. Payment due within 15 days from the date of issuance.\n2. In case of late payment, interest @ 1.5% per month will be charged.',

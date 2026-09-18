@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
@@ -9,6 +10,8 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
+import '../../business_profile/domain/business_profile_model.dart';
+import '../../business_profile/presentation/manage_company_list_screen.dart';
 import '../../customers/domain/customer_model.dart';
 import '../../home/bloc/home_bloc.dart';
 import '../../home/bloc/home_event.dart';
@@ -17,6 +20,7 @@ import '../bloc/document_event.dart';
 import '../data/document_repository.dart';
 import '../domain/document_item_model.dart';
 import '../domain/document_model.dart';
+import '../../settings/presentation/payment_details_list_screen.dart';
 import 'pdf_preview_screen.dart';
 import 'widgets/customer_select_sheet.dart';
 import 'widgets/item_entry_sheet.dart';
@@ -54,6 +58,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   bool _isSaving = false;
   bool _isInitialized = false;
   bool _includePaymentDetails = false;
+  String? _selectedBankDetailId;
+  String? _selectedUpiDetailId;
 
   @override
   void initState() {
@@ -71,6 +77,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     );
     _issueDate = doc?.issueDate ?? DateTime.now();
     _includePaymentDetails = doc?.includePaymentDetails ?? false;
+    _selectedBankDetailId = doc?.selectedBankDetailId;
+    _selectedUpiDetailId = doc?.selectedUpiDetailId;
     _dueDate = doc?.dueDate ?? DateTime.now().add(const Duration(days: 15));
     _selectedCustomer = doc?.customerSnapshot;
     _items = doc?.items != null ? List.from(doc!.items) : [];
@@ -190,6 +198,21 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   Future<DocumentModel?> _buildAndSaveDocument({
     DocumentStatus? forcedStatus,
   }) async {
+    final profileState = context.read<BusinessProfileBloc>().state;
+    if (profileState is BusinessProfileLoaded) {
+      if (profileState.profile.businessName.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Please select or set up your Business Profile before creating a document.',
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return null;
+      }
+    }
+
     if (_items.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -224,7 +247,12 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
       overallDiscountValue: _overallDiscountValue,
       overallDiscountType: _overallDiscountType,
       templateId: _templateId,
-      includePaymentDetails: _includePaymentDetails,
+      includePaymentDetails:
+          _selectedBankDetailId != null ||
+          _selectedUpiDetailId != null ||
+          _includePaymentDetails,
+      selectedBankDetailId: _selectedBankDetailId,
+      selectedUpiDetailId: _selectedUpiDetailId,
       poNumber: _poNumberController.text.trim().isNotEmpty
           ? _poNumberController.text.trim()
           : null,
@@ -250,32 +278,6 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     }
 
     return document;
-  }
-
-  void _onTogglePaymentDetails(bool val) {
-    if (val) {
-      final profileState = context.read<BusinessProfileBloc>().state;
-      if (profileState is BusinessProfileLoaded) {
-        final p = profileState.profile;
-        final hasDetails =
-            p.paymentDetails.isNotEmpty ||
-            (p.bankName != null && p.bankName!.isNotEmpty) ||
-            (p.upiId != null && p.upiId!.isNotEmpty);
-        if (!hasDetails) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Please add bank or UPI details in Business Profile first.',
-              ),
-              backgroundColor: Colors.orange,
-            ),
-          );
-          setState(() => _includePaymentDetails = false);
-          return;
-        }
-      }
-    }
-    setState(() => _includePaymentDetails = val);
   }
 
   Future<void> _handleSaveAndPreview() async {
@@ -345,6 +347,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               // _buildDocTypePills(),
               // const SizedBox(height: 16),
 
+              // 1.5 Selected Company Selector
+              _buildCompanySelector(),
+              const SizedBox(height: 16),
+
               // 2. Document Meta Card (Number + Dates)
               _buildMetaCard(),
               const SizedBox(height: 24),
@@ -371,7 +377,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               ],
 
               // 6. Notes & Terms Accordion
-              _buildSectionTitle('ADDITIONAL INFO'),
+              _buildSectionTitle('SHOW PAYMENTS INFO'),
               _buildNotesTermsSection(),
             ],
           ),
@@ -455,6 +461,89 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   //   );
   // }
 
+  Widget _buildCompanySelector() {
+    return BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
+      builder: (context, state) {
+        if (state is! BusinessProfileLoaded) {
+          return const SizedBox.shrink();
+        }
+        final profile = state.profile;
+
+        return InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const ManageCompanyListScreen(),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.2),
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                if (profile.logoPath != null && profile.logoPath!.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Image.file(
+                      File(profile.logoPath!),
+                      width: 32,
+                      height: 32,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.business, color: AppColors.primary),
+                    ),
+                  )
+                else
+                  const Icon(Icons.business, color: AppColors.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Creating document for',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        profile.businessName.isNotEmpty
+                            ? profile.businessName
+                            : 'Set up your company',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.swap_horiz,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildMetaCard() {
     return AppCard(
       padding: const EdgeInsets.all(16),
@@ -500,7 +589,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                             fontSize: 15,
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 8),
+                          contentPadding: EdgeInsets.all(8),
                         ),
                       ),
                     ],
@@ -1122,50 +1211,177 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // 1. Payment Profile & QR Code Toggle Card
-        AppCard(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.qr_code_2_rounded,
-                size: 26,
-                color: AppColors.primary,
-              ),
+        // 1. Payment Profile & QR Code Selection Card
+        BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
+          builder: (context, state) {
+            if (state is! BusinessProfileLoaded) return const SizedBox();
+            final profile = state.profile;
+            final banks = profile.paymentDetails
+                .where((p) => p.type == 'Bank')
+                .toList();
+            final upis = profile.paymentDetails
+                .where((p) => p.type == 'UPI')
+                .toList();
 
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Payment Profile & QR',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _includePaymentDetails
-                          ? 'Bank details & UPI QR printed on document'
-                          : 'Payment info hidden on document',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
+            // Add legacy options if needed
+            if (banks.isEmpty &&
+                profile.bankName != null &&
+                profile.bankName!.isNotEmpty) {
+              banks.add(
+                PaymentDetail(
+                  id: 'legacy',
+                  type: 'Bank',
+                  title: 'Legacy Bank Profile',
+                  details: profile.accountNumber ?? '',
                 ),
+              );
+            }
+            if (upis.isEmpty &&
+                profile.upiId != null &&
+                profile.upiId!.isNotEmpty) {
+              upis.add(
+                PaymentDetail(
+                  id: 'legacy_upi',
+                  type: 'UPI',
+                  title: 'Legacy UPI',
+                  details: profile.upiId!,
+                ),
+              );
+            }
+
+            final hasAny = banks.isNotEmpty || upis.isNotEmpty;
+
+            return AppCard(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(
+                        Icons.qr_code_2_rounded,
+                        size: 22,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Select Payment Profile & QR',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if (!hasAny) ...[
+                    const Text(
+                      'No payment profiles available.',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PaymentDetailsListScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.add_circle_outline, size: 18),
+                      label: const Text('Create New Payment Profile'),
+                    ),
+                  ] else ...[
+                    // Bank Dropdown
+                    if (banks.isNotEmpty)
+                      InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Bank Account (Select 1)',
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String?>(
+                            isExpanded: true,
+                            value:
+                                banks.any((b) => b.id == _selectedBankDetailId)
+                                ? _selectedBankDetailId
+                                : (banks.isNotEmpty &&
+                                          _selectedBankDetailId != 'none'
+                                      ? banks.first.id
+                                      : 'none'),
+                            items: [
+                              const DropdownMenuItem(
+                                value: 'none',
+                                child: Text('None'),
+                              ),
+                              ...banks.map(
+                                (b) => DropdownMenuItem(
+                                  value: b.id,
+                                  child: Text(b.title),
+                                ),
+                              ),
+                            ],
+                            onChanged: (val) {
+                              setState(() {
+                                _selectedBankDetailId = val;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    if (banks.isNotEmpty && upis.isNotEmpty)
+                      const SizedBox(height: 12),
+                    // UPI Dropdown
+                    if (upis.isNotEmpty)
+                      InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'UPI / QR (Select 1)',
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String?>(
+                            isExpanded: true,
+                            value: upis.any((u) => u.id == _selectedUpiDetailId)
+                                ? _selectedUpiDetailId
+                                : (upis.isNotEmpty &&
+                                          _selectedUpiDetailId != 'none'
+                                      ? upis.first.id
+                                      : 'none'),
+                            items: [
+                              const DropdownMenuItem(
+                                value: 'none',
+                                child: Text('None'),
+                              ),
+                              ...upis.map(
+                                (u) => DropdownMenuItem(
+                                  value: u.id,
+                                  child: Text(u.title),
+                                ),
+                              ),
+                            ],
+                            onChanged: (val) {
+                              setState(() {
+                                _selectedUpiDetailId = val;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                  ],
+                ],
               ),
-              Switch.adaptive(
-                value: _includePaymentDetails,
-                activeTrackColor: AppColors.primary,
-                onChanged: _onTogglePaymentDetails,
-              ),
-            ],
-          ),
+            );
+          },
         ),
         const SizedBox(height: 14),
 

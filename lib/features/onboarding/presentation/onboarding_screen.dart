@@ -14,7 +14,12 @@ import '../../navigation/main_nav_scaffold.dart';
 import '../../business_profile/domain/business_profile_model.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final bool isAddingNewCompany;
+  
+  const OnboardingScreen({
+    super.key,
+    this.isAddingNewCompany = false,
+  });
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -23,7 +28,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  final int _totalPages = 5;
+  int get _totalPages => widget.isAddingNewCompany ? 4 : 5;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -96,7 +101,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _skipOnboarding() {
-    _finishAndNavigate(BusinessProfile(id: '')); 
+    if (widget.isAddingNewCompany) {
+      Navigator.of(context).pop();
+      return;
+    }
+    _finishAndNavigate(const BusinessProfile(id: '')); 
     // passing empty ID allows the bloc to create a new blank profile, or use existing
   }
 
@@ -142,23 +151,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           stampPath: _stampPath,
         );
       }
-
-      _finishAndNavigate(profile);
+    _finishAndNavigate(profile);
   }
 
   Future<void> _finishAndNavigate(BusinessProfile profile) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('has_completed_onboarding', true);
-    await prefs.setString('app_language', _selectedLanguage);
-    await prefs.setString('app_country', _selectedCountry);
+    if (!widget.isAddingNewCompany) {
+      await prefs.setBool('has_completed_onboarding', true);
+      await prefs.setString('app_language', _selectedLanguage);
+      await prefs.setString('app_country', _selectedCountry);
+    }
 
     if (mounted) {
       if (profile.businessName.isNotEmpty) {
         context.read<BusinessProfileBloc>().add(UpdateBusinessProfileEvent(profile));
       }
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainNavScaffold()),
-      );
+      
+      if (widget.isAddingNewCompany) {
+        Navigator.of(context).pop();
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MainNavScaffold()),
+        );
+      }
     }
   }
 
@@ -220,13 +235,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     _currentPage = index;
                   });
                 },
-                children: [
-                  _buildStep1Localization(),
-                  _buildStepImageUpload(1, 'Upload Company Logo', 'A professional logo builds trust with your clients.', _logoPath),
-                  _buildStepImageUpload(2, 'Upload Signature', 'Digital signatures make your invoices authentic and legally compliant.', _signaturePath),
-                  _buildStepImageUpload(3, 'Upload Company Stamp', 'Optional. Add an official company stamp/seal.', _stampPath, isOptional: true),
-                  _buildStep5BusinessInfo(),
-                ],
+                children: widget.isAddingNewCompany
+                    ? [
+                        _buildStepImageUpload(1, 'Upload Company Logo', 'A professional logo builds trust with your clients.', _logoPath),
+                        _buildStepImageUpload(2, 'Upload Signature', 'Digital signatures make your invoices authentic and legally compliant.', _signaturePath),
+                        _buildStepImageUpload(3, 'Upload Company Stamp', 'Optional. Add an official company stamp/seal.', _stampPath, isOptional: true),
+                        _buildStep5BusinessInfo(),
+                      ]
+                    : [
+                        _buildStep1Localization(),
+                        _buildStepImageUpload(1, 'Upload Company Logo', 'A professional logo builds trust with your clients.', _logoPath),
+                        _buildStepImageUpload(2, 'Upload Signature', 'Digital signatures make your invoices authentic and legally compliant.', _signaturePath),
+                        _buildStepImageUpload(3, 'Upload Company Stamp', 'Optional. Add an official company stamp/seal.', _stampPath, isOptional: true),
+                        _buildStep5BusinessInfo(),
+                      ],
               ),
             ),
 
@@ -566,3 +588,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+

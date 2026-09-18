@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../core/widgets/status_badge.dart';
@@ -17,9 +18,16 @@ class DocumentPdfGenerator {
     required BusinessProfile profile,
     String? templateId,
   }) async {
+    final font = await PdfGoogleFonts.notoSansRegular();
+    final boldFont = await PdfGoogleFonts.notoSansBold();
+
     final pdf = pw.Document(
       title: '${document.docType.displayName} ${document.docNumber}',
       author: profile.businessName.isNotEmpty ? profile.businessName : 'RedInvoice',
+      theme: pw.ThemeData.withFont(
+        base: font,
+        bold: boldFont,
+      ),
     );
 
     final selectedTemplate = templateId ?? document.templateId;
@@ -97,7 +105,7 @@ class DocumentPdfGenerator {
   }
 
   static String _fmt(double amount, BusinessProfile profile) {
-    final sym = (profile.currencySymbol.isEmpty || profile.currencySymbol == '₹') ? 'Rs.' : profile.currencySymbol;
+    final sym = profile.currencySymbol.isEmpty ? '₹' : profile.currencySymbol;
     return CurrencyFormatter.format(amount, symbol: sym);
   }
 
@@ -682,18 +690,49 @@ class DocumentPdfGenerator {
   }) {
     if (!doc.includePaymentDetails) return pw.Container();
 
-    // Extract payment details
-    final bankDetails = profile.paymentDetails.where((p) => p.type == 'Bank').toList();
-    final upiDetails = profile.paymentDetails.where((p) => p.type == 'UPI').toList();
+    // Get all Bank details
+    var bankDetails = profile.paymentDetails.where((p) => p.type == 'Bank').toList();
+    // If a specific bank detail is selected, filter it
+    if (doc.selectedBankDetailId == 'none') {
+      bankDetails = [];
+    } else if (doc.selectedBankDetailId != null && doc.selectedBankDetailId!.isNotEmpty) {
+      bankDetails = bankDetails.where((p) => p.id == doc.selectedBankDetailId).toList();
+    } else if (bankDetails.isNotEmpty) {
+      // If none selected but we have multiple, default to the first one (since we only show 1 per invoice)
+      bankDetails = [bankDetails.first];
+    }
     
-    // Legacy support
-    if (bankDetails.isEmpty && profile.bankName != null && profile.bankName!.isNotEmpty) {
+    // Legacy fallback if no Bank details exist but old fields are present
+    if (bankDetails.isEmpty && doc.selectedBankDetailId != 'none' && profile.bankName != null && profile.bankName!.isNotEmpty) {
       bankDetails.add(PaymentDetail(
-        id: 'legacy_bank', type: 'Bank', title: profile.bankName!, details: profile.accountNumber ?? '', extra: profile.ifscCode
+        id: 'legacy',
+        type: 'Bank',
+        title: 'Bank Account',
+        details: '${profile.accountNumber}',
+        extra: profile.ifscCode,
       ));
     }
-    if (upiDetails.isEmpty && profile.upiId != null && profile.upiId!.isNotEmpty) {
-      upiDetails.add(PaymentDetail(id: 'legacy_upi', type: 'UPI', title: 'UPI', details: profile.upiId!));
+
+    // Get all UPI details
+    var upiDetails = profile.paymentDetails.where((p) => p.type == 'UPI').toList();
+    // If a specific UPI detail is selected, filter it
+    if (doc.selectedUpiDetailId == 'none') {
+      upiDetails = [];
+    } else if (doc.selectedUpiDetailId != null && doc.selectedUpiDetailId!.isNotEmpty) {
+      upiDetails = upiDetails.where((p) => p.id == doc.selectedUpiDetailId).toList();
+    } else if (upiDetails.isNotEmpty) {
+      // Default to the first one
+      upiDetails = [upiDetails.first];
+    }
+
+    // Legacy fallback for UPI
+    if (upiDetails.isEmpty && doc.selectedUpiDetailId != 'none' && profile.upiId != null && profile.upiId!.isNotEmpty) {
+      upiDetails.add(PaymentDetail(
+        id: 'legacy_upi',
+        type: 'UPI',
+        title: 'UPI',
+        details: profile.upiId!,
+      ));
     }
 
     final hasBank = bankDetails.isNotEmpty;

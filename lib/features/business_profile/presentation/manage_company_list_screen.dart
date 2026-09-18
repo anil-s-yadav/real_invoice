@@ -7,7 +7,9 @@ import '../../subscription/presentation/subscription_screen.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../data/business_profile_repository.dart';
 import '../domain/business_profile_model.dart';
-import 'business_profile_screen.dart';
+import '../bloc/business_profile_bloc.dart';
+import '../bloc/business_profile_event.dart';
+import '../../onboarding/presentation/onboarding_screen.dart';
 
 class ManageCompanyListScreen extends StatefulWidget {
   const ManageCompanyListScreen({super.key});
@@ -43,7 +45,9 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
   Future<void> _setActive(String id) async {
     await _repository.setActiveProfileId(id);
     _loadData();
-    // Dispatch events to reload global states if needed, wait for user if they want this.
+    if (mounted) {
+      context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
+    }
   }
 
   Future<void> _delete(BusinessProfile profile) async {
@@ -143,7 +147,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
         onPressed: () async {
           await Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => const BusinessProfileScreen(profileId: ''),
+              builder: (_) => const OnboardingScreen(isAddingNewCompany: true),
             ),
           );
           _loadData();
@@ -202,28 +206,11 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                         icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
                         padding: EdgeInsets.zero,
                         onSelected: (val) async {
-                          if (val == 'edit') {
-                            await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => BusinessProfileScreen(profileId: profile.id),
-                              ),
-                            );
-                            _loadData();
-                          } else if (val == 'delete') {
+                          if (val == 'delete') {
                             _delete(profile);
                           }
                         },
                         itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_outlined, size: 18),
-                                SizedBox(width: 8),
-                                Text('Edit'),
-                              ],
-                            ),
-                          ),
                           if (!isActive)
                             const PopupMenuItem(
                               value: 'delete',
@@ -504,3 +491,4 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
     );
   }
 }
+

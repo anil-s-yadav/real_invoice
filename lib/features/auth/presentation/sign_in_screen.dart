@@ -15,7 +15,10 @@ class SignInScreen extends StatelessWidget {
         listener: (context, state) {
           if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: AppColors.statusOverdueText),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppColors.statusOverdueText,
+              ),
             );
           }
         },
@@ -24,7 +27,9 @@ class SignInScreen extends StatelessWidget {
 
           return SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xxl),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.xxl,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -38,7 +43,11 @@ class SignInScreen extends StatelessWidget {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.receipt_long, size: 48, color: AppColors.primary),
+                    child: const Icon(
+                      Icons.receipt_long,
+                      size: 48,
+                      color: AppColors.primary,
+                    ),
                   ),
                   const SizedBox(height: AppDimensions.xxxl),
                   const Text(
@@ -62,27 +71,33 @@ class SignInScreen extends StatelessWidget {
                   const SizedBox(height: 64),
 
                   if (isLoading)
-                    const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                    const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
                   else ...[
                     _SocialSignInButton(
-                      icon: Icons.g_mobiledata,
+                      icon: Image.asset("assets/icons/google.png", scale: 1.2),
                       label: 'Continue with Google',
                       backgroundColor: Colors.white,
                       textColor: AppColors.textPrimary,
-                      iconColor: Colors.red,
                       onPressed: () {
-                        context.read<AuthBloc>().add(const SignInWithGoogleRequestedEvent());
+                        context.read<AuthBloc>().add(
+                          const SignInWithGoogleRequestedEvent(),
+                        );
                       },
                     ),
                     const SizedBox(height: AppDimensions.md),
                     _SocialSignInButton(
-                      icon: Icons.apple,
+                      icon: Icon(Icons.apple, color: Colors.white, size: 28),
                       label: 'Continue with Apple',
                       backgroundColor: Colors.black,
                       textColor: Colors.white,
-                      iconColor: Colors.white,
                       onPressed: () {
-                        context.read<AuthBloc>().add(const SignInWithAppleRequestedEvent());
+                        context.read<AuthBloc>().add(
+                          const SignInWithAppleRequestedEvent(),
+                        );
                       },
                     ),
                   ],
@@ -110,11 +125,10 @@ class SignInScreen extends StatelessWidget {
 }
 
 class _SocialSignInButton extends StatelessWidget {
-  final IconData icon;
+  final Widget icon;
   final String label;
   final Color backgroundColor;
   final Color textColor;
-  final Color iconColor;
   final VoidCallback onPressed;
 
   const _SocialSignInButton({
@@ -122,7 +136,6 @@ class _SocialSignInButton extends StatelessWidget {
     required this.label,
     required this.backgroundColor,
     required this.textColor,
-    required this.iconColor,
     required this.onPressed,
   });
 
@@ -136,7 +149,7 @@ class _SocialSignInButton extends StatelessWidget {
         elevation: 1,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(100),
           side: backgroundColor == Colors.white
               ? BorderSide(color: AppColors.border)
               : BorderSide.none,
@@ -145,14 +158,11 @@ class _SocialSignInButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: iconColor, size: 28),
+          icon,
           const SizedBox(width: 12),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ],
       ),

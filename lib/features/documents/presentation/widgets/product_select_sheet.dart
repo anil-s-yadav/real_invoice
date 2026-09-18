@@ -17,7 +17,10 @@ class ProductSelectSheet extends StatefulWidget {
 
   const ProductSelectSheet({super.key, this.selectedProduct});
 
-  static Future<ProductItem?> show(BuildContext context, {ProductItem? current}) {
+  static Future<ProductItem?> show(
+    BuildContext context, {
+    ProductItem? current,
+  }) {
     return AppBottomSheet.show<ProductItem>(
       context: context,
       title: 'Select Item',
@@ -48,7 +51,12 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(AppDimensions.lg, AppDimensions.sm, AppDimensions.lg, AppDimensions.xs),
+            padding: const EdgeInsets.fromLTRB(
+              AppDimensions.lg,
+              AppDimensions.sm,
+              AppDimensions.lg,
+              AppDimensions.xs,
+            ),
             child: AppButton(
               label: 'Add New Item to Catalog',
               icon: Icons.add_box_outlined,
@@ -71,7 +79,11 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
               onChanged: (val) => setState(() => _searchQuery = val.trim()),
               decoration: const InputDecoration(
                 hintText: 'Search items by name...',
-                prefixIcon: Icon(Icons.search, size: 20, color: AppColors.textMuted),
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 20,
+                  color: AppColors.textMuted,
+                ),
                 isDense: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 10),
               ),
@@ -107,17 +119,22 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                   return ListView.separated(
                     padding: const EdgeInsets.all(AppDimensions.md),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final product = filtered[index];
-                      final isSelected = widget.selectedProduct?.id == product.id;
+                      final isSelected =
+                          widget.selectedProduct?.id == product.id;
 
                       return AppCard(
                         padding: EdgeInsets.zero,
                         backgroundColor: isSelected
                             ? AppColors.primary.withValues(alpha: 0.05)
                             : AppColors.surface,
-                        border: Border.all(color: isSelected ? AppColors.primary : AppColors.border),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.border,
+                        ),
                         child: InkWell(
                           onTap: () => Navigator.of(context).pop(product),
                           borderRadius: BorderRadius.circular(12),
@@ -130,25 +147,33 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                                   height: 40,
                                   decoration: BoxDecoration(
                                     color: isSelected
-                                        ? AppColors.primary.withValues(alpha: 0.1)
+                                        ? AppColors.primary.withValues(
+                                            alpha: 0.1,
+                                          )
                                         : AppColors.surfaceVariant,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
                                     Icons.inventory_2_outlined,
-                                    color: isSelected ? AppColors.primary : AppColors.textMuted,
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : AppColors.textMuted,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         product.title,
-                                        style: AppTypography.titleSmall.copyWith(
-                                          color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                                        ),
+                                        style: AppTypography.titleSmall
+                                            .copyWith(
+                                              color: isSelected
+                                                  ? AppColors.primary
+                                                  : AppColors.textPrimary,
+                                            ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(

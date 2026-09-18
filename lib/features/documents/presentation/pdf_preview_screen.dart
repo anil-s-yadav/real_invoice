@@ -17,8 +17,8 @@ import '../bloc/document_event.dart';
 import '../data/document_repository.dart';
 import '../domain/document_model.dart';
 import 'document_editor_screen.dart';
-import 'template_selector_screen.dart';
 import 'widgets/payment_entry_sheet.dart';
+import 'widgets/template_thumbnail_card.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
   final DocumentModel document;
@@ -38,25 +38,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     super.initState();
     _document = widget.document;
     _currentTemplateId = widget.document.templateId;
-  }
-
-  Future<void> _showTemplateSelector() async {
-    final selectedId = await Navigator.of(context).push<String>(
-      MaterialPageRoute(
-        builder: (_) =>
-            TemplateSelectorScreen(initialTemplateId: _currentTemplateId),
-      ),
-    );
-
-    if (selectedId != null && selectedId != _currentTemplateId && mounted) {
-      setState(() {
-        _currentTemplateId = selectedId;
-        _document = _document.copyWith(templateId: selectedId);
-      });
-      // Persist template choice to database
-      context.read<DocumentBloc>().add(SaveDocumentEvent(_document));
-      context.read<HomeBloc>().add(const LoadHomeDataEvent());
-    }
   }
 
   Future<void> _handleConvertToInvoice() async {
@@ -90,6 +71,78 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     }
   }
 
+  void _showTemplateSelector() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (bottomSheetContext) {
+        return Container(
+          height: 220,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'Select Template',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: StatefulBuilder(
+                  builder: (context, setStateSheet) {
+                    final templates = TemplateRegistry.getTemplatesFor(_document.docType);
+                    return ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: templates.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        final t = templates[index];
+                        final isSelected = t.id == _currentTemplateId;
+                        return SizedBox(
+                          width: 100,
+                          child: InkWell(
+                            onTap: () {
+                              if (!isSelected) {
+                                setStateSheet(() {}); // update sheet UI immediately
+                                setState(() {
+                                  _currentTemplateId = t.id;
+                                  _document = _document.copyWith(templateId: t.id);
+                                });
+                                context.read<DocumentBloc>().add(SaveDocumentEvent(_document));
+                              }
+                            },
+                            child: IgnorePointer(
+                              child: TemplateThumbnailCard(
+                                template: t,
+                                isSelected: isSelected,
+                                documentType: _document.docType,
+                                showPaymentDetails: false,
+                                onTap: () {},
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
@@ -104,11 +157,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
               '${_document.docType.displayName} ${_document.docNumber}',
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.palette_outlined),
-                tooltip: 'Change Template',
-                onPressed: _showTemplateSelector,
-              ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
                 tooltip: 'Edit Document',
@@ -193,7 +241,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Balance Due: ₹${_document.balanceDue.toStringAsFixed(2)}',
+                          'Balance Due: Ã¢â€šÂ¹${_document.balanceDue.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -215,7 +263,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                   ),
                 ),
 
-              // Template pill chip indicator
+                            // Template pill chip indicator
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppDimensions.lg,
@@ -244,7 +292,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     InkWell(
                       onTap: _showTemplateSelector,
                       child: Text(
-                        'Change Style (6 available) ▾',
+                        'Change Style â–¾',
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,

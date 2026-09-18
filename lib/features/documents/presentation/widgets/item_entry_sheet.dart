@@ -17,11 +17,7 @@ class ItemEntrySheet extends StatefulWidget {
   final String documentId;
   final DocumentItem? initialItem;
 
-  const ItemEntrySheet({
-    super.key,
-    required this.documentId,
-    this.initialItem,
-  });
+  const ItemEntrySheet({super.key, required this.documentId, this.initialItem});
 
   static Future<DocumentItem?> show(
     BuildContext context, {
@@ -53,7 +49,16 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
   String? _titleError;
   String? _priceError;
 
-  final List<String> _commonUnits = ['pcs', 'hrs', 'service', 'days', 'kg', 'month', 'visit', 'box'];
+  final List<String> _commonUnits = [
+    'pcs',
+    'hrs',
+    'service',
+    'days',
+    'kg',
+    'month',
+    'visit',
+    'box',
+  ];
   final List<double> _taxRates = [0.0, 5.0, 12.0, 18.0, 28.0];
 
   @override
@@ -63,13 +68,19 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
     _titleController = TextEditingController(text: item?.title ?? '');
     _descController = TextEditingController(text: item?.description ?? '');
     _qtyController = TextEditingController(
-      text: item != null ? (item.quantity % 1 == 0 ? item.quantity.toInt().toString() : item.quantity.toString()) : '1',
+      text: item != null
+          ? (item.quantity % 1 == 0
+                ? item.quantity.toInt().toString()
+                : item.quantity.toString())
+          : '1',
     );
     _priceController = TextEditingController(
       text: item != null ? item.unitPrice.toStringAsFixed(2) : '',
     );
     _discountController = TextEditingController(
-      text: item != null && item.discountPercent > 0 ? item.discountPercent.toStringAsFixed(1) : '0',
+      text: item != null && item.discountPercent > 0
+          ? item.discountPercent.toStringAsFixed(1)
+          : '0',
     );
     _hsnController = TextEditingController(text: item?.hsnSacCode ?? '');
     _selectedUnit = item?.unit ?? 'pcs';
@@ -84,7 +95,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
   Future<void> _loadDefaults() async {
     final settingsRepo = InvoiceSettingsRepository();
     final taxEnabled = await settingsRepo.getDefaultTaxEnabled();
-    final defaultTax = taxEnabled ? await settingsRepo.getDefaultTaxRate() : 0.0;
+    final defaultTax = taxEnabled
+        ? await settingsRepo.getDefaultTaxRate()
+        : 0.0;
     final defaultDiscount = await settingsRepo.getDefaultDiscountRate();
 
     if (mounted) {
@@ -116,7 +129,8 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
 
   double get _currentQty => double.tryParse(_qtyController.text) ?? 1.0;
   double get _currentPrice => double.tryParse(_priceController.text) ?? 0.0;
-  double get _currentDiscount => double.tryParse(_discountController.text) ?? 0.0;
+  double get _currentDiscount =>
+      double.tryParse(_discountController.text) ?? 0.0;
 
   double get _grossAmount => _currentQty * _currentPrice;
   double get _discountAmount => _grossAmount * (_currentDiscount / 100.0);
@@ -128,7 +142,8 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
     setState(() {
       _selectedProductId = product.id;
       _titleController.text = product.title;
-      if (product.description != null) _descController.text = product.description!;
+      if (product.description != null)
+        _descController.text = product.description!;
       _priceController.text = product.unitPrice.toStringAsFixed(2);
       _selectedUnit = product.unit;
       _taxPercent = product.defaultTaxPercent;
@@ -154,13 +169,17 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
       documentId: widget.documentId,
       productId: _selectedProductId,
       title: title,
-      description: _descController.text.trim().isNotEmpty ? _descController.text.trim() : null,
+      description: _descController.text.trim().isNotEmpty
+          ? _descController.text.trim()
+          : null,
       quantity: _currentQty,
       unit: _selectedUnit,
       unitPrice: price,
       discountPercent: _currentDiscount,
       taxPercent: _taxPercent,
-      hsnSacCode: _hsnController.text.trim().isNotEmpty ? _hsnController.text.trim() : null,
+      hsnSacCode: _hsnController.text.trim().isNotEmpty
+          ? _hsnController.text.trim()
+          : null,
     );
 
     Navigator.of(context).pop(item);
@@ -214,7 +233,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
@@ -229,7 +250,11 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                       ),
                     ),
                   ),
-                  const Icon(Icons.chevron_right, color: AppColors.primary, size: 20),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -242,7 +267,8 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
             label: 'Item / Service Name *',
             hint: 'e.g. Electrical Rewiring or Logo Design',
             errorText: _titleError,
-            autofocus: widget.initialItem == null && _titleController.text.isEmpty,
+            autofocus:
+                widget.initialItem == null && _titleController.text.isEmpty,
             onChanged: (val) {
               if (_titleError != null) setState(() => _titleError = null);
             },
@@ -259,7 +285,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                   controller: _qtyController,
                   label: 'Qty *',
                   hint: '1',
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   onChanged: (_) => setState(() {}),
                 ),
               ),
@@ -270,12 +298,17 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                   controller: _priceController,
                   label: 'Unit Price *',
                   hint: '0.00',
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   prefix: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Center(
                       widthFactor: 1.0,
-                      child: Text('₹', style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text(
+                        '₹',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                   errorText: _priceError,
@@ -291,9 +324,11 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: _selectedUnit,
+                  initialValue: _selectedUnit,
                   decoration: _dropdownDecoration('Unit'),
-                  items: _commonUnits.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
+                  items: _commonUnits
+                      .map((u) => DropdownMenuItem(value: u, child: Text(u)))
+                      .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _selectedUnit = val);
                   },
@@ -302,12 +337,16 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
               const SizedBox(width: AppDimensions.md),
               Expanded(
                 child: DropdownButtonFormField<double>(
-                  value: _taxPercent,
+                  initialValue: _taxPercent,
                   decoration: _dropdownDecoration('GST Tax'),
-                  items: _taxRates.map((r) => DropdownMenuItem(
-                    value: r, 
-                    child: Text(r == 0 ? 'Exempt (0%)' : '%'),
-                  )).toList(),
+                  items: _taxRates
+                      .map(
+                        (r) => DropdownMenuItem(
+                          value: r,
+                          child: Text(r == 0 ? 'Exempt (0%)' : '%'),
+                        ),
+                      )
+                      .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _taxPercent = val);
                   },
@@ -325,7 +364,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                   controller: _discountController,
                   label: 'Discount (%)',
                   hint: '0',
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   suffix: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Center(widthFactor: 1.0, child: Text('%')),
@@ -363,10 +404,15 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Taxable Amount', style: AppTypography.bodySmall),
+                    const Text(
+                      'Taxable Amount',
+                      style: AppTypography.bodySmall,
+                    ),
                     Text(
                       CurrencyFormatter.format(_taxableAmount),
-                      style: AppTypography.tabularNumbers.copyWith(fontSize: 13),
+                      style: AppTypography.tabularNumbers.copyWith(
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -378,7 +424,10 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                       Text('GST (%)', style: AppTypography.bodySmall),
                       Text(
                         '+ ',
-                        style: AppTypography.tabularNumbers.copyWith(fontSize: 13, color: AppColors.accentNavy),
+                        style: AppTypography.tabularNumbers.copyWith(
+                          fontSize: 13,
+                          color: AppColors.accentNavy,
+                        ),
                       ),
                     ],
                   ),
@@ -387,10 +436,17 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Line Total', style: AppTypography.titleSmall.copyWith(fontWeight: FontWeight.w700)),
+                    Text(
+                      'Line Total',
+                      style: AppTypography.titleSmall.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     Text(
                       CurrencyFormatter.format(_lineTotal),
-                      style: AppTypography.moneyMedium.copyWith(color: AppColors.primaryDark),
+                      style: AppTypography.moneyMedium.copyWith(
+                        color: AppColors.primaryDark,
+                      ),
                     ),
                   ],
                 ),
@@ -400,7 +456,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
           const SizedBox(height: AppDimensions.xl),
 
           AppButton(
-            label: widget.initialItem != null ? 'Update Item' : 'Add to Document',
+            label: widget.initialItem != null
+                ? 'Update Item'
+                : 'Add to Document',
             onPressed: _handleSave,
             icon: Icons.check,
           ),
