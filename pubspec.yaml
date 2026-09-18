@@ -21,6 +21,14 @@ version: 1.0.0+1
 environment:
   sdk: ^3.12.2
 
+# Tell the sqlite3 build hook to use the OS-provided SQLite library
+# instead of downloading a precompiled binary from GitHub.
+# This avoids TLS handshake failures on Windows (dartbug.com/52266).
+hooks:
+  user_defines:
+    sqlite3:
+      source: system
+
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,

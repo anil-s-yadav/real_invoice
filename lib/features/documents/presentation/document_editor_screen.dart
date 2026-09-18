@@ -546,86 +546,69 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
   Widget _buildMetaCard() {
     return AppCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.tag_rounded,
-                  size: 20,
-                  color: AppColors.textMuted,
+          // Document number â€” simple inline row
+          Row(
+            children: [
+              Text(
+                '${_docType.displayName} #',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${_docType.displayName} No',
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextField(
-                        controller: _docNumberController,
-                        textCapitalization: TextCapitalization.characters,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          color: AppColors.textPrimary,
-                          letterSpacing: 0.5,
-                        ),
-                        decoration: const InputDecoration(
-                          hintText: 'e.g. INV-2026-0001',
-                          hintStyle: TextStyle(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.normal,
-                            fontSize: 15,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(8),
-                        ),
-                      ),
-                    ],
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: _docNumberController,
+                  textCapitalization: TextCapitalization.characters,
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    color: AppColors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'INV-2026-0001',
+                    hintStyle: TextStyle(
+                      color: AppColors.textMuted.withValues(alpha: 0.5),
+                      fontWeight: FontWeight.normal,
+                      fontSize: 15,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 10,
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, color: AppColors.border),
-          ),
+          const SizedBox(height: 12),
+          // Dates row
           Row(
             children: [
               Expanded(
-                child: _buildDateTile(
+                child: _buildDateChip(
                   label: '${_docType.displayName} Date',
                   dateStr: DateFormatter.format(_issueDate),
                   onTap: _selectIssueDate,
-                  icon: Icons.calendar_today_rounded,
                 ),
               ),
-              Container(
-                width: 1,
-                height: 40,
-                color: AppColors.border,
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-              ),
+              const SizedBox(width: 12),
               Expanded(
-                child: _buildDateTile(
+                child: _buildDateChip(
                   label: _docType == DocumentType.quotation
                       ? 'Valid Until'
                       : 'Due Date',
                   dateStr: DateFormatter.format(_dueDate),
                   onTap: _selectDueDate,
-                  icon: Icons.event_available_rounded,
                 ),
               ),
             ],
@@ -635,43 +618,54 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     );
   }
 
-  Widget _buildDateTile({
+  Widget _buildDateChip({
     required String label,
     required String dateStr,
     required VoidCallback onTap,
-    required IconData icon,
   }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 14, color: AppColors.textMuted),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.canvas,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textMuted,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    dateStr,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            dateStr,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            Icon(
+              Icons.calendar_today_rounded,
+              size: 14,
+              color: AppColors.textMuted,
+            ),
+          ],
+        ),
       ),
     );
   }

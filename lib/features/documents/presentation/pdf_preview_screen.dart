@@ -74,70 +74,139 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   void _showTemplateSelector() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      useSafeArea: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (bottomSheetContext) {
+        final screenHeight = MediaQuery.of(bottomSheetContext).size.height;
+        final templates = TemplateRegistry.getTemplatesFor(_document.docType);
+
         return Container(
-          height: 220,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          height: screenHeight * 0.9,
+          padding: const EdgeInsets.only(top: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  'Select Template',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Select Template',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppColors.textPrimary,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () => Navigator.pop(bottomSheetContext),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
+
               Expanded(
-                child: StatefulBuilder(
-                  builder: (context, setStateSheet) {
-                    final templates = TemplateRegistry.getTemplatesFor(_document.docType);
-                    return ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: templates.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) {
-                        final t = templates[index];
-                        final isSelected = t.id == _currentTemplateId;
-                        return SizedBox(
-                          width: 100,
-                          child: InkWell(
-                            onTap: () {
-                              if (!isSelected) {
-                                setStateSheet(() {}); // update sheet UI immediately
-                                setState(() {
-                                  _currentTemplateId = t.id;
-                                  _document = _document.copyWith(templateId: t.id);
-                                });
-                                context.read<DocumentBloc>().add(SaveDocumentEvent(_document));
-                              }
-                            },
-                            child: IgnorePointer(
-                              child: TemplateThumbnailCard(
-                                template: t,
-                                isSelected: isSelected,
-                                documentType: _document.docType,
-                                showPaymentDetails: false,
-                                onTap: () {},
-                              ),
-                            ),
-                          ),
-                        );
+                child: GridView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.65,
+                  ),
+                  itemCount: templates.length,
+                  itemBuilder: (context, index) {
+                    final t = templates[index];
+                    final isSelected = t.id == _currentTemplateId;
+                    return InkWell(
+                      onTap: () {
+                        if (!isSelected) {
+                          setState(() {
+                            _currentTemplateId = t.id;
+                            _document = _document.copyWith(templateId: t.id);
+                          });
+                          context.read<DocumentBloc>().add(
+                            SaveDocumentEvent(_document),
+                          );
+                          Navigator.pop(bottomSheetContext);
+                        }
                       },
+                      child: IgnorePointer(
+                        child: TemplateThumbnailCard(
+                          template: t,
+                          isSelected: isSelected,
+                          documentType: _document.docType,
+                          showPaymentDetails: false,
+                          onTap: () {},
+                        ),
+                      ),
                     );
                   },
                 ),
               ),
+              const SizedBox(height: 30),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showDocumentSettings() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (bottomSheetContext) {
+        return StatefulBuilder(
+          builder: (context, setStateSheet) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Document Settings',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    title: const Text('Show Payment Details & QR Code'),
+                    subtitle: const Text('Include bank and UPI info on PDF'),
+                    value: _document.includePaymentDetails,
+                    activeThumbColor: AppColors.primary,
+                    onChanged: (val) {
+                      setStateSheet(() {
+                        _document = _document.copyWith(
+                          includePaymentDetails: val,
+                        );
+                      });
+                      setState(() {});
+                      context.read<DocumentBloc>().add(
+                        SaveDocumentEvent(_document),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -157,10 +226,13 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
               '${_document.docType.displayName} ${_document.docNumber}',
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.edit_outlined),
-                tooltip: 'Edit Document',
-                onPressed: () async {
+              GestureDetector(
+                onTap: _showDocumentSettings,
+                child: Icon(Icons.settings_outlined),
+              ),
+              SizedBox(width: 10),
+              GestureDetector(
+                onTap: () async {
                   await Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) =>
@@ -175,152 +247,174 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     }
                   }
                 },
+                child: Icon(Icons.edit_outlined),
               ),
+
               TextButton(
-                child: Text("Done"),
+                child: const Text("Done"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
             ],
           ),
-          body: Column(
-            children: [
-              // Quick actions banner (Convert / Record Payment)
-              if (_document.docType == DocumentType.quotation &&
-                  _document.status != DocumentStatus.accepted)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.lg,
-                    vertical: 8,
-                  ),
-                  color: AppColors.primaryLight,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.check_circle_outline,
-                        color: AppColors.primaryDark,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          'Client accepted this quotation?',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryDark,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: _handleConvertToInvoice,
-                        child: const Text(
-                          'Convert to Invoice',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else if (_document.docType == DocumentType.invoice &&
-                  _document.balanceDue > 0)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.lg,
-                    vertical: 8,
-                  ),
-                  color: AppColors.statusPaidBg,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.payments_outlined,
-                        color: AppColors.statusPaidText,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Balance Due: Ã¢â€šÂ¹${_document.balanceDue.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.statusPaidText,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: _handleRecordPayment,
-                        child: const Text(
-                          'Record Payment',
-                          style: TextStyle(
-                            color: AppColors.statusPaidText,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                            // Template pill chip indicator
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppDimensions.lg,
-                  8,
-                  AppDimensions.lg,
-                  4,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Quick actions banner (Convert / Record Payment)
+                if (_document.docType == DocumentType.quotation &&
+                    _document.status != DocumentStatus.accepted)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.lg,
+                    ),
+                    color: AppColors.primaryLight,
+                    child: Row(
                       children: [
-                        const Text(
-                          'Template: ',
-                          style: AppTypography.bodySmall,
+                        const Icon(
+                          Icons.check_circle_outline,
+                          color: AppColors.primaryDark,
+                          size: 20,
                         ),
-                        Text(
-                          TemplateRegistry.getById(_currentTemplateId).name,
-                          style: AppTypography.titleSmall.copyWith(
-                            fontSize: 12,
-                            color: AppColors.primary,
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Client accepted this quotation?',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: _handleConvertToInvoice,
+                          child: const Text(
+                            'Convert to Invoice',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
                     ),
-                    InkWell(
-                      onTap: _showTemplateSelector,
-                      child: Text(
-                        'Change Style â–¾',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                  )
+                else if (_document.docType == DocumentType.invoice &&
+                    _document.balanceDue > 0)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.lg,
+                      // vertical: 8,
+                    ),
+                    color: AppColors.statusPaidBg,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.payments_outlined,
+                          color: AppColors.statusPaidText,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Balance Due: \u20B9${_document.balanceDue.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.statusPaidText,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: _handleRecordPayment,
+                          child: const Text(
+                            'Record Payment',
+                            style: TextStyle(
+                              color: AppColors.statusPaidText,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Template pill chip indicator
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Template: ',
+                            style: AppTypography.bodySmall,
+                          ),
+                          Text(
+                            TemplateRegistry.getById(_currentTemplateId).name,
+                            style: AppTypography.titleSmall.copyWith(
+                              fontSize: 12,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      InkWell(
+                        onTap: _showTemplateSelector,
+                        child: Text(
+                          'Change Style \u25BE',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-              // Native Interactive PDF Viewer with local printing & sharing
-              Expanded(
-                child: PdfPreview(
-                  build: (format) => DocumentPdfGenerator.generate(
-                    document: _document,
-                    profile: profile,
-                    templateId: _currentTemplateId,
-                  ),
-                  canChangeOrientation: false,
-                  canChangePageFormat: false,
-                  canDebug: false,
-                  pdfFileName: '${_document.docNumber}.pdf',
-                  loadingWidget: const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
+                // Clean styled Native Interactive PDF Viewer
+                Expanded(
+                  child: PdfPreview(
+                    build: (format) => DocumentPdfGenerator.generate(
+                      document: _document,
+                      profile: profile,
+                      templateId: _currentTemplateId,
+                    ),
+                    previewPageMargin: EdgeInsets.all(5),
+                    useActions: true,
+                    canChangeOrientation: false,
+                    canChangePageFormat: true,
+                    canDebug: false,
+                    scrollViewDecoration: const BoxDecoration(
+                      color: AppColors.canvas,
+                    ),
+                    pdfPreviewPageDecoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(30),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    pdfFileName: '${_document.docNumber}.pdf',
+                    loadingWidget: const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+
+                // Custom Bottom Bar for Print & Share
+                //
+              ],
+            ),
           ),
         );
       },

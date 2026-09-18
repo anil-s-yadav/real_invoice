@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:real_invoice/features/onboarding/bloc/onboarding_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
@@ -12,14 +13,12 @@ import '../../business_profile/bloc/business_profile_event.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 import '../../navigation/main_nav_scaffold.dart';
 import '../../business_profile/domain/business_profile_model.dart';
+import '../bloc/onboarding_cubit.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final bool isAddingNewCompany;
-  
-  const OnboardingScreen({
-    super.key,
-    this.isAddingNewCompany = false,
-  });
+
+  const OnboardingScreen({super.key, this.isAddingNewCompany = false});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -53,7 +52,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _panController = TextEditingController();
   final _websiteController = TextEditingController();
 
-  final List<String> _languages = ['English', 'Spanish', 'French', 'German', 'Hindi', 'Arabic'];
+  final List<String> _languages = [
+    'English',
+    'Spanish',
+    'French',
+    'German',
+    'Hindi',
+    'Arabic',
+  ];
   final List<Map<String, String>> _countries = [
     {'name': 'India', 'currency': 'INR', 'symbol': '₹'},
     {'name': 'United States', 'currency': 'USD', 'symbol': '\$'},
@@ -105,68 +111,73 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       Navigator.of(context).pop();
       return;
     }
-    _finishAndNavigate(const BusinessProfile(id: '')); 
+    _finishAndNavigate(const BusinessProfile(id: ''));
     // passing empty ID allows the bloc to create a new blank profile, or use existing
   }
 
-
   Future<void> _submitOnboarding() async {
     if (_nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Business Name is required')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Business Name is required')),
+      );
       return;
     }
-    
+
     final state = context.read<BusinessProfileBloc>().state;
 
-      BusinessProfile profile;
-      if (state is BusinessProfileLoaded) {
-        profile = state.profile.copyWith(
-          businessName: _nameController.text.trim(),
-          email: _emailController.text.trim(),
-          phone: _phoneController.text.trim(),
-          address: _addressController.text.trim(),
-          gstin: _gstinController.text.trim(),
-          pan: _panController.text.trim(),
-          website: _websiteController.text.trim(),
-          currencyCode: _selectedCurrencyCode,
-          currencySymbol: _selectedCurrencySymbol,
-          logoPath: _logoPath,
-          signaturePath: _signaturePath,
-          stampPath: _stampPath,
-        );
-      } else {
-        profile = BusinessProfile(
-          id: '',
-          businessName: _nameController.text.trim(),
-          email: _emailController.text.trim(),
-          phone: _phoneController.text.trim(),
-          address: _addressController.text.trim(),
-          gstin: _gstinController.text.trim(),
-          pan: _panController.text.trim(),
-          website: _websiteController.text.trim(),
-          currencyCode: _selectedCurrencyCode,
-          currencySymbol: _selectedCurrencySymbol,
-          logoPath: _logoPath,
-          signaturePath: _signaturePath,
-          stampPath: _stampPath,
-        );
-      }
+    BusinessProfile profile;
+    if (state is BusinessProfileLoaded) {
+      profile = state.profile.copyWith(
+        businessName: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        address: _addressController.text.trim(),
+        gstin: _gstinController.text.trim(),
+        pan: _panController.text.trim(),
+        website: _websiteController.text.trim(),
+        currencyCode: _selectedCurrencyCode,
+        currencySymbol: _selectedCurrencySymbol,
+        logoPath: _logoPath,
+        signaturePath: _signaturePath,
+        stampPath: _stampPath,
+      );
+    } else {
+      profile = BusinessProfile(
+        id: '',
+        businessName: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        address: _addressController.text.trim(),
+        gstin: _gstinController.text.trim(),
+        pan: _panController.text.trim(),
+        website: _websiteController.text.trim(),
+        currencyCode: _selectedCurrencyCode,
+        currencySymbol: _selectedCurrencySymbol,
+        logoPath: _logoPath,
+        signaturePath: _signaturePath,
+        stampPath: _stampPath,
+      );
+    }
     _finishAndNavigate(profile);
   }
 
   Future<void> _finishAndNavigate(BusinessProfile profile) async {
-    final prefs = await SharedPreferences.getInstance();
     if (!widget.isAddingNewCompany) {
-      await prefs.setBool('has_completed_onboarding', true);
+      if (mounted) {
+        await context.read<OnboardingCubit>().completeOnboarding();
+      }
+      final prefs = await SharedPreferences.getInstance();
       await prefs.setString('app_language', _selectedLanguage);
       await prefs.setString('app_country', _selectedCountry);
     }
 
     if (mounted) {
       if (profile.businessName.isNotEmpty) {
-        context.read<BusinessProfileBloc>().add(UpdateBusinessProfileEvent(profile));
+        context.read<BusinessProfileBloc>().add(
+          UpdateBusinessProfileEvent(profile),
+        );
       }
-      
+
       if (widget.isAddingNewCompany) {
         Navigator.of(context).pop();
       } else {
@@ -198,7 +209,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         actions: [
           TextButton(
             onPressed: _skipOnboarding,
-            child: const Text('Skip', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Skip',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -215,7 +232,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       margin: const EdgeInsets.symmetric(horizontal: 2),
                       height: 4,
                       decoration: BoxDecoration(
-                        color: index <= _currentPage ? AppColors.primary : AppColors.border,
+                        color: index <= _currentPage
+                            ? AppColors.primary
+                            : AppColors.border,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -237,16 +256,48 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 children: widget.isAddingNewCompany
                     ? [
-                        _buildStepImageUpload(1, 'Upload Company Logo', 'A professional logo builds trust with your clients.', _logoPath),
-                        _buildStepImageUpload(2, 'Upload Signature', 'Digital signatures make your invoices authentic and legally compliant.', _signaturePath),
-                        _buildStepImageUpload(3, 'Upload Company Stamp', 'Optional. Add an official company stamp/seal.', _stampPath, isOptional: true),
+                        _buildStepImageUpload(
+                          1,
+                          'Upload Company Logo',
+                          'A professional logo builds trust with your clients.',
+                          _logoPath,
+                        ),
+                        _buildStepImageUpload(
+                          2,
+                          'Upload Signature',
+                          'Digital signatures make your invoices authentic and legally compliant.',
+                          _signaturePath,
+                        ),
+                        _buildStepImageUpload(
+                          3,
+                          'Upload Company Stamp',
+                          'Optional. Add an official company stamp/seal.',
+                          _stampPath,
+                          isOptional: true,
+                        ),
                         _buildStep5BusinessInfo(),
                       ]
                     : [
                         _buildStep1Localization(),
-                        _buildStepImageUpload(1, 'Upload Company Logo', 'A professional logo builds trust with your clients.', _logoPath),
-                        _buildStepImageUpload(2, 'Upload Signature', 'Digital signatures make your invoices authentic and legally compliant.', _signaturePath),
-                        _buildStepImageUpload(3, 'Upload Company Stamp', 'Optional. Add an official company stamp/seal.', _stampPath, isOptional: true),
+                        _buildStepImageUpload(
+                          1,
+                          'Upload Company Logo',
+                          'A professional logo builds trust with your clients.',
+                          _logoPath,
+                        ),
+                        _buildStepImageUpload(
+                          2,
+                          'Upload Signature',
+                          'Digital signatures make your invoices authentic and legally compliant.',
+                          _signaturePath,
+                        ),
+                        _buildStepImageUpload(
+                          3,
+                          'Upload Company Stamp',
+                          'Optional. Add an official company stamp/seal.',
+                          _stampPath,
+                          isOptional: true,
+                        ),
                         _buildStep5BusinessInfo(),
                       ],
               ),
@@ -261,16 +312,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     OutlinedButton(
                       onPressed: _previousPage,
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 24,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     const SizedBox(width: 16),
                   ],
                   Expanded(
                     child: AppButton(
-                      label: _currentPage == _totalPages - 1 ? 'Complete Setup' : 'Continue',
+                      label: _currentPage == _totalPages - 1
+                          ? 'Complete Setup'
+                          : 'Continue',
                       onPressed: _nextPage,
                     ),
                   ),
@@ -293,11 +354,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 16),
           const Text('Regional Settings', style: AppTypography.displayMedium),
           const SizedBox(height: 8),
-          const Text('Choose your preferred language, operating country, and default currency.', style: AppTypography.bodyMedium),
+          const Text(
+            'Choose your preferred language, operating country, and default currency.',
+            style: AppTypography.bodyMedium,
+          ),
           const SizedBox(height: 32),
 
           // Language
-          const Text('App Language', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          const Text(
+            'App Language',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
           const SizedBox(height: 8),
           _buildSearchableDropdown(
             value: _selectedLanguage,
@@ -308,7 +375,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 24),
 
           // Country & Currency
-          const Text('Operating Country & Currency', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          const Text(
+            'Operating Country & Currency',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
           const SizedBox(height: 8),
           _buildSearchableDropdown(
             value: _selectedCountry,
@@ -333,10 +403,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.payments_outlined, color: AppColors.textSecondary, size: 20),
+                const Icon(
+                  Icons.payments_outlined,
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
                 const SizedBox(width: 12),
-                const Expanded(child: Text('Default Currency', style: TextStyle(color: AppColors.textSecondary))),
-                Text('$_selectedCurrencyCode ($_selectedCurrencySymbol)', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                const Expanded(
+                  child: Text(
+                    'Default Currency',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                ),
+                Text(
+                  '$_selectedCurrencyCode ($_selectedCurrencySymbol)',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -371,7 +456,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             Icon(icon, color: AppColors.primary, size: 20),
             const SizedBox(width: 12),
-            Expanded(child: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))),
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
             const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
           ],
         ),
@@ -388,7 +481,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.7,
@@ -399,25 +494,46 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             String searchQuery = '';
             return StatefulBuilder(
               builder: (context, setModalState) {
-                final filtered = items.where((item) => item.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+                final filtered = items
+                    .where(
+                      (item) => item.toLowerCase().contains(
+                        searchQuery.toLowerCase(),
+                      ),
+                    )
+                    .toList();
                 return Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       child: TextField(
                         decoration: InputDecoration(
                           hintText: 'Search...',
                           prefixIcon: const Icon(Icons.search),
                           filled: true,
                           fillColor: AppColors.surfaceVariant,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
                         ),
-                        onChanged: (val) => setModalState(() => searchQuery = val),
+                        onChanged: (val) =>
+                            setModalState(() => searchQuery = val),
                       ),
                     ),
                     Expanded(
@@ -446,8 +562,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildStepImageUpload(int step, String title, String subtitle, String? imagePath, {bool isOptional = false}) {
-    final IconData icon = step == 1 ? Icons.business : (step == 2 ? Icons.draw : Icons.verified);
+  Widget _buildStepImageUpload(
+    int step,
+    String title,
+    String subtitle,
+    String? imagePath, {
+    bool isOptional = false,
+  }) {
+    final IconData icon = step == 1
+        ? Icons.business
+        : (step == 2 ? Icons.draw : Icons.verified);
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -461,14 +585,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               if (isOptional)
                 const Padding(
                   padding: EdgeInsets.only(left: 8),
-                  child: Text('(Optional)', style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+                  child: Text(
+                    '(Optional)',
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 14),
+                  ),
                 ),
             ],
           ),
           const SizedBox(height: 8),
           Text(subtitle, style: AppTypography.bodyMedium),
           const SizedBox(height: 48),
-          
+
           Center(
             child: GestureDetector(
               onTap: () => _pickImage(step),
@@ -478,9 +605,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2, style: BorderStyle.solid),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                    width: 2,
+                    style: BorderStyle.solid,
+                  ),
                   boxShadow: [
-                    BoxShadow(color: AppColors.primary.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10)),
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
                   ],
                 ),
                 child: imagePath != null
@@ -491,9 +626,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add_a_photo_outlined, size: 48, color: AppColors.primary.withValues(alpha: 0.5)),
+                          Icon(
+                            Icons.add_a_photo_outlined,
+                            size: 48,
+                            color: AppColors.primary.withValues(alpha: 0.5),
+                          ),
                           const SizedBox(height: 16),
-                          const Text('Tap to Upload', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                          const Text(
+                            'Tap to Upload',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
               ),
@@ -510,7 +655,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   });
                 },
                 icon: const Icon(Icons.delete_outline, color: Colors.red),
-                label: const Text('Remove Image', style: TextStyle(color: Colors.red)),
+                label: const Text(
+                  'Remove Image',
+                  style: TextStyle(color: Colors.red),
+                ),
               ),
             ),
         ],
@@ -528,17 +676,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             const Icon(Icons.storefront, size: 48, color: AppColors.primary),
             const SizedBox(height: 16),
-            const Text('Business Information', style: AppTypography.displayMedium),
+            const Text(
+              'Business Information',
+              style: AppTypography.displayMedium,
+            ),
             const SizedBox(height: 8),
-            const Text('Almost done! Enter your primary business details.', style: AppTypography.bodyMedium),
+            const Text(
+              'Almost done! Enter your primary business details.',
+              style: AppTypography.bodyMedium,
+            ),
             const SizedBox(height: 32),
 
             AppTextField(
               label: 'Business Name',
               controller: _nameController,
               prefix: const Icon(Icons.business),
-              onChanged: (val) { if(val.isNotEmpty) setState((){}); },
-              
+              onChanged: (val) {
+                if (val.isNotEmpty) setState(() {});
+              },
             ),
             const SizedBox(height: 16),
             AppTextField(
@@ -588,4 +743,3 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
-

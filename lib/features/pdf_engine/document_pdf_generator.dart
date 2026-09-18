@@ -56,6 +56,22 @@ class DocumentPdfGenerator {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: _getMargins(selectedTemplate),
+        footer: (context) => pw.Container(
+          margin: const pw.EdgeInsets.only(top: 16),
+          child: pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                'This is a computer generated Document.',
+                style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey),
+              ),
+              pw.Text(
+                'Page ${context.pageNumber} of ${context.pagesCount}',
+                style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey),
+              ),
+            ],
+          ),
+        ),
         build: (context) => _buildTemplateContent(
           context,
           document,
