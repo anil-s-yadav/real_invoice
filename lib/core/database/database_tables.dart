@@ -61,6 +61,7 @@ class DatabaseTables {
       description TEXT,
       unitPrice REAL NOT NULL,
       unit TEXT NOT NULL,
+      defaultTaxName TEXT,
       defaultTaxPercent REAL NOT NULL,
       hsnSacCode TEXT,
       createdAt TEXT NOT NULL
@@ -92,6 +93,7 @@ class DatabaseTables {
       relatedDocId TEXT,
       subtotal REAL NOT NULL,
       taxAmount REAL NOT NULL,
+      documentTaxesJson TEXT,
       roundOff REAL NOT NULL,
       totalAmount REAL NOT NULL,
       amountPaid REAL NOT NULL,
@@ -112,6 +114,7 @@ class DatabaseTables {
       unit TEXT NOT NULL,
       unitPrice REAL NOT NULL,
       discountPercent REAL NOT NULL,
+      taxName TEXT,
       taxPercent REAL NOT NULL,
       hsnSacCode TEXT,
       lineTotal REAL NOT NULL,

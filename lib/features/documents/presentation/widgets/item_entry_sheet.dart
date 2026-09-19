@@ -8,10 +8,8 @@ import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
-import '../../../products/domain/product_model.dart';
 import '../../../settings/data/invoice_settings_repository.dart';
 import '../../domain/document_item_model.dart';
-import 'product_select_sheet.dart';
 
 class ItemEntrySheet extends StatefulWidget {
   final String documentId;
@@ -138,18 +136,7 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
   double get _taxAmount => _taxableAmount * (_taxPercent / 100.0);
   double get _lineTotal => _taxableAmount + _taxAmount;
 
-  void _onSelectProductFromCatalog(ProductItem product) {
-    setState(() {
-      _selectedProductId = product.id;
-      _titleController.text = product.title;
-      if (product.description != null)
-        _descController.text = product.description!;
-      _priceController.text = product.unitPrice.toStringAsFixed(2);
-      _selectedUnit = product.unit;
-      _taxPercent = product.defaultTaxPercent;
-      if (product.hsnSacCode != null) _hsnController.text = product.hsnSacCode!;
-    });
-  }
+
 
   void _handleSave() {
     final title = _titleController.text.trim();
@@ -219,48 +206,6 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Search Saved Items Action
-          InkWell(
-            onTap: () async {
-              final product = await ProductSelectSheet.show(context);
-              if (product != null) {
-                _onSelectProductFromCatalog(product);
-              }
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: AppColors.primary, size: 22),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Search saved items from catalog...',
-                      style: AppTypography.titleSmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const Icon(
-                    Icons.chevron_right,
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: AppDimensions.xl),
-
           // Title
           AppTextField(
             controller: _titleController,
@@ -421,9 +366,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('GST (%)', style: AppTypography.bodySmall),
+                      Text('Tax (${_taxPercent.toStringAsFixed(1)}%)', style: AppTypography.bodySmall),
                       Text(
-                        '+ ',
+                        '+ ${CurrencyFormatter.format(_taxAmount)}',
                         style: AppTypography.tabularNumbers.copyWith(
                           fontSize: 13,
                           color: AppColors.accentNavy,

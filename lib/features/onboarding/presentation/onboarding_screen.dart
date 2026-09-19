@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:real_invoice/features/onboarding/bloc/onboarding_cubit.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
@@ -190,11 +191,39 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _pickImage(int step) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() {
-        if (step == 1) _logoPath = image.path;
-        if (step == 2) _signaturePath = image.path;
-        if (step == 3) _stampPath = image.path;
-      });
+      final bool isSignature = step == 2;
+      final title = isSignature ? 'Crop Signature' : 'Crop Image';
+
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: isSignature 
+            ? null // Free crop for signature
+            : const CropAspectRatio(ratioX: 1, ratioY: 1),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: title,
+            toolbarColor: AppColors.primary,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: isSignature 
+                ? CropAspectRatioPreset.original 
+                : CropAspectRatioPreset.square,
+            lockAspectRatio: !isSignature,
+          ),
+          IOSUiSettings(
+            title: title,
+            aspectRatioLockEnabled: !isSignature,
+            resetAspectRatioEnabled: false,
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        setState(() {
+          if (step == 1) _logoPath = croppedFile.path;
+          if (step == 2) _signaturePath = croppedFile.path;
+          if (step == 3) _stampPath = croppedFile.path;
+        });
+      }
     }
   }
 
@@ -202,7 +231,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.canvas,
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -220,29 +248,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Progress Indicator
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              child: Row(
-                children: List.generate(_totalPages, (index) {
-                  return Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: index <= _currentPage
-                            ? AppColors.primary
-                            : AppColors.border,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+            return Column(
+              children: [
+                // Progress Indicator
+                if (!isKeyboardOpen) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    child: Row(
+                      children: List.generate(_totalPages, (index) {
+                        return Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: index <= _currentPage
+                                  ? AppColors.primary
+                                  : AppColors.border,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        );
+                      }),
                     ),
-                  );
-                }),
-              ),
-            ),
-            const SizedBox(height: 16),
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
             // Page Content
             Expanded(
@@ -310,14 +343,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   Visibility(
                     visible: _currentPage > 0,
-                    maintainSize: false,
-                    maintainAnimation: true,
-                    maintainState: true,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 16.0),
                       child: OutlinedButton(
                         onPressed: _previousPage,
                         style: OutlinedButton.styleFrom(
+                          minimumSize: Size.zero,
                           padding: const EdgeInsets.symmetric(
                             vertical: 14,
                             horizontal: 20,
@@ -346,9 +377,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
+        );
+      }),
+    ),
+  );
   }
 
   Widget _buildStep1Localization() {
@@ -718,13 +750,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             const SizedBox(height: 16),
             AppTextField(
-              label: 'GSTIN / Tax Number',
+              label: 'Tax ID (GSTIN)',
               controller: _gstinController,
               prefix: const Icon(Icons.receipt_long_outlined),
             ),
             const SizedBox(height: 16),
             AppTextField(
-              label: 'PAN (Permanent Account Number)',
+              label: 'Company ID (PAN)',
               controller: _panController,
               textCapitalization: TextCapitalization.characters,
               prefix: const Icon(Icons.credit_card_outlined),

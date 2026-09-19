@@ -24,6 +24,7 @@ import '../../settings/presentation/payment_details_list_screen.dart';
 import 'pdf_preview_screen.dart';
 import 'widgets/customer_select_sheet.dart';
 import 'widgets/item_entry_sheet.dart';
+import 'widgets/product_select_sheet.dart';
 
 class DocumentEditorScreen extends StatefulWidget {
   final DocumentModel? initialDocument;
@@ -471,7 +472,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                       width: 32,
                       height: 32,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
+                      errorBuilder: (_, _, _) =>
                           const Icon(Icons.business, color: AppColors.primary),
                     ),
                   )
@@ -681,6 +682,126 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     );
   }
 
+  void _showCustomerInfo() {
+    if (_selectedCustomer == null) return;
+    final customer = _selectedCustomer!;
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      customer.name.substring(0, customer.name.length.clamp(1, 2)).toUpperCase(),
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          customer.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        if (customer.gstin != null && customer.gstin!.isNotEmpty)
+                          Text('Tax ID: ${customer.gstin}', style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              if (customer.phone != null && customer.phone!.isNotEmpty) ...[
+                _buildInfoRow(Icons.phone_outlined, 'Phone', customer.phone!),
+                const SizedBox(height: 16),
+              ],
+              if (customer.email != null && customer.email!.isNotEmpty) ...[
+                _buildInfoRow(Icons.email_outlined, 'Email', customer.email!),
+                const SizedBox(height: 16),
+              ],
+              if (customer.billingAddress != null && customer.billingAddress!.isNotEmpty) ...[
+                _buildInfoRow(Icons.location_on_outlined, 'Billing Address', customer.billingAddress!),
+                const SizedBox(height: 16),
+              ],
+              if (customer.shippingAddress != null && customer.shippingAddress!.isNotEmpty) ...[
+                _buildInfoRow(Icons.local_shipping_outlined, 'Shipping Address', customer.shippingAddress!),
+                const SizedBox(height: 16),
+              ],
+              if (customer.notes != null && customer.notes!.isNotEmpty) ...[
+                _buildInfoRow(Icons.notes, 'Notes', customer.notes!),
+                const SizedBox(height: 16),
+              ],
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    final newCustomer = await CustomerSelectSheet.show(context);
+                    if (newCustomer != null) {
+                      setState(() => _selectedCustomer = newCustomer);
+                    }
+                  },
+                  icon: const Icon(Icons.swap_horiz),
+                  label: const Text('Change Customer'),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: AppColors.textSecondary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              Text(value, style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCustomerSection() {
     if (_selectedCustomer == null) {
       return GestureDetector(
@@ -724,80 +845,75 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
       );
     }
 
-    return AppCard(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              _selectedCustomer!.name
-                  .substring(0, _selectedCustomer!.name.length.clamp(1, 2))
-                  .toUpperCase(),
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+    return InkWell(
+      onTap: _showCustomerInfo,
+      borderRadius: BorderRadius.circular(16),
+      child: AppCard(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                _selectedCustomer!.name
+                    .substring(0, _selectedCustomer!.name.length.clamp(1, 2))
+                    .toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _selectedCustomer!.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                if (_selectedCustomer!.phone != null &&
-                    _selectedCustomer!.phone!.isNotEmpty)
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    _selectedCustomer!.phone!,
+                    _selectedCustomer!.name,
                     style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppColors.textPrimary,
                     ),
-                  )
-                else if (_selectedCustomer!.email != null &&
-                    _selectedCustomer!.email!.isNotEmpty)
-                  Text(
-                    _selectedCustomer!.email!,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-              ],
+                  const SizedBox(height: 4),
+                  if (_selectedCustomer!.phone != null &&
+                      _selectedCustomer!.phone!.isNotEmpty)
+                    Text(
+                      _selectedCustomer!.phone!,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    )
+                  else if (_selectedCustomer!.email != null &&
+                      _selectedCustomer!.email!.isNotEmpty)
+                    Text(
+                      _selectedCustomer!.email!,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.swap_horiz_rounded,
-              color: AppColors.primary,
+            const Icon(
+              Icons.chevron_right,
+              color: AppColors.textMuted,
             ),
-            onPressed: () async {
-              final customer = await CustomerSelectSheet.show(context);
-              if (customer != null) {
-                setState(() => _selectedCustomer = customer);
-              }
-            },
-            tooltip: 'Change Customer',
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -878,14 +994,35 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                             ],
                           ],
                         ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: () => setState(() => _items.removeAt(index)),
-                          child: const Icon(
-                            Icons.remove_circle_outline,
-                            color: AppColors.statusOverdueText,
-                            size: 20,
-                          ),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                final updatedItem = await ItemEntrySheet.show(
+                                  context,
+                                  documentId: _documentId,
+                                  item: item,
+                                );
+                                if (updatedItem != null) {
+                                  setState(() => _items[index] = updatedItem);
+                                }
+                              },
+                              child: const Icon(
+                                Icons.edit_outlined,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            GestureDetector(
+                              onTap: () => setState(() => _items.removeAt(index)),
+                              child: const Icon(
+                                Icons.delete_outline,
+                                color: AppColors.statusOverdueText,
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -894,44 +1031,61 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               },
             ),
 
-          // Add Item Button inside the card
-          InkWell(
-            onTap: () async {
-              final newItem = await ItemEntrySheet.show(
-                context,
-                documentId: _documentId,
-              );
-              if (newItem != null) {
-                setState(() => _items.add(newItem));
-              }
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                border: _items.isNotEmpty
-                    ? const Border(top: BorderSide(color: AppColors.border))
-                    : null,
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_circle_outline,
-                    color: AppColors.primary,
-                    size: 20,
+          // Add Item Buttons inside the card
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            decoration: BoxDecoration(
+              border: _items.isNotEmpty
+                  ? const Border(top: BorderSide(color: AppColors.border))
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final product = await ProductSelectSheet.show(context);
+                      if (product != null) {
+                        setState(() {
+                          _items.add(
+                            DocumentItem(
+                              id: const Uuid().v4(),
+                              documentId: _documentId,
+                              productId: product.id,
+                              title: product.title,
+                              description: product.description,
+                              quantity: 1,
+                              unit: product.unit,
+                              unitPrice: product.unitPrice,
+                              discountPercent: 0,
+                              taxPercent: product.defaultTaxPercent,
+                              hsnSacCode: product.hsnSacCode,
+                            ),
+                          );
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.list_alt, size: 18),
+                    label: const Text('From Catalog'),
                   ),
-                  SizedBox(width: 8),
-                  Text(
-                    'Add Line Item',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final newItem = await ItemEntrySheet.show(
+                        context,
+                        documentId: _documentId,
+                      );
+                      if (newItem != null) {
+                        setState(() => _items.add(newItem));
+                      }
+                    },
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('Custom Item'),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

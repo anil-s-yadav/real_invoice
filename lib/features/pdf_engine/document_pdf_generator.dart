@@ -1052,7 +1052,7 @@ class DocumentPdfGenerator {
             '- ${_fmt(doc.overallDiscountAmount, profile)}',
           ),
         if (doc.totalTaxAmount > 0)
-          _buildRow('Total GST:', '+ ${_fmt(doc.totalTaxAmount, profile)}'),
+          _buildRow('Total Tax:', '+ ${_fmt(doc.totalTaxAmount, profile)}'),
         if (doc.roundOff.abs() > 0.001)
           _buildRow(
             'Round Off:',

@@ -482,29 +482,37 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          const Text(
-                            'Template: ',
-                            style: AppTypography.bodySmall,
-                          ),
-                          Text(
-                            TemplateRegistry.getById(_currentTemplateId).name,
-                            style: AppTypography.titleSmall.copyWith(
-                              fontSize: 12,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
+                      // Row(
+                      //   children: [
+                      //     const Text(
+                      //       'Template: ',
+                      //       style: AppTypography.bodySmall,
+                      //     ),
+                      //   ],
+                      // ),
+                      const Text(
+                        'Double Tap Document to Zoom',
+                        style: AppTypography.bodySmall,
                       ),
                       InkWell(
                         onTap: _showTemplateSelector,
-                        child: Text(
-                          'Change Style \u25BE',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Change Style \u25BE  : ',
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              TemplateRegistry.getById(_currentTemplateId).name,
+                              style: AppTypography.titleSmall.copyWith(
+                                fontSize: 12,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -519,22 +527,25 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       profile: profile,
                       templateId: _currentTemplateId,
                     ),
-                    previewPageMargin: EdgeInsets.all(5),
+                    previewPageMargin: EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     useActions: true,
                     canChangeOrientation: false,
                     canChangePageFormat: true,
                     canDebug: false,
                     scrollViewDecoration: const BoxDecoration(
-                      color: AppColors.canvas,
+                      color: AppColors.surface,
                     ),
                     pdfPreviewPageDecoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withAlpha(15),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                          offset: const Offset(0, 3),
+                          color: Colors.black.withAlpha(30),
+                          blurRadius: 10,
+                          spreadRadius: 5,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),

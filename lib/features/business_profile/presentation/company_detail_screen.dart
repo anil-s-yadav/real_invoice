@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/confirm_dialog.dart';
@@ -38,16 +39,44 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() {
-        _hasChanges = true;
-        if (field == 'logo') {
-          _profile = _profile.copyWith(logoPath: image.path);
-        } else if (field == 'signature') {
-          _profile = _profile.copyWith(signaturePath: image.path);
-        } else if (field == 'stamp') {
-          _profile = _profile.copyWith(stampPath: image.path);
-        }
-      });
+      final bool isSignature = field == 'signature';
+      final title = isSignature ? 'Crop Signature' : 'Crop Image';
+
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: isSignature 
+            ? null 
+            : const CropAspectRatio(ratioX: 1, ratioY: 1),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: title,
+            toolbarColor: AppColors.primary,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: isSignature 
+                ? CropAspectRatioPreset.original 
+                : CropAspectRatioPreset.square,
+            lockAspectRatio: !isSignature,
+          ),
+          IOSUiSettings(
+            title: title,
+            aspectRatioLockEnabled: !isSignature,
+            resetAspectRatioEnabled: false,
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        setState(() {
+          _hasChanges = true;
+          if (field == 'logo') {
+            _profile = _profile.copyWith(logoPath: croppedFile.path);
+          } else if (field == 'signature') {
+            _profile = _profile.copyWith(signaturePath: croppedFile.path);
+          } else if (field == 'stamp') {
+            _profile = _profile.copyWith(stampPath: croppedFile.path);
+          }
+        });
+      }
     }
   }
 
@@ -150,9 +179,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             const SizedBox(height: 12),
             _buildReadOnlyField('Business Name', _profile.businessName),
             if (_profile.gstin != null && _profile.gstin!.isNotEmpty)
-              _buildReadOnlyField('GSTIN', _profile.gstin!),
+              _buildReadOnlyField('Tax ID / GSTIN', _profile.gstin!),
             if (_profile.pan != null && _profile.pan!.isNotEmpty)
-              _buildReadOnlyField('PAN', _profile.pan!),
+              _buildReadOnlyField('Company ID / PAN', _profile.pan!),
 
             const SizedBox(height: 20),
 

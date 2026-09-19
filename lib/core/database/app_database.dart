@@ -28,7 +28,7 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
@@ -95,6 +95,13 @@ class AppDatabase {
             await db.execute(
               'ALTER TABLE ${DatabaseTables.documents} ADD COLUMN selectedUpiDetailId TEXT',
             );
+          } catch (_) {}
+        }
+        if (oldVersion < 7) {
+          try {
+            await db.execute('ALTER TABLE ${DatabaseTables.products} ADD COLUMN defaultTaxName TEXT');
+            await db.execute('ALTER TABLE ${DatabaseTables.documentItems} ADD COLUMN taxName TEXT');
+            await db.execute('ALTER TABLE ${DatabaseTables.documents} ADD COLUMN documentTaxesJson TEXT');
           } catch (_) {}
         }
       },
