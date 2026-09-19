@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/widgets/confirm_dialog.dart';
 import '../../subscription/presentation/subscription_screen.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../data/business_profile_repository.dart';
@@ -10,6 +9,7 @@ import '../domain/business_profile_model.dart';
 import '../bloc/business_profile_bloc.dart';
 import '../bloc/business_profile_event.dart';
 import '../../onboarding/presentation/onboarding_screen.dart';
+import 'company_detail_screen.dart';
 
 class ManageCompanyListScreen extends StatefulWidget {
   const ManageCompanyListScreen({super.key});
@@ -51,19 +51,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
     }
   }
 
-  Future<void> _delete(BusinessProfile profile) async {
-    final confirm = await ConfirmDialog.show(
-      context,
-      title: 'Delete Company',
-      message: 'Are you sure you want to delete ${profile.businessName}?',
-      confirmLabel: 'Delete',
-      isDestructive: true,
-    );
-    if (confirm) {
-      await _repository.deleteProfile(profile.id);
-      _loadData();
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -170,115 +158,110 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
   }
 
   Widget _buildCompanyCard(BusinessProfile profile, bool isActive) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isActive
-              ? AppColors.primary
-              : Colors.grey.withValues(alpha: 0.2),
-          width: isActive ? 2 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return GestureDetector(
+      onTap: () async {
+        final result = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => CompanyDetailScreen(
+              profile: profile,
+              isActive: isActive,
+            ),
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Logo & Menu
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundColor: AppColors.canvas,
-                      backgroundImage:
-                          profile.logoPath != null &&
-                              profile.logoPath!.isNotEmpty
-                          ? FileImage(File(profile.logoPath!))
-                          : null,
-                      child:
-                          profile.logoPath == null || profile.logoPath!.isEmpty
-                          ? const Icon(
-                              Icons.business,
-                              size: 20,
-                              color: AppColors.textSecondary,
-                            )
-                          : null,
+        );
+        if (result == true) _loadData();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isActive
+                ? AppColors.primary
+                : Colors.grey.withValues(alpha: 0.2),
+            width: isActive ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Logo
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: AppColors.canvas,
+                    backgroundImage:
+                        profile.logoPath != null &&
+                            profile.logoPath!.isNotEmpty
+                        ? FileImage(File(profile.logoPath!))
+                        : null,
+                    child:
+                        profile.logoPath == null || profile.logoPath!.isEmpty
+                        ? const Icon(
+                            Icons.business,
+                            size: 22,
+                            color: AppColors.textSecondary,
+                          )
+                        : null,
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Name
+                  Text(
+                    profile.businessName.isEmpty
+                        ? 'Unnamed Company'
+                        : profile.businessName,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
                     ),
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: PopupMenuButton<String>(
-                        icon: const Icon(
-                          Icons.more_vert,
-                          size: 20,
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Extra Info
+                  if (profile.gstin != null && profile.gstin!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text(
+                        'GST: ${profile.gstin}',
+                        style: const TextStyle(
+                          fontSize: 11,
                           color: AppColors.textSecondary,
                         ),
-                        padding: EdgeInsets.zero,
-                        onSelected: (val) async {
-                          if (val == 'delete') {
-                            _delete(profile);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          if (!isActive)
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.delete_outline,
-                                    size: 18,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Delete',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-
-                // Name
-                Text(
-                  profile.businessName.isEmpty
-                      ? 'Unnamed Company'
-                      : profile.businessName,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-
-                // Extra Info
-                if (profile.gstin != null && profile.gstin!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: Text(
-                      'GST: ${profile.gstin}',
+                  if (profile.email != null && profile.email!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text(
+                        '${profile.email}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  if (profile.phone != null &&
+                      profile.phone!.isNotEmpty &&
+                      (profile.gstin == null || profile.gstin!.isEmpty))
+                    Text(
+                      '${profile.phone}',
                       style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.textSecondary,
@@ -286,109 +269,87 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                if (profile.email != null && profile.email!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: Text(
-                      '${profile.email}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                if (profile.phone != null &&
-                    profile.phone!.isNotEmpty &&
-                    (profile.gstin == null || profile.gstin!.isEmpty))
-                  Text(
-                    '${profile.phone}',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
 
-                const Spacer(),
+                  const Spacer(),
 
-                // Active status / button
-                SizedBox(
-                  width: double.infinity,
-                  child: isActive
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.check_circle,
-                                size: 14,
-                                color: AppColors.primary,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'Active',
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : TextButton(
-                          onPressed: () => _setActive(profile.id),
-                          style: TextButton.styleFrom(
+                  // Active status / button
+                  SizedBox(
+                    width: double.infinity,
+                    child: isActive
+                        ? Container(
                             padding: const EdgeInsets.symmetric(vertical: 6),
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            backgroundColor: Colors.grey.withValues(
-                              alpha: 0.05,
-                            ),
-                            shape: RoundedRectangleBorder(
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                          ),
-                          child: const Text(
-                            'Set Active',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w600,
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check_circle,
+                                  size: 14,
+                                  color: AppColors.primary,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Active',
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : TextButton(
+                            onPressed: () => _setActive(profile.id),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              backgroundColor: Colors.grey.withValues(
+                                alpha: 0.05,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              'Set Active',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                ),
-              ],
-            ),
-          ),
-
-          if (isActive)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(14),
-                    bottomLeft: Radius.circular(14),
                   ),
-                ),
-                child: const Icon(Icons.star, size: 12, color: Colors.white),
+                ],
               ),
             ),
-        ],
+
+            if (isActive)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(14),
+                      bottomLeft: Radius.circular(14),
+                    ),
+                  ),
+                  child: const Icon(Icons.star, size: 12, color: Colors.white),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

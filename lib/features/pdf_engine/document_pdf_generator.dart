@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -18,9 +18,23 @@ class DocumentPdfGenerator {
     required BusinessProfile profile,
     String? templateId,
   }) async {
-    final font = await PdfGoogleFonts.robotoRegular();
-    final boldFont = await PdfGoogleFonts.robotoMedium();
-    final fallback = await PdfGoogleFonts.notoSansDevanagariRegular();
+    // Load fonts: prefer local assets (works offline/debug), fallback to network
+    pw.Font font;
+    pw.Font boldFont;
+    pw.Font fallback;
+    try {
+      final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
+      final boldData = await rootBundle.load('assets/fonts/Roboto-Medium.ttf');
+      final fallbackData = await rootBundle.load('assets/fonts/NotoSansDevanagari-Regular.ttf');
+      font = pw.Font.ttf(fontData);
+      boldFont = pw.Font.ttf(boldData);
+      fallback = pw.Font.ttf(fallbackData);
+    } catch (_) {
+      // Fallback to network fonts if local assets are missing
+      font = await PdfGoogleFonts.robotoRegular();
+      boldFont = await PdfGoogleFonts.robotoMedium();
+      fallback = await PdfGoogleFonts.notoSansDevanagariRegular();
+    }
 
     final pdf = pw.Document(
       title: '${document.docType.displayName} ${document.docNumber}',

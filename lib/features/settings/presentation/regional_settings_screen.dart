@@ -19,12 +19,12 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
   String _selectedLanguage = 'English';
   String _selectedCountry = 'India';
   String _selectedCurrencyCode = 'INR';
-  String _selectedCurrencySymbol = '?';
+  String _selectedCurrencySymbol = '\u20B9';
   bool _isLoading = true;
 
   final List<String> _languages = ['English', 'Hindi', 'Spanish', 'French'];
   final List<Map<String, String>> _countries = [
-    {'name': 'India', 'currency': 'INR', 'symbol': '?'},
+    {'name': 'India', 'currency': 'INR', 'symbol': '\u20B9'},
     {'name': 'United States', 'currency': 'USD', 'symbol': '\$'},
     {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': '£'},
     {'name': 'Australia', 'currency': 'AUD', 'symbol': 'A\$'},
@@ -42,6 +42,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     final state = context.read<BusinessProfileBloc>().state;
 
     if (state is BusinessProfileLoaded) {
@@ -61,6 +62,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
     await prefs.setString('app_language', _selectedLanguage);
     await prefs.setString('app_country', _selectedCountry);
 
+    if (!mounted) return;
     final state = context.read<BusinessProfileBloc>().state;
     if (state is BusinessProfileLoaded) {
       final updatedProfile = state.profile.copyWith(
@@ -302,7 +304,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                             ),
                           ),
                           Text(
-                            '\ (\)',
+                            '$_selectedCurrencyCode ($_selectedCurrencySymbol)',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,

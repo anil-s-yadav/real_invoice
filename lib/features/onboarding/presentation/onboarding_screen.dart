@@ -13,7 +13,6 @@ import '../../business_profile/bloc/business_profile_event.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 import '../../navigation/main_nav_scaffold.dart';
 import '../../business_profile/domain/business_profile_model.dart';
-import '../bloc/onboarding_cubit.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final bool isAddingNewCompany;
@@ -203,6 +202,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.canvas,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -305,7 +305,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
             // Bottom Controls
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
               child: Row(
                 children: [
                   Visibility(
@@ -319,8 +319,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onPressed: _previousPage,
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 24,
+                            vertical: 14,
+                            horizontal: 20,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
