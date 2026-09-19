@@ -49,7 +49,9 @@ class RedInvoiceRoot extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<AuthRepository>(create: (_) => DummyAuthRepository()),
+        RepositoryProvider<AuthRepository>(
+          create: (_) => DummyAuthRepository(),
+        ),
         RepositoryProvider(create: (_) => BusinessProfileRepository()),
         RepositoryProvider(create: (_) => CustomerRepository()),
         RepositoryProvider(create: (_) => ProductRepository()),
@@ -84,7 +86,11 @@ class RedInvoiceRoot extends StatelessWidget {
               businessProfileRepository: ctx.read<BusinessProfileRepository>(),
             )..add(const LoadHomeDataEvent()),
           ),
-          BlocProvider(create: (ctx) => AuthBloc(authRepository: ctx.read<AuthRepository>())..add(const AppStartedEvent())),
+          BlocProvider(
+            create: (ctx) =>
+                AuthBloc(authRepository: ctx.read<AuthRepository>())
+                  ..add(const AppStartedEvent()),
+          ),
           BlocProvider(
             create: (_) =>
                 SubscriptionBloc()..add(const CheckSubscriptionStatusEvent()),
@@ -114,9 +120,13 @@ class RedInvoiceApp extends StatelessWidget {
               builder: (context, hasCompletedOnboarding) {
                 Widget homeWidget;
                 if (authState is AuthInitial || authState is AuthLoading) {
-                  homeWidget = const Scaffold(body: Center(child: CircularProgressIndicator()));
+                  homeWidget = const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
                 } else if (authState is Authenticated) {
-                  homeWidget = hasCompletedOnboarding ? const MainNavScaffold() : const OnboardingScreen();
+                  homeWidget = hasCompletedOnboarding
+                      ? const MainNavScaffold()
+                      : const OnboardingScreen();
                 } else {
                   homeWidget = const SignInScreen();
                 }
