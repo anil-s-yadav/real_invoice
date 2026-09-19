@@ -76,7 +76,7 @@ class DocumentModel {
     this.customerSnapshot,
     required this.issueDate,
     required this.dueDate,
-    this.status = DocumentStatus.draft,
+    this.status = DocumentStatus.sent,
     this.items = const [],
     this.payments = const [],
     this.overallDiscountValue = 0.0,
@@ -152,7 +152,7 @@ class DocumentModel {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final targetDueDate = DateTime(dueDate.year, dueDate.month, dueDate.day);
-    if (status != DocumentStatus.draft && targetDueDate.isBefore(today)) {
+    if (status != DocumentStatus.sent && targetDueDate.isBefore(today)) {
       return DocumentStatus.overdue;
     }
     return status;
@@ -270,7 +270,7 @@ class DocumentModel {
       dueDate: DateTime.tryParse(map['dueDate'] as String? ?? '') ?? DateTime.now().add(const Duration(days: 15)),
       status: DocumentStatus.values.firstWhere(
         (e) => e.name == map['status'],
-        orElse: () => DocumentStatus.draft,
+        orElse: () => DocumentStatus.sent,
       ),
       items: items,
       payments: payments,

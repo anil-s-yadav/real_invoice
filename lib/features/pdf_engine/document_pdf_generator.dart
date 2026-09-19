@@ -18,8 +18,9 @@ class DocumentPdfGenerator {
     required BusinessProfile profile,
     String? templateId,
   }) async {
-    final font = await PdfGoogleFonts.notoSansRegular();
-    final boldFont = await PdfGoogleFonts.notoSansBold();
+    final font = await PdfGoogleFonts.robotoRegular();
+    final boldFont = await PdfGoogleFonts.robotoMedium();
+    final fallback = await PdfGoogleFonts.notoSansDevanagariRegular();
 
     final pdf = pw.Document(
       title: '${document.docType.displayName} ${document.docNumber}',
@@ -27,6 +28,7 @@ class DocumentPdfGenerator {
       theme: pw.ThemeData.withFont(
         base: font,
         bold: boldFont,
+        fontFallback: [fallback],
       ),
     );
 
@@ -121,7 +123,7 @@ class DocumentPdfGenerator {
   }
 
   static String _fmt(double amount, BusinessProfile profile) {
-    final sym = profile.currencySymbol.isEmpty ? '₹' : profile.currencySymbol;
+    final sym = profile.currencySymbol.isEmpty ? '\u20B9' : profile.currencySymbol;
     return CurrencyFormatter.format(amount, symbol: sym);
   }
 

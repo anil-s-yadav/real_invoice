@@ -40,6 +40,26 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     _currentTemplateId = widget.document.templateId;
   }
 
+  Future<void> _handleConvertProformaToInvoice() async {
+    final repo = context.read<DocumentRepository>();
+    final invoice = await repo.convertProformaToInvoice(_document.id);
+
+    if (mounted) {
+      context.read<DocumentBloc>().add(const LoadDocumentsEvent());
+      context.read<HomeBloc>().add(const LoadHomeDataEvent());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Proforma converted to Invoice !'),
+          backgroundColor: AppColors.statusPaidText,
+        ),
+      );
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => PdfPreviewScreen(document: invoice)),
+      );
+    }
+  }
+
   Future<void> _handleConvertToInvoice() async {
     final repo = context.read<DocumentRepository>();
     final invoice = await repo.convertQuotationToInvoice(_document.id);
@@ -150,7 +170,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                           template: t,
                           isSelected: isSelected,
                           documentType: _document.docType,
-                          showPaymentDetails: false,
+                          
                           onTap: () {},
                         ),
                       ),
@@ -263,7 +283,8 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
               children: [
                 // Quick actions banner (Convert / Record Payment)
                 if (_document.docType == DocumentType.quotation &&
-                    _document.status != DocumentStatus.accepted)
+                    _document.status != DocumentStatus.accepted &&
+                    _document.status != DocumentStatus.cancelled)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppDimensions.lg,
@@ -271,15 +292,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     color: AppColors.primaryLight,
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.check_circle_outline,
-                          color: AppColors.primaryDark,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
                         const Expanded(
                           child: Text(
-                            'Client accepted this quotation?',
+                            'Accepted?',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -288,7 +303,122 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                           ),
                         ),
                         TextButton(
+                          onPressed: () async {
+                            final repo = context.read<DocumentRepository>();
+                            await repo.updateDocumentStatus(
+                              _document.id,
+                              DocumentStatus.accepted,
+                            );
+                            if (mounted) {
+                              final doc = await repo.getDocumentById(
+                                _document.id,
+                              );
+                              if (doc != null) setState(() => _document = doc);
+                              context.read<DocumentBloc>().add(
+                                const LoadDocumentsEvent(),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            'Yes',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            final repo = context.read<DocumentRepository>();
+                            await repo.updateDocumentStatus(
+                              _document.id,
+                              DocumentStatus.cancelled,
+                            );
+                            if (mounted) {
+                              final doc = await repo.getDocumentById(
+                                _document.id,
+                              );
+                              if (doc != null) setState(() => _document = doc);
+                              context.read<DocumentBloc>().add(
+                                const LoadDocumentsEvent(),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            'No',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (_document.docType == DocumentType.quotation &&
+                    _document.status == DocumentStatus.accepted)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.lg,
+                    ),
+                    color: AppColors.statusAcceptedBg,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle,
+                          color: AppColors.statusAcceptedText,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Quotation Accepted',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.statusAcceptedText,
+                            ),
+                          ),
+                        ),
+                        TextButton(
                           onPressed: _handleConvertToInvoice,
+                          child: const Text(
+                            'Convert to Invoice',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.statusAcceptedText,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (_document.docType == DocumentType.proforma)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.lg,
+                    ),
+                    color: AppColors.primaryLight,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.transform,
+                          color: AppColors.primaryDark,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Finalize Document',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: _handleConvertProformaToInvoice,
                           child: const Text(
                             'Convert to Invoice',
                             style: TextStyle(fontWeight: FontWeight.bold),
@@ -302,7 +432,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppDimensions.lg,
-                      // vertical: 8,
                     ),
                     color: AppColors.statusPaidBg,
                     child: Row(
@@ -315,7 +444,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Balance Due: \u20B9${_document.balanceDue.toStringAsFixed(2)}',
+                            'Balance Due: ₹',
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -395,10 +524,10 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withAlpha(30),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                          offset: const Offset(0, 5),
+                          color: Colors.black.withAlpha(15),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),

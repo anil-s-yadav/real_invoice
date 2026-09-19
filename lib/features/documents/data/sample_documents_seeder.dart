@@ -256,7 +256,7 @@ class SampleDocumentsSeeder {
         customerSnapshot: starlight,
         issueDate: now.subtract(const Duration(days: 2)),
         dueDate: now.add(const Duration(days: 20)),
-        status: DocumentStatus.draft,
+        status: DocumentStatus.sent,
         templateId: TemplateRegistry.elegant,
         items: const [
           DocumentItem(
@@ -386,7 +386,7 @@ class SampleDocumentsSeeder {
         customerSnapshot: apex,
         issueDate: now.subtract(const Duration(days: 4)),
         dueDate: now.add(const Duration(days: 26)),
-        status: DocumentStatus.draft,
+        status: DocumentStatus.sent,
         templateId: TemplateRegistry.minimal,
         items: const [
           DocumentItem(
@@ -692,7 +692,7 @@ class SampleDocumentsSeeder {
         customerSnapshot: zenith,
         issueDate: now.subtract(const Duration(days: 1)),
         dueDate: now.add(const Duration(days: 14)),
-        status: DocumentStatus.draft,
+        status: DocumentStatus.sent,
         templateId: TemplateRegistry.bold,
         items: const [
           DocumentItem(
@@ -748,7 +748,7 @@ class SampleDocumentsSeeder {
         customerSnapshot: studioDen,
         issueDate: now.subtract(const Duration(days: 2)),
         dueDate: now.add(const Duration(days: 28)),
-        status: DocumentStatus.draft,
+        status: DocumentStatus.sent,
         templateId: TemplateRegistry.elegant,
         items: const [
           DocumentItem(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
+import 'dart:typed_data';
 import '../../../core/constants/app_colors.dart';
 import '../../business_profile/domain/business_profile_model.dart';
 import '../../customers/domain/customer_model.dart';
@@ -14,7 +15,6 @@ class TemplatePreviewScreen extends StatelessWidget {
   final BusinessProfile profile;
   final bool isDefault;
   final VoidCallback onSetDefault;
-  final bool showPaymentDetails;
 
   const TemplatePreviewScreen({
     super.key,
@@ -23,7 +23,6 @@ class TemplatePreviewScreen extends StatelessWidget {
     required this.profile,
     required this.isDefault,
     required this.onSetDefault,
-    this.showPaymentDetails = true,
   });
 
   static Future<void> show({
@@ -44,7 +43,6 @@ class TemplatePreviewScreen extends StatelessWidget {
           profile: profile,
           isDefault: isDefault,
           onSetDefault: onSetDefault,
-          showPaymentDetails: showPaymentDetails,
         ),
       ),
     );
@@ -63,7 +61,8 @@ class TemplatePreviewScreen extends StatelessWidget {
       customerSnapshot: Customer(
         id: 'sample-cust',
         name: 'Acme Technologies Pvt Ltd',
-        billingAddress: '42 Silicon Valley Road, Indiranagar, Bengaluru, KA 560038',
+        billingAddress:
+            '42 Silicon Valley Road, Indiranagar, Bengaluru, KA 560038',
         gstin: '29ABCDE1234F1Z5',
         email: 'billing@acmetech.com',
         phone: '+91 98765 43210',
@@ -74,7 +73,8 @@ class TemplatePreviewScreen extends StatelessWidget {
           id: '1',
           documentId: 'sample-preview',
           title: 'Design System & Branding',
-          description: 'High-fidelity mobile app UI/UX mockups and design token library',
+          description:
+              'High-fidelity mobile app UI/UX mockups and design token library',
           quantity: 1.0,
           unitPrice: 28000.0,
           taxPercent: 18.0,
@@ -84,7 +84,8 @@ class TemplatePreviewScreen extends StatelessWidget {
           id: '2',
           documentId: 'sample-preview',
           title: 'Mobile Application Sprint',
-          description: 'Frontend and backend API integration for cross-platform app',
+          description:
+              'Frontend and backend API integration for cross-platform app',
           quantity: 2.0,
           unitPrice: 32000.0,
           taxPercent: 18.0,
@@ -92,7 +93,7 @@ class TemplatePreviewScreen extends StatelessWidget {
         ),
       ],
       templateId: template.id,
-      includePaymentDetails: showPaymentDetails,
+
       notes: 'Thank you for choosing our services!',
       terms:
           '1. Payment due within 15 days from the date of issuance.\n2. In case of late payment, interest @ 1.5% per month will be charged.',
@@ -114,7 +115,10 @@ class TemplatePreviewScreen extends StatelessWidget {
             ),
             Text(
               '${documentType.displayName} Template Preview',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),
@@ -132,21 +136,42 @@ class TemplatePreviewScreen extends StatelessWidget {
         children: [
           // Native Interactive PDF Viewer with zoom/pan
           Expanded(
-            child: PdfPreview(
-              build: (format) => DocumentPdfGenerator.generate(
-                document: sampleDoc,
-                profile: profile,
-                templateId: template.id,
-              ),
-              canChangeOrientation: false,
-              canChangePageFormat: false,
-              canDebug: false,
-              allowPrinting: false,
-              allowSharing: false,
-              pdfFileName: '${template.id}_preview.pdf',
-              loadingWidget: const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              ),
+            child: FutureBuilder<Uint8List?>(
+              future: _generatePdfImage(sampleDoc),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
+                }
+                if (snapshot.hasError || !snapshot.hasData) {
+                  return const Center(child: Text('Failed to load preview'));
+                }
+                return Container(
+                  color: AppColors.canvas,
+                  child: InteractiveViewer(
+                    minScale: 1.0,
+                    maxScale: 4.0,
+                    child: Center(
+                      child: Container(
+                        margin: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(15),
+                              blurRadius: 8,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Image.memory(snapshot.data!),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 
@@ -238,5 +263,22 @@ class TemplatePreviewScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<Uint8List?> _generatePdfImage(DocumentModel sampleDoc) async {
+    try {
+      final bytes = await DocumentPdfGenerator.generate(
+        document: sampleDoc,
+        profile: profile,
+        templateId: template.id,
+      );
+
+      await for (final page in Printing.raster(bytes, pages: [0], dpi: 200)) {
+        return await page.toPng();
+      }
+    } catch (e) {
+      debugPrint('Error rasterizing pdf: ');
+    }
+    return null;
   }
 }

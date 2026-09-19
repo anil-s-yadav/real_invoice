@@ -4,7 +4,6 @@ import '../constants/app_dimensions.dart';
 import '../constants/app_typography.dart';
 
 enum DocumentStatus {
-  draft,
   sent,
   partial,
   paid,
@@ -16,8 +15,6 @@ enum DocumentStatus {
 extension DocumentStatusX on DocumentStatus {
   String get displayName {
     switch (this) {
-      case DocumentStatus.draft:
-        return 'DRAFT';
       case DocumentStatus.sent:
         return 'SENT';
       case DocumentStatus.partial:
@@ -39,8 +36,6 @@ extension DocumentStatusX on DocumentStatus {
         return AppColors.statusPaidText;
       case DocumentStatus.sent:
         return AppColors.statusSentText;
-      case DocumentStatus.draft:
-        return AppColors.statusDraftText;
       case DocumentStatus.partial:
         return AppColors.statusPartialText;
       case DocumentStatus.overdue:
@@ -58,8 +53,6 @@ extension DocumentStatusX on DocumentStatus {
         return AppColors.statusPaidBg;
       case DocumentStatus.sent:
         return AppColors.statusSentBg;
-      case DocumentStatus.draft:
-        return AppColors.statusDraftBg;
       case DocumentStatus.partial:
         return AppColors.statusPartialBg;
       case DocumentStatus.overdue:
@@ -77,8 +70,6 @@ extension DocumentStatusX on DocumentStatus {
         return AppColors.statusPaidBorder;
       case DocumentStatus.sent:
         return AppColors.statusSentBorder;
-      case DocumentStatus.draft:
-        return AppColors.statusDraftBorder;
       case DocumentStatus.partial:
         return AppColors.statusPartialBorder;
       case DocumentStatus.overdue:

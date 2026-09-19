@@ -215,7 +215,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           PieChartSectionData(
-                            color: AppColors.statusDraftText,
+                            color: AppColors.statusSentText,
                             value: 15,
                             title: '15%',
                             radius: _touchedIndex == 3 ? 60 : 50,
@@ -237,7 +237,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         const SizedBox(height: 8),
                         _buildLegend('Initech', AppColors.statusPaidText),
                         const SizedBox(height: 8),
-                        _buildLegend('Others', AppColors.statusDraftText),
+                        _buildLegend('Others', AppColors.statusSentText),
                       ],
                     ),
                   ),

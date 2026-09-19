@@ -308,27 +308,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.all(24),
               child: Row(
                 children: [
-                  if (_currentPage > 0) ...[
-                    OutlinedButton(
-                      onPressed: _previousPage,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 24,
+                  Visibility(
+                    visible: _currentPage > 0,
+                    maintainSize: false,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: OutlinedButton(
+                        onPressed: _previousPage,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 24,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.textPrimary,
                         ),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                  ],
+                  ),
                   Expanded(
                     child: AppButton(
+                      key: const ValueKey('continue_button'),
                       label: _currentPage == _totalPages - 1
                           ? 'Complete Setup'
                           : 'Continue',
@@ -581,7 +588,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Text(title, style: AppTypography.displayMedium),
+              Expanded(child: Text(title, style: AppTypography.displayMedium)),
               if (isOptional)
                 const Padding(
                   padding: EdgeInsets.only(left: 8),

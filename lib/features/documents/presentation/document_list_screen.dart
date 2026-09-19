@@ -1,5 +1,7 @@
+import '../data/document_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:real_invoice/features/documents/data/document_repository.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
@@ -22,7 +24,6 @@ import '../../pdf_engine/template_registry.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 
-
 enum DateFilterRange {
   allTime,
   last7Days,
@@ -35,12 +36,18 @@ enum DateFilterRange {
 extension DateFilterRangeExt on DateFilterRange {
   String get displayName {
     switch (this) {
-      case DateFilterRange.allTime: return 'All Time';
-      case DateFilterRange.last7Days: return 'Last 7 Days';
-      case DateFilterRange.last30Days: return 'Last 30 Days';
-      case DateFilterRange.last90Days: return 'Last 90 Days';
-      case DateFilterRange.last1Year: return 'Last 1 Year';
-      case DateFilterRange.custom: return 'Custom Range';
+      case DateFilterRange.allTime:
+        return 'All Time';
+      case DateFilterRange.last7Days:
+        return 'Last 7 Days';
+      case DateFilterRange.last30Days:
+        return 'Last 30 Days';
+      case DateFilterRange.last90Days:
+        return 'Last 90 Days';
+      case DateFilterRange.last1Year:
+        return 'Last 1 Year';
+      case DateFilterRange.custom:
+        return 'Custom Range';
     }
   }
 }
@@ -59,7 +66,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
   DocumentType? _selectedType;
   DocumentStatus? _selectedStatus;
   String _searchQuery = '';
-  
+
   DateFilterRange _selectedDateRangeType = DateFilterRange.allTime;
   DateTime? _customStartDate;
   DateTime? _customEndDate;
@@ -161,7 +168,9 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
   Future<void> _showDateRangePicker() async {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
         return SafeArea(
           child: Column(
@@ -169,13 +178,25 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
             children: [
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text('Select Date Range', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                child: Text(
+                  'Select Date Range',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
               ),
               ...DateFilterRange.values.map((range) {
                 final isSelected = _selectedDateRangeType == range;
                 return ListTile(
-                  title: Text(range.displayName, style: TextStyle(fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500)),
-                  trailing: isSelected ? const Icon(Icons.check, color: AppColors.primary) : null,
+                  title: Text(
+                    range.displayName,
+                    style: TextStyle(
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? const Icon(Icons.check, color: AppColors.primary)
+                      : null,
                   onTap: () async {
                     if (range == DateFilterRange.custom) {
                       Navigator.pop(context);
@@ -195,7 +216,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                             ),
                             child: child!,
                           );
-                        }
+                        },
                       );
                       if (picked != null) {
                         _applyFilter(
@@ -386,12 +407,16 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                             height: 44,
                             width: 44,
                             decoration: BoxDecoration(
-                              color: _selectedDateRangeType != DateFilterRange.allTime
+                              color:
+                                  _selectedDateRangeType !=
+                                      DateFilterRange.allTime
                                   ? AppColors.primary
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: _selectedDateRangeType != DateFilterRange.allTime
+                                color:
+                                    _selectedDateRangeType !=
+                                        DateFilterRange.allTime
                                     ? AppColors.primary
                                     : AppColors.border.withValues(alpha: 0.5),
                               ),
@@ -400,7 +425,9 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                             child: Icon(
                               Icons.calendar_month_outlined,
                               size: 22,
-                              color: _selectedDateRangeType != DateFilterRange.allTime
+                              color:
+                                  _selectedDateRangeType !=
+                                      DateFilterRange.allTime
                                   ? Colors.white
                                   : AppColors.textMuted,
                             ),
@@ -733,10 +760,23 @@ class _DocumentListItemCard extends StatelessWidget {
           } else if (val == 'payment') {
             await PaymentEntrySheet.show(context, document: document);
           } else if (val == 'convert') {
-            context.read<DocumentBloc>().add(
-              ConvertQuotationEvent(document.id),
-            );
+            if (document.docType == DocumentType.proforma) {
+              final repo = context.read<DocumentRepository>();
+              await repo.convertProformaToInvoice(document.id);
+              context.read<DocumentBloc>().add(const LoadDocumentsEvent());
+            } else {
+              context.read<DocumentBloc>().add(
+                ConvertQuotationEvent(document.id),
+              );
+            }
             context.read<HomeBloc>().add(const LoadHomeDataEvent());
+          } else if (val == 'mark_accepted') {
+            final repo = context.read<DocumentRepository>();
+            await repo.updateDocumentStatus(
+              document.id,
+              DocumentStatus.accepted,
+            );
+            context.read<DocumentBloc>().add(const LoadDocumentsEvent());
           } else if (val == 'delete') {
             final confirmed = await ConfirmDialog.show(
               context,
@@ -806,6 +846,26 @@ class _DocumentListItemCard extends StatelessWidget {
             ),
           if (document.docType == DocumentType.quotation &&
               document.status != DocumentStatus.accepted)
+            const PopupMenuItem(
+              value: 'mark_accepted',
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 18,
+                    color: Colors.green,
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    'Mark as Accepted',
+                    style: TextStyle(color: Colors.green),
+                  ),
+                ],
+              ),
+            ),
+          if (document.docType == DocumentType.proforma ||
+              (document.docType == DocumentType.quotation &&
+                  document.status == DocumentStatus.accepted))
             const PopupMenuItem(
               value: 'convert',
               child: Row(

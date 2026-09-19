@@ -16,7 +16,7 @@ class SummaryStats {
   final int overdueCount;
   final double paidTotal;
   final int paidCount;
-  final int draftCount;
+  
 
   const SummaryStats({
     this.unpaidTotal = 0.0,
@@ -25,7 +25,7 @@ class SummaryStats {
     this.overdueCount = 0,
     this.paidTotal = 0.0,
     this.paidCount = 0,
-    this.draftCount = 0,
+    
   });
 }
 
@@ -342,7 +342,60 @@ class DocumentRepository {
     return '$prefix$nextNumber';
   }
 
-  Future<DocumentModel> convertQuotationToInvoice(String quotationId) async {
+  
+  Future<DocumentModel> convertProformaToInvoice(String proformaId) async {
+    final proforma = await getDocumentById(proformaId);
+    if (proforma == null) {
+      throw Exception('Proforma not found');
+    }
+
+    // 1. Mark proforma as accepted (optional, just good to know it's processed)
+    await updateDocumentStatus(proformaId, DocumentStatus.accepted);
+
+    // 2. Generate new Invoice Number
+    final nextInvoiceNumber = await getNextDocumentNumber(DocumentType.invoice);
+    final now = DateTime.now();
+
+    // 3. Create new Invoice
+    final newInvoiceId = _uuid.v4();
+    final newItems = proforma.items.map((item) {
+      return item.copyWith(
+        id: _uuid.v4(),
+        documentId: newInvoiceId,
+      );
+    }).toList();
+
+    final invoice = DocumentModel(
+      id: newInvoiceId,
+      docNumber: nextInvoiceNumber,
+      docType: DocumentType.invoice,
+      customerId: proforma.customerId,
+      customerSnapshot: proforma.customerSnapshot,
+      issueDate: now,
+      dueDate: now.add(const Duration(days: 7)),
+      items: newItems,
+      overallDiscountValue: proforma.overallDiscountValue,
+      overallDiscountType: proforma.overallDiscountType,
+      status: DocumentStatus.sent,
+      templateId: proforma.templateId,
+      notes: proforma.notes,
+      terms: proforma.terms,
+      selectedBankDetailId: proforma.selectedBankDetailId,
+      selectedUpiDetailId: proforma.selectedUpiDetailId,
+      poNumber: proforma.poNumber,
+      subject: proforma.subject,
+      shippingCharges: proforma.shippingCharges,
+      includePaymentDetails: proforma.includePaymentDetails,
+      relatedDocId: proformaId,
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    await saveDocument(invoice);
+    return invoice;
+  }
+
+Future<DocumentModel> convertQuotationToInvoice(String quotationId) async {
     final quotation = await getDocumentById(quotationId);
     if (quotation == null) {
       throw Exception('Quotation not found');
@@ -372,7 +425,7 @@ class DocumentRepository {
       customerSnapshot: quotation.customerSnapshot,
       issueDate: now,
       dueDate: now.add(const Duration(days: 15)),
-      status: DocumentStatus.draft,
+      status: DocumentStatus.sent,
       items: newItems,
       payments: const [],
       overallDiscountValue: quotation.overallDiscountValue,
@@ -483,7 +536,7 @@ class DocumentRepository {
     int overdueCount = 0;
     double paidTotal = 0;
     int paidCount = 0;
-    int draftCount = 0;
+    
 
     for (final doc in docs) {
       final status = doc['status'] as String;
@@ -492,9 +545,7 @@ class DocumentRepository {
       final dueDate = doc['dueDate'] as String;
       final remaining = (total - paid).clamp(0.0, double.infinity);
 
-      if (status == DocumentStatus.draft.name) {
-        draftCount++;
-      } else if (status == DocumentStatus.paid.name || remaining <= 0) {
+      if (status == DocumentStatus.paid.name || remaining <= 0) {
         paidTotal += paid;
         paidCount++;
       } else {
@@ -516,7 +567,7 @@ class DocumentRepository {
       overdueCount: overdueCount,
       paidTotal: paidTotal,
       paidCount: paidCount,
-      draftCount: draftCount,
+      
     );
   }
 }

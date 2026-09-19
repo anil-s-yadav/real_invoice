@@ -8,7 +8,7 @@ class TemplateThumbnailCard extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final DocumentType documentType;
-  final bool showPaymentDetails;
+  
 
   const TemplateThumbnailCard({
     super.key,
@@ -16,7 +16,7 @@ class TemplateThumbnailCard extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     this.documentType = DocumentType.invoice,
-    this.showPaymentDetails = true,
+    
   });
 
   @override
@@ -172,7 +172,7 @@ class TemplateThumbnailCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              if (showPaymentDetails)
+              if (true)
                 Container(
                   width: 35,
                   padding: const EdgeInsets.all(2.5),
@@ -304,7 +304,7 @@ class TemplateThumbnailCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              if (showPaymentDetails)
+              if (true)
                 Container(
                   width: 35,
                   padding: const EdgeInsets.all(3),

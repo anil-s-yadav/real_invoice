@@ -231,7 +231,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
     final now = DateTime.now();
     final status =
-        forcedStatus ?? widget.initialDocument?.status ?? DocumentStatus.draft;
+        forcedStatus ?? widget.initialDocument?.status ?? DocumentStatus.sent;
 
     final document = DocumentModel(
       id: _documentId,
@@ -289,21 +289,6 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     }
   }
 
-  Future<void> _handleSaveDraft() async {
-    final doc = await _buildAndSaveDocument(forcedStatus: DocumentStatus.draft);
-    if (doc != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '${doc.docType.displayName} ${doc.docNumber} saved as Draft!',
-          ),
-          backgroundColor: AppColors.statusPaidText,
-        ),
-      );
-      Navigator.of(context).pop();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -319,18 +304,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
         backgroundColor: AppColors.canvas,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
-        actions: [
-          TextButton(
-            onPressed: _isSaving ? null : _handleSaveDraft,
-            child: const Text(
-              'Save Draft',
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ],
+        actions: [],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

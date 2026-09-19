@@ -22,8 +22,7 @@ class DefaultTemplatesScreen extends StatefulWidget {
 class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool _showPaymentDetails = true;
-
+  
   static const List<DocumentType> _types = [
     DocumentType.invoice,
     DocumentType.quotation,
@@ -105,27 +104,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
-        actions: [
-          Row(
-            children: [
-              const Text(
-                'Pay Info',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
-              ),
-              Switch(
-                value: _showPaymentDetails,
-                onChanged: (val) {
-                  setState(() {
-                    _showPaymentDetails = val;
-                  });
-                },
-                activeColor: AppColors.primary,
-                activeTrackColor: AppColors.primary.withValues(alpha: 0.3),
-              ),
-            ],
-          ),
-        ],
-        bottom: PreferredSize(
+                bottom: PreferredSize(
           preferredSize: const Size.fromHeight(54),
           child: Container(
             height: 42,
@@ -287,7 +266,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                           template: t,
                           isSelected: isSelected,
                           documentType: type,
-                          showPaymentDetails: _showPaymentDetails,
+                          
                           onTap: () {
                             TemplatePreviewScreen.show(
                               context: context,
@@ -295,7 +274,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                               documentType: type,
                               profile: profile,
                               isDefault: isSelected,
-                              showPaymentDetails: _showPaymentDetails,
+                              
                               onSetDefault: () {
                                 final updatedProfile = profile.copyWith(
                                   defaultInvoiceTemplateId: type == DocumentType.invoice
