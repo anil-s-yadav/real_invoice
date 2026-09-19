@@ -31,11 +31,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         profileFuture,
       ]);
 
-      emit(HomeLoaded(
-        stats: results[0] as SummaryStats,
-        recentDocuments: results[1] as dynamic,
-        profile: results[2] as dynamic,
-      ));
+      emit(
+        HomeLoaded(
+          stats: results[0] as SummaryStats,
+          recentDocuments: results[1] as dynamic,
+          profile: results[2] as dynamic,
+        ),
+      );
     } catch (e) {
       emit(HomeError(e.toString()));
     }

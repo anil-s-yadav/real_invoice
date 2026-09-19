@@ -10,7 +10,8 @@ class TaxDiscountSettingsScreen extends StatefulWidget {
   const TaxDiscountSettingsScreen({super.key});
 
   @override
-  State<TaxDiscountSettingsScreen> createState() => _TaxDiscountSettingsScreenState();
+  State<TaxDiscountSettingsScreen> createState() =>
+      _TaxDiscountSettingsScreenState();
 }
 
 class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
@@ -44,8 +45,12 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
 
     if (mounted) {
       setState(() {
-        _taxRateController.text = taxRate.toStringAsFixed(taxRate.truncateToDouble() == taxRate ? 0 : 1);
-        _discountRateController.text = discountRate.toStringAsFixed(discountRate.truncateToDouble() == discountRate ? 0 : 1);
+        _taxRateController.text = taxRate.toStringAsFixed(
+          taxRate.truncateToDouble() == taxRate ? 0 : 1,
+        );
+        _discountRateController.text = discountRate.toStringAsFixed(
+          discountRate.truncateToDouble() == discountRate ? 0 : 1,
+        );
         _taxLabelController.text = taxLabel;
         _autoApplyTax = taxEnabled;
         _isLoading = false;
@@ -62,13 +67,16 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
   }
 
   double get _currentTaxRate => double.tryParse(_taxRateController.text) ?? 0.0;
-  double get _currentDiscountRate => double.tryParse(_discountRateController.text) ?? 0.0;
+  double get _currentDiscountRate =>
+      double.tryParse(_discountRateController.text) ?? 0.0;
 
   Future<void> _saveSettings() async {
     setState(() => _isSaving = true);
     final tax = double.tryParse(_taxRateController.text) ?? 0.0;
     final discount = double.tryParse(_discountRateController.text) ?? 0.0;
-    final label = _taxLabelController.text.trim().isEmpty ? 'GST' : _taxLabelController.text.trim();
+    final label = _taxLabelController.text.trim().isEmpty
+        ? 'GST'
+        : _taxLabelController.text.trim();
 
     await _settingsRepo.setDefaultTaxRate(tax);
     await _settingsRepo.setDefaultDiscountRate(discount);
@@ -146,25 +154,34 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                           spacing: 8,
                           runSpacing: 8,
                           children: _commonTaxLabels.map((label) {
-                            final isSelected = _taxLabelController.text.toUpperCase() == label;
+                            final isSelected =
+                                _taxLabelController.text.toUpperCase() == label;
                             return ChoiceChip(
                               label: Text(label),
                               selected: isSelected,
                               onSelected: (selected) {
                                 if (selected) {
-                                  setState(() => _taxLabelController.text = label);
+                                  setState(
+                                    () => _taxLabelController.text = label,
+                                  );
                                 }
                               },
                               selectedColor: AppColors.primary,
                               labelStyle: TextStyle(
                                 fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                color: isSelected ? Colors.white : AppColors.textPrimary,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.textPrimary,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 side: BorderSide(
-                                  color: isSelected ? AppColors.primary : AppColors.border,
+                                  color: isSelected
+                                      ? AppColors.primary
+                                      : AppColors.border,
                                 ),
                               ),
                               showCheckmark: false,
@@ -198,7 +215,10 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                               height: 38,
                               child: TextField(
                                 controller: _taxRateController,
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 textAlign: TextAlign.center,
                                 onChanged: (_) => setState(() {}),
                                 style: const TextStyle(
@@ -208,22 +228,35 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                                 ),
                                 decoration: InputDecoration(
                                   suffixText: '%',
-                                  suffixStyle: const TextStyle(fontWeight: FontWeight.bold),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                  suffixStyle: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 6,
+                                  ),
                                   isDense: true,
                                   filled: true,
-                                  fillColor: AppColors.surfaceVariant.withValues(alpha: 0.5),
+                                  fillColor: AppColors.surfaceVariant
+                                      .withValues(alpha: 0.5),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: AppColors.border),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.border,
+                                    ),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: AppColors.border),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.border,
+                                    ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.primary,
+                                      width: 1.5,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -236,29 +269,40 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                           runSpacing: 8,
                           children: _presetTaxRates.map((rate) {
                             final isSelected = _currentTaxRate == rate;
-                            final text = rate.truncateToDouble() == rate ? '${rate.toInt()}%' : '$rate%';
+                            final text = rate.truncateToDouble() == rate
+                                ? '${rate.toInt()}%'
+                                : '$rate%';
                             return ChoiceChip(
                               label: Text(text),
                               selected: isSelected,
                               onSelected: (selected) {
                                 if (selected) {
                                   setState(() {
-                                    _taxRateController.text = rate.toStringAsFixed(
-                                      rate.truncateToDouble() == rate ? 0 : 1,
-                                    );
+                                    _taxRateController.text = rate
+                                        .toStringAsFixed(
+                                          rate.truncateToDouble() == rate
+                                              ? 0
+                                              : 1,
+                                        );
                                   });
                                 }
                               },
                               selectedColor: AppColors.primary,
                               labelStyle: TextStyle(
                                 fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                color: isSelected ? Colors.white : AppColors.textPrimary,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.textPrimary,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 side: BorderSide(
-                                  color: isSelected ? AppColors.primary : AppColors.border,
+                                  color: isSelected
+                                      ? AppColors.primary
+                                      : AppColors.border,
                                 ),
                               ),
                               showCheckmark: false,
@@ -272,7 +316,10 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
 
                   // Auto Apply Switch
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: Row(
                       children: [
                         const Expanded(
@@ -338,7 +385,9 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                           height: 38,
                           child: TextField(
                             controller: _discountRateController,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                             textAlign: TextAlign.center,
                             onChanged: (_) => setState(() {}),
                             style: const TextStyle(
@@ -348,22 +397,36 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                             ),
                             decoration: InputDecoration(
                               suffixText: '%',
-                              suffixStyle: const TextStyle(fontWeight: FontWeight.bold),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                              suffixStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
                               isDense: true,
                               filled: true,
-                              fillColor: AppColors.surfaceVariant.withValues(alpha: 0.5),
+                              fillColor: AppColors.surfaceVariant.withValues(
+                                alpha: 0.5,
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: AppColors.border),
+                                borderSide: const BorderSide(
+                                  color: AppColors.border,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: AppColors.border),
+                                borderSide: const BorderSide(
+                                  color: AppColors.border,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                borderSide: const BorderSide(
+                                  color: AppColors.primary,
+                                  width: 1.5,
+                                ),
                               ),
                             ),
                           ),
@@ -376,29 +439,38 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                       runSpacing: 8,
                       children: _presetDiscountRates.map((rate) {
                         final isSelected = _currentDiscountRate == rate;
-                        final text = rate.truncateToDouble() == rate ? '${rate.toInt()}%' : '$rate%';
+                        final text = rate.truncateToDouble() == rate
+                            ? '${rate.toInt()}%'
+                            : '$rate%';
                         return ChoiceChip(
                           label: Text(text),
                           selected: isSelected,
                           onSelected: (selected) {
                             if (selected) {
                               setState(() {
-                                _discountRateController.text = rate.toStringAsFixed(
-                                  rate.truncateToDouble() == rate ? 0 : 1,
-                                );
+                                _discountRateController.text = rate
+                                    .toStringAsFixed(
+                                      rate.truncateToDouble() == rate ? 0 : 1,
+                                    );
                               });
                             }
                           },
                           selectedColor: AppColors.primary,
                           labelStyle: TextStyle(
                             fontSize: 13,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            color: isSelected ? Colors.white : AppColors.textPrimary,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.textPrimary,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                             side: BorderSide(
-                              color: isSelected ? AppColors.primary : AppColors.border,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.border,
                             ),
                           ),
                           showCheckmark: false,
@@ -432,7 +504,9 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
     final taxPercent = _autoApplyTax ? _currentTaxRate : 0.0;
     final taxAmount = taxableAmount * (taxPercent / 100.0);
     final totalAmount = taxableAmount + taxAmount;
-    final taxLabel = _taxLabelController.text.trim().isEmpty ? 'GST' : _taxLabelController.text.trim();
+    final taxLabel = _taxLabelController.text.trim().isEmpty
+        ? 'GST'
+        : _taxLabelController.text.trim();
 
     return Container(
       width: double.infinity,
@@ -492,7 +566,10 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
             ),
           ],
           const SizedBox(height: 6),
-          _buildSummaryRow('Taxable Subtotal', CurrencyFormatter.format(taxableAmount)),
+          _buildSummaryRow(
+            'Taxable Subtotal',
+            CurrencyFormatter.format(taxableAmount),
+          ),
           if (_autoApplyTax && taxPercent > 0) ...[
             const SizedBox(height: 6),
             _buildSummaryRow(
@@ -512,10 +589,7 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-          ),
+          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
         ),
         Text(
           value,

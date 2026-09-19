@@ -66,7 +66,14 @@ class SettingsTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (trailing != null) trailing! else const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 20),
+            if (trailing != null)
+              trailing!
+            else
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.textMuted,
+                size: 20,
+              ),
           ],
         ),
       ),

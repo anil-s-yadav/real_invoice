@@ -40,8 +40,8 @@ class ThemeCubit extends Cubit<ThemeMode> {
       final modeStr = mode == ThemeMode.light
           ? 'light'
           : mode == ThemeMode.dark
-              ? 'dark'
-              : 'system';
+          ? 'dark'
+          : 'system';
       await prefs.setString(_themePrefKey, modeStr);
     } catch (_) {}
   }

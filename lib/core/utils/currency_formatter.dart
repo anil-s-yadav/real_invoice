@@ -30,10 +30,7 @@ class CurrencyFormatter {
   }
 
   /// Compact representation for dashboard cards, e.g. ₹ 1.25L or ₹ 45K
-  static String formatCompact(
-    double amount, {
-    String symbol = '₹',
-  }) {
+  static String formatCompact(double amount, {String symbol = '₹'}) {
     if (amount >= 10000000) {
       return '$symbol ${(amount / 10000000).toStringAsFixed(2)} Cr';
     } else if (amount >= 100000) {
@@ -46,7 +43,11 @@ class CurrencyFormatter {
   }
 
   /// Converts number to words in Indian Rupees (standard Indian invoice requirement)
-  static String toWords(double amount, {String currencyUnit = 'Rupees', String subunit = 'Paise'}) {
+  static String toWords(
+    double amount, {
+    String currencyUnit = 'Rupees',
+    String subunit = 'Paise',
+  }) {
     final intPart = amount.floor();
     final decimalPart = ((amount - intPart) * 100).round();
 
@@ -65,13 +66,39 @@ class CurrencyFormatter {
     if (n == 0) return 'Zero';
 
     const units = [
-      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
-      'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
-      'Seventeen', 'Eighteen', 'Nineteen'
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
     ];
 
     const tens = [
-      '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
     ];
 
     String convertLessThanThousand(int num) {
@@ -86,7 +113,8 @@ class CurrencyFormatter {
         num ~/= 10;
       }
       if (num == 0) return current;
-      return '${units[num]} Hundred ${current.isNotEmpty ? 'and $current' : ''}'.trim();
+      return '${units[num]} Hundred ${current.isNotEmpty ? 'and $current' : ''}'
+          .trim();
     }
 
     var crore = n ~/ 10000000;

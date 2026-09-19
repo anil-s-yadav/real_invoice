@@ -3,14 +3,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 import '../constants/app_typography.dart';
 
-enum DocumentStatus {
-  sent,
-  partial,
-  paid,
-  overdue,
-  accepted,
-  cancelled,
-}
+enum DocumentStatus { sent, partial, paid, overdue, accepted, cancelled }
 
 extension DocumentStatusX on DocumentStatus {
   String get displayName {
@@ -86,11 +79,7 @@ class StatusBadge extends StatelessWidget {
   final DocumentStatus status;
   final bool isCompact;
 
-  const StatusBadge({
-    super.key,
-    required this.status,
-    this.isCompact = false,
-  });
+  const StatusBadge({super.key, required this.status, this.isCompact = false});
 
   @override
   Widget build(BuildContext context) {

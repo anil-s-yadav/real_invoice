@@ -46,8 +46,12 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
     _nameController = TextEditingController(text: c?.name ?? '');
     _phoneController = TextEditingController(text: c?.phone ?? '');
     _emailController = TextEditingController(text: c?.email ?? '');
-    _billingAddressController = TextEditingController(text: c?.billingAddress ?? '');
-    _shippingAddressController = TextEditingController(text: c?.shippingAddress ?? '');
+    _billingAddressController = TextEditingController(
+      text: c?.billingAddress ?? '',
+    );
+    _shippingAddressController = TextEditingController(
+      text: c?.shippingAddress ?? '',
+    );
     _gstinController = TextEditingController(text: c?.gstin ?? '');
     _notesController = TextEditingController(text: c?.notes ?? '');
   }
@@ -79,8 +83,12 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
     final customer = Customer(
       id: widget.initialCustomer?.id ?? const Uuid().v4(),
       name: name,
-      phone: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
-      email: _emailController.text.trim().isNotEmpty ? _emailController.text.trim() : null,
+      phone: _phoneController.text.trim().isNotEmpty
+          ? _phoneController.text.trim()
+          : null,
+      email: _emailController.text.trim().isNotEmpty
+          ? _emailController.text.trim()
+          : null,
       billingAddress: _billingAddressController.text.trim().isNotEmpty
           ? _billingAddressController.text.trim()
           : null,
@@ -90,7 +98,9 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
       gstin: _gstinController.text.trim().isNotEmpty
           ? _gstinController.text.trim().toUpperCase()
           : null,
-      notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
+      notes: _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null,
       createdAt: widget.initialCustomer?.createdAt ?? DateTime.now(),
     );
 
@@ -135,7 +145,11 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
                   label: 'Phone Number',
                   hint: '+91 98765 43210',
                   keyboardType: TextInputType.phone,
-                  prefix: const Icon(Icons.phone_outlined, size: 18, color: AppColors.textMuted),
+                  prefix: const Icon(
+                    Icons.phone_outlined,
+                    size: 18,
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ),
               const SizedBox(width: AppDimensions.md),
@@ -145,7 +159,11 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
                   label: 'Email Address',
                   hint: 'contact@acme.com',
                   keyboardType: TextInputType.emailAddress,
-                  prefix: const Icon(Icons.mail_outline, size: 18, color: AppColors.textMuted),
+                  prefix: const Icon(
+                    Icons.mail_outline,
+                    size: 18,
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ),
             ],
@@ -156,7 +174,11 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
             label: 'GSTIN (Tax ID)',
             hint: 'e.g. 29ABCDE1234F1Z5',
             textCapitalization: TextCapitalization.characters,
-            prefix: const Icon(Icons.badge_outlined, size: 18, color: AppColors.textMuted),
+            prefix: const Icon(
+              Icons.badge_outlined,
+              size: 18,
+              color: AppColors.textMuted,
+            ),
           ),
           const SizedBox(height: AppDimensions.md),
           AppTextField(
@@ -176,7 +198,9 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
           ),
           const SizedBox(height: AppDimensions.xl),
           AppButton(
-            label: widget.initialCustomer != null ? 'Update Customer' : 'Save Customer',
+            label: widget.initialCustomer != null
+                ? 'Update Customer'
+                : 'Save Customer',
             onPressed: _handleSave,
             isLoading: _isSaving,
             icon: Icons.check,

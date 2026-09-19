@@ -7,7 +7,7 @@ class ProductRepository {
   final AppDatabase _appDatabase;
 
   ProductRepository({AppDatabase? appDatabase})
-      : _appDatabase = appDatabase ?? AppDatabase.instance;
+    : _appDatabase = appDatabase ?? AppDatabase.instance;
 
   Future<List<ProductItem>> getAllProducts() async {
     final db = await _appDatabase.database;
@@ -53,10 +53,6 @@ class ProductRepository {
 
   Future<void> deleteProduct(String id) async {
     final db = await _appDatabase.database;
-    await db.delete(
-      DatabaseTables.products,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete(DatabaseTables.products, where: 'id = ?', whereArgs: [id]);
   }
 }

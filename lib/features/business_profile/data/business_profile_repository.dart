@@ -10,7 +10,7 @@ class BusinessProfileRepository {
   static const String _activeProfileKey = 'active_profile_id';
 
   BusinessProfileRepository({AppDatabase? appDatabase})
-      : _appDatabase = appDatabase ?? AppDatabase.instance;
+    : _appDatabase = appDatabase ?? AppDatabase.instance;
 
   Future<String> getActiveProfileId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,7 +26,7 @@ class BusinessProfileRepository {
     if (id != null && id.isEmpty) {
       return const BusinessProfile(id: '');
     }
-    
+
     final targetId = id ?? await getActiveProfileId();
     final db = await _appDatabase.database;
     final results = await db.query(
@@ -58,16 +58,16 @@ class BusinessProfileRepository {
   Future<BusinessProfile> saveProfile(BusinessProfile profile) async {
     final db = await _appDatabase.database;
     // If ID is empty, generate a new one
-    final profileToSave = profile.id.isEmpty 
-        ? profile.copyWith(id: const Uuid().v4()) 
+    final profileToSave = profile.id.isEmpty
+        ? profile.copyWith(id: const Uuid().v4())
         : profile;
-        
+
     await db.insert(
       DatabaseTables.businessProfiles,
       profileToSave.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    
+
     return profileToSave;
   }
 
@@ -78,7 +78,7 @@ class BusinessProfileRepository {
       where: 'id = ?',
       whereArgs: [id],
     );
-    
+
     // If we deleted the active profile, reset to default
     final activeId = await getActiveProfileId();
     if (activeId == id) {

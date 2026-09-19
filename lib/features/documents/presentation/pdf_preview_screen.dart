@@ -14,6 +14,7 @@ import '../../pdf_engine/document_pdf_generator.dart';
 import '../../pdf_engine/template_registry.dart';
 import '../bloc/document_bloc.dart';
 import '../bloc/document_event.dart';
+import '../bloc/document_state.dart';
 import '../data/document_repository.dart';
 import '../domain/document_model.dart';
 import 'document_editor_screen.dart';
@@ -45,7 +46,17 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     final invoice = await repo.convertProformaToInvoice(_document.id);
 
     if (mounted) {
-      context.read<DocumentBloc>().add(const LoadDocumentsEvent());
+      final currentLoaded =
+          context.read<DocumentBloc>().state as DocumentLoaded?;
+      context.read<DocumentBloc>().add(
+        LoadDocumentsEvent(
+          type: currentLoaded?.typeFilter,
+          status: currentLoaded?.statusFilter,
+          searchQuery: currentLoaded?.searchQuery ?? '',
+          startDate: currentLoaded?.startDateFilter,
+          endDate: currentLoaded?.endDateFilter,
+        ),
+      );
       context.read<HomeBloc>().add(const LoadHomeDataEvent());
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +76,17 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     final invoice = await repo.convertQuotationToInvoice(_document.id);
 
     if (mounted) {
-      context.read<DocumentBloc>().add(const LoadDocumentsEvent());
+      final currentLoaded =
+          context.read<DocumentBloc>().state as DocumentLoaded?;
+      context.read<DocumentBloc>().add(
+        LoadDocumentsEvent(
+          type: currentLoaded?.typeFilter,
+          status: currentLoaded?.statusFilter,
+          searchQuery: currentLoaded?.searchQuery ?? '',
+          startDate: currentLoaded?.startDateFilter,
+          endDate: currentLoaded?.endDateFilter,
+        ),
+      );
       context.read<HomeBloc>().add(const LoadHomeDataEvent());
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -170,7 +191,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                           template: t,
                           isSelected: isSelected,
                           documentType: _document.docType,
-                          
+
                           onTap: () {},
                         ),
                       ),
@@ -303,21 +324,14 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () async {
-                            final repo = context.read<DocumentRepository>();
-                            await repo.updateDocumentStatus(
-                              _document.id,
-                              DocumentStatus.accepted,
+                          onPressed: () {
+                            final updated = _document.copyWith(
+                              status: DocumentStatus.accepted,
                             );
-                            if (mounted) {
-                              final doc = await repo.getDocumentById(
-                                _document.id,
-                              );
-                              if (doc != null) setState(() => _document = doc);
-                              context.read<DocumentBloc>().add(
-                                const LoadDocumentsEvent(),
-                              );
-                            }
+                            setState(() => _document = updated);
+                            context.read<DocumentBloc>().add(
+                              SaveDocumentEvent(updated),
+                            );
                           },
                           child: const Text(
                             'Yes',
@@ -328,21 +342,14 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () async {
-                            final repo = context.read<DocumentRepository>();
-                            await repo.updateDocumentStatus(
-                              _document.id,
-                              DocumentStatus.cancelled,
+                          onPressed: () {
+                            final updated = _document.copyWith(
+                              status: DocumentStatus.cancelled,
                             );
-                            if (mounted) {
-                              final doc = await repo.getDocumentById(
-                                _document.id,
-                              );
-                              if (doc != null) setState(() => _document = doc);
-                              context.read<DocumentBloc>().add(
-                                const LoadDocumentsEvent(),
-                              );
-                            }
+                            setState(() => _document = updated);
+                            context.read<DocumentBloc>().add(
+                              SaveDocumentEvent(updated),
+                            );
                           },
                           child: const Text(
                             'No',

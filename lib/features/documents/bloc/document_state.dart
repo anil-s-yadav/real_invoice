@@ -24,7 +24,7 @@ class DocumentLoaded extends DocumentState {
   final String searchQuery;
   final DateTime? startDateFilter;
   final DateTime? endDateFilter;
-  
+
   final DocumentModel? resultingDocument;
 
   const DocumentLoaded(
@@ -34,7 +34,7 @@ class DocumentLoaded extends DocumentState {
     this.searchQuery = '',
     this.startDateFilter,
     this.endDateFilter,
-    
+
     this.resultingDocument,
   });
 
@@ -63,14 +63,14 @@ class DocumentActionSuccess extends DocumentLoaded {
     DateTime? endDateFilter,
     DocumentModel? resultingDocument,
   }) : super(
-          documents,
-          typeFilter: typeFilter,
-          statusFilter: statusFilter,
-          searchQuery: searchQuery,
-          startDateFilter: startDateFilter,
-          endDateFilter: endDateFilter,
-          resultingDocument: resultingDocument,
-        );
+         documents,
+         typeFilter: typeFilter,
+         statusFilter: statusFilter,
+         searchQuery: searchQuery,
+         startDateFilter: startDateFilter,
+         endDateFilter: endDateFilter,
+         resultingDocument: resultingDocument,
+       );
 
   @override
   List<Object?> get props => [

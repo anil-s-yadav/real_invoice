@@ -18,7 +18,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        title: const Text('Financial Reports', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Financial Reports',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: AppColors.canvas,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
@@ -53,7 +56,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            
+
             // Revenue Chart
             const Text(
               'Revenue Overview',
@@ -83,26 +86,51 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     ),
                     titlesData: FlTitlesData(
                       show: true,
-                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
                           reservedSize: 30,
                           interval: 1,
                           getTitlesWidget: (value, meta) {
-                            const style = TextStyle(color: AppColors.textSecondary, fontSize: 12);
+                            const style = TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            );
                             Widget text;
                             switch (value.toInt()) {
-                              case 0: text = const Text('Jan', style: style); break;
-                              case 2: text = const Text('Mar', style: style); break;
-                              case 4: text = const Text('May', style: style); break;
-                              case 6: text = const Text('Jul', style: style); break;
-                              case 8: text = const Text('Sep', style: style); break;
-                              case 10: text = const Text('Nov', style: style); break;
-                              default: text = const Text('', style: style); break;
+                              case 0:
+                                text = const Text('Jan', style: style);
+                                break;
+                              case 2:
+                                text = const Text('Mar', style: style);
+                                break;
+                              case 4:
+                                text = const Text('May', style: style);
+                                break;
+                              case 6:
+                                text = const Text('Jul', style: style);
+                                break;
+                              case 8:
+                                text = const Text('Sep', style: style);
+                                break;
+                              case 10:
+                                text = const Text('Nov', style: style);
+                                break;
+                              default:
+                                text = const Text('', style: style);
+                                break;
                             }
-                            return SideTitleWidget(meta: meta, space: 10, child: text);
+                            return SideTitleWidget(
+                              meta: meta,
+                              space: 10,
+                              child: text,
+                            );
                           },
                         ),
                       ),
@@ -115,7 +143,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             if (value == 0) return const SizedBox.shrink();
                             return Text(
                               '${(value / 1000).toInt()}k',
-                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 12,
+                              ),
                             );
                           },
                         ),
@@ -179,15 +210,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     child: PieChart(
                       PieChartData(
                         pieTouchData: PieTouchData(
-                          touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                            setState(() {
-                              if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
-                                _touchedIndex = -1;
-                                return;
-                              }
-                              _touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                            });
-                          },
+                          touchCallback:
+                              (FlTouchEvent event, pieTouchResponse) {
+                                setState(() {
+                                  if (!event.isInterestedForInteractions ||
+                                      pieTouchResponse == null ||
+                                      pieTouchResponse.touchedSection == null) {
+                                    _touchedIndex = -1;
+                                    return;
+                                  }
+                                  _touchedIndex = pieTouchResponse
+                                      .touchedSection!
+                                      .touchedSectionIndex;
+                                });
+                              },
                         ),
                         borderData: FlBorderData(show: false),
                         sectionsSpace: 2,
@@ -198,28 +234,44 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             value: 40,
                             title: '40%',
                             radius: _touchedIndex == 0 ? 60 : 50,
-                            titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                            titleStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                           PieChartSectionData(
                             color: AppColors.primaryDark,
                             value: 30,
                             title: '30%',
                             radius: _touchedIndex == 1 ? 60 : 50,
-                            titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                            titleStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                           PieChartSectionData(
                             color: AppColors.statusPaidText,
                             value: 15,
                             title: '15%',
                             radius: _touchedIndex == 2 ? 60 : 50,
-                            titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                            titleStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                           PieChartSectionData(
                             color: AppColors.statusSentText,
                             value: 15,
                             title: '15%',
                             radius: _touchedIndex == 3 ? 60 : 50,
-                            titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                            titleStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ],
                       ),
@@ -251,7 +303,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  Widget _buildKpiCard(String title, String value, String subtitle, IconData icon, Color color) {
+  Widget _buildKpiCard(
+    String title,
+    String value,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
     return AppCard(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -297,9 +355,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
   Widget _buildLegend(String label, Color color) {
     return Row(
       children: [
-        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textPrimary)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textPrimary,
+          ),
+        ),
       ],
     );
   }

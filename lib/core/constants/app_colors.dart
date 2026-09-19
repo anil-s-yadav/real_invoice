@@ -72,5 +72,7 @@ class AppColors {
   // Accents
   static const Color accentNavy = Color(0xFF1E293B);
   static const Color accentGold = Color(0xFFD97706);
-  static const Color premiumGold = Color(0xFFDAA520); // Darker, rich goldenrod for premium features
+  static const Color premiumGold = Color(
+    0xFFDAA520,
+  ); // Darker, rich goldenrod for premium features
 }

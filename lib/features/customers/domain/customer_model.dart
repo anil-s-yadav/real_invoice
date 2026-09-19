@@ -69,7 +69,9 @@ class Customer {
       shippingAddress: map['shippingAddress'] as String?,
       gstin: map['gstin'] as String?,
       notes: map['notes'] as String?,
-      createdAt: DateTime.tryParse(map['createdAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(map['createdAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 }

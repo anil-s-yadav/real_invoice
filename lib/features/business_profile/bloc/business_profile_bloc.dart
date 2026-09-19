@@ -3,10 +3,12 @@ import '../data/business_profile_repository.dart';
 import 'business_profile_event.dart';
 import 'business_profile_state.dart';
 
-class BusinessProfileBloc extends Bloc<BusinessProfileEvent, BusinessProfileState> {
+class BusinessProfileBloc
+    extends Bloc<BusinessProfileEvent, BusinessProfileState> {
   final BusinessProfileRepository repository;
 
-  BusinessProfileBloc({required this.repository}) : super(const BusinessProfileInitial()) {
+  BusinessProfileBloc({required this.repository})
+    : super(const BusinessProfileInitial()) {
     on<LoadBusinessProfileEvent>(_onLoadProfile);
     on<UpdateBusinessProfileEvent>(_onUpdateProfile);
   }

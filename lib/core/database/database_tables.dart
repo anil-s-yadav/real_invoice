@@ -8,7 +8,8 @@ class DatabaseTables {
   static const String documentItems = 'document_items';
   static const String paymentRecords = 'payment_records';
 
-  static const String createBusinessProfiles = '''
+  static const String createBusinessProfiles =
+      '''
     CREATE TABLE IF NOT EXISTS $businessProfiles (
       id TEXT PRIMARY KEY,
       businessName TEXT NOT NULL,
@@ -37,7 +38,8 @@ class DatabaseTables {
     );
   ''';
 
-  static const String createCustomers = '''
+  static const String createCustomers =
+      '''
     CREATE TABLE IF NOT EXISTS $customers (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -51,7 +53,8 @@ class DatabaseTables {
     );
   ''';
 
-  static const String createProducts = '''
+  static const String createProducts =
+      '''
     CREATE TABLE IF NOT EXISTS $products (
       id TEXT PRIMARY KEY,
       title TEXT NOT NULL,
@@ -64,7 +67,8 @@ class DatabaseTables {
     );
   ''';
 
-  static const String createDocuments = '''
+  static const String createDocuments =
+      '''
     CREATE TABLE IF NOT EXISTS $documents (
       id TEXT PRIMARY KEY,
       docNumber TEXT NOT NULL,
@@ -96,7 +100,8 @@ class DatabaseTables {
     );
   ''';
 
-  static const String createDocumentItems = '''
+  static const String createDocumentItems =
+      '''
     CREATE TABLE IF NOT EXISTS $documentItems (
       id TEXT PRIMARY KEY,
       documentId TEXT NOT NULL,
@@ -114,7 +119,8 @@ class DatabaseTables {
     );
   ''';
 
-  static const String createPaymentRecords = '''
+  static const String createPaymentRecords =
+      '''
     CREATE TABLE IF NOT EXISTS $paymentRecords (
       id TEXT PRIMARY KEY,
       documentId TEXT NOT NULL,

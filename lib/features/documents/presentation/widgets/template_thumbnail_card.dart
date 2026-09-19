@@ -8,7 +8,6 @@ class TemplateThumbnailCard extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final DocumentType documentType;
-  
 
   const TemplateThumbnailCard({
     super.key,
@@ -16,7 +15,6 @@ class TemplateThumbnailCard extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     this.documentType = DocumentType.invoice,
-    
   });
 
   @override
@@ -32,7 +30,9 @@ class TemplateThumbnailCard extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: isSelected ? template.accentColor : AppColors.borderStrong,
+                  color: isSelected
+                      ? template.accentColor
+                      : AppColors.borderStrong,
                   width: isSelected ? 3 : 1,
                 ),
                 boxShadow: [
@@ -47,7 +47,11 @@ class TemplateThumbnailCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(5),
-                    child: _buildDummyDataThumbnail(template.id, template.accentColor, documentType),
+                    child: _buildDummyDataThumbnail(
+                      template.id,
+                      template.accentColor,
+                      documentType,
+                    ),
                   ),
                   if (isSelected)
                     Positioned(
@@ -59,7 +63,11 @@ class TemplateThumbnailCard extends StatelessWidget {
                           color: template.accentColor,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.check, color: Colors.white, size: 16),
+                        child: const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                       ),
                     ),
                 ],
@@ -82,7 +90,11 @@ class TemplateThumbnailCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDummyDataThumbnail(String id, Color accentColor, DocumentType docType) {
+  Widget _buildDummyDataThumbnail(
+    String id,
+    Color accentColor,
+    DocumentType docType,
+  ) {
     if (id == TemplateRegistry.sunsetOrange) {
       return _buildSunsetOrangeThumbnail(accentColor, docType);
     }
@@ -100,14 +112,31 @@ class TemplateThumbnailCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
-            child: Text(docType.displayName.toUpperCase(), style: TextStyle(color: accentColor, fontSize: 6.5, fontWeight: FontWeight.bold)),
+            child: Text(
+              docType.displayName.toUpperCase(),
+              style: TextStyle(
+                color: accentColor,
+                fontSize: 6.5,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           const SizedBox(height: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('YOUR BRAND', style: TextStyle(color: textColor, fontSize: headingSize, fontWeight: FontWeight.bold)),
-              Text('004 | 19 JUN', style: TextStyle(color: mutedColor, fontSize: 3)),
+              Text(
+                'YOUR BRAND',
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: headingSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '004 | 19 JUN',
+                style: TextStyle(color: mutedColor, fontSize: 3),
+              ),
             ],
           ),
           const SizedBox(height: 3),
@@ -119,13 +148,30 @@ class TemplateThumbnailCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF3EC),
                     borderRadius: BorderRadius.circular(3),
-                    border: Border.all(color: const Color(0xFFFED7AA), width: 0.5),
+                    border: Border.all(
+                      color: const Color(0xFFFED7AA),
+                      width: 0.5,
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Quotation by', style: TextStyle(color: accentColor, fontSize: 3.2, fontWeight: FontWeight.bold)),
-                      Text('Your Company\nGSTIN / PAN', style: TextStyle(color: textColor, fontSize: 2.6, height: 1.1)),
+                      Text(
+                        'Quotation by',
+                        style: TextStyle(
+                          color: accentColor,
+                          fontSize: 3.2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Your Company\nGSTIN / PAN',
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 2.6,
+                          height: 1.1,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -137,13 +183,30 @@ class TemplateThumbnailCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF3EC),
                     borderRadius: BorderRadius.circular(3),
-                    border: Border.all(color: const Color(0xFFFED7AA), width: 0.5),
+                    border: Border.all(
+                      color: const Color(0xFFFED7AA),
+                      width: 0.5,
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Quotation to', style: TextStyle(color: accentColor, fontSize: 3.2, fontWeight: FontWeight.bold)),
-                      Text('Studio Den\nGSTIN / PAN', style: TextStyle(color: textColor, fontSize: 2.6, height: 1.1)),
+                      Text(
+                        'Quotation to',
+                        style: TextStyle(
+                          color: accentColor,
+                          fontSize: 3.2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Studio Den\nGSTIN / PAN',
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 2.6,
+                          height: 1.1,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -158,15 +221,62 @@ class TemplateThumbnailCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: const Row(
               children: [
-                Expanded(flex: 3, child: Text('Item description', style: TextStyle(color: Colors.white, fontSize: 3.2, fontWeight: FontWeight.bold))),
-                Expanded(flex: 1, child: Text('Qty', style: TextStyle(color: Colors.white, fontSize: 3.2, fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
-                Expanded(flex: 2, child: Text('Amount', style: TextStyle(color: Colors.white, fontSize: 3.2, fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    'Item description',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 3.2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Qty',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 3.2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    'Amount',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 3.2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
               ],
             ),
           ),
-          _buildDummyRow('Web Development', '1', '₹10,000', bgColor: Colors.white),
-          _buildDummyRow('Logo Design', '1', '₹1,000', bgColor: const Color(0xFFFFF3EC)),
-          _buildDummyRow('Full Stack Dev', '1', '₹40,000', bgColor: Colors.white),
+          _buildDummyRow(
+            'Web Development',
+            '1',
+            '₹10,000',
+            bgColor: Colors.white,
+          ),
+          _buildDummyRow(
+            'Logo Design',
+            '1',
+            '₹1,000',
+            bgColor: const Color(0xFFFFF3EC),
+          ),
+          _buildDummyRow(
+            'Full Stack Dev',
+            '1',
+            '₹40,000',
+            bgColor: Colors.white,
+          ),
           const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -179,26 +289,66 @@ class TemplateThumbnailCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF3EC),
                     borderRadius: BorderRadius.circular(2),
-                    border: Border.all(color: const Color(0xFFFED7AA), width: 0.5),
+                    border: Border.all(
+                      color: const Color(0xFFFED7AA),
+                      width: 0.5,
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('PAYMENT', style: TextStyle(color: accentColor, fontSize: 2.2, fontWeight: FontWeight.bold)),
-                      const Text('UPI: user@upi', style: TextStyle(color: Colors.black87, fontSize: 2.2)),
+                      Text(
+                        'PAYMENT',
+                        style: TextStyle(
+                          color: accentColor,
+                          fontSize: 2.2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Text(
+                        'UPI: user@upi',
+                        style: TextStyle(color: Colors.black87, fontSize: 2.2),
+                      ),
                     ],
                   ),
                 )
               else
-                Text('Terms & Notes...', style: TextStyle(color: mutedColor, fontSize: 2.6)),
+                Text(
+                  'Terms & Notes...',
+                  style: TextStyle(color: mutedColor, fontSize: 2.6),
+                ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Sub Total: ₹51,000', style: TextStyle(color: mutedColor, fontSize: 2.8)),
-                  const Text('Discount(5%): -₹2,550', style: TextStyle(color: Color(0xFF16A34A), fontSize: 2.8, fontWeight: FontWeight.bold)),
-                  Text('Total: ₹48,450', style: TextStyle(color: textColor, fontSize: 4.5, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Sub Total: ₹51,000',
+                    style: TextStyle(color: mutedColor, fontSize: 2.8),
+                  ),
+                  const Text(
+                    'Discount(5%): -₹2,550',
+                    style: TextStyle(
+                      color: Color(0xFF16A34A),
+                      fontSize: 2.8,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Total: ₹48,450',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 4.5,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 1),
-                  Text('Auth. Signature', style: TextStyle(color: textColor, fontSize: 2.6, fontStyle: FontStyle.italic)),
+                  Text(
+                    'Auth. Signature',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 2.6,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -208,11 +358,15 @@ class TemplateThumbnailCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStandardThumbnail(String id, Color accentColor, DocumentType docType) {
+  Widget _buildStandardThumbnail(
+    String id,
+    Color accentColor,
+    DocumentType docType,
+  ) {
     const double titleSize = 5.5;
     const double headingSize = 3.8;
     const double bodySize = 3.2;
-    
+
     final Color textColor = Colors.black87;
     final Color mutedColor = Colors.black54;
 
@@ -224,20 +378,42 @@ class TemplateThumbnailCard extends StatelessWidget {
           // Header variation based on template
           if (id == TemplateRegistry.bold) ...[
             Container(
-              height: 18, 
+              height: 18,
               width: double.infinity,
               color: accentColor,
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(docType.displayName.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 7.5, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              child: Text(
+                docType.displayName.toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 7.5,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
             ),
             const SizedBox(height: 4),
           ] else if (id == TemplateRegistry.corporate) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('YOUR LOGO', style: TextStyle(color: accentColor, fontSize: titleSize, fontWeight: FontWeight.bold)),
-                Text(docType.displayName.toUpperCase(), style: const TextStyle(fontSize: titleSize, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                Text(
+                  'YOUR LOGO',
+                  style: TextStyle(
+                    color: accentColor,
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  docType.displayName.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 3),
@@ -245,10 +421,27 @@ class TemplateThumbnailCard extends StatelessWidget {
             const SizedBox(height: 4),
           ] else ...[
             Row(
-              mainAxisAlignment: id == TemplateRegistry.elegant ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: id == TemplateRegistry.elegant
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.spaceBetween,
               children: [
-                Text('RealInvoice', style: TextStyle(color: accentColor, fontSize: titleSize, fontWeight: FontWeight.bold)),
-                if (id != TemplateRegistry.elegant) Text(docType.displayName.toUpperCase(), style: const TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                Text(
+                  'RealInvoice',
+                  style: TextStyle(
+                    color: accentColor,
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (id != TemplateRegistry.elegant)
+                  Text(
+                    docType.displayName.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 4),
@@ -262,15 +455,43 @@ class TemplateThumbnailCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Billed To:', style: TextStyle(color: mutedColor, fontSize: headingSize, fontWeight: FontWeight.bold)),
-                  Text('Acme Corp\n123 Business Rd.', style: TextStyle(color: textColor, fontSize: bodySize, height: 1.15)),
+                  Text(
+                    'Billed To:',
+                    style: TextStyle(
+                      color: mutedColor,
+                      fontSize: headingSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Acme Corp\n123 Business Rd.',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: bodySize,
+                      height: 1.15,
+                    ),
+                  ),
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('${docType.prefix}2024-001', style: TextStyle(color: textColor, fontSize: headingSize, fontWeight: FontWeight.bold)),
-                  Text('Date: Oct 1\nDue: Oct 15', style: TextStyle(color: mutedColor, fontSize: bodySize, height: 1.15)),
+                  Text(
+                    '${docType.prefix}2024-001',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: headingSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Date: Oct 1\nDue: Oct 15',
+                    style: TextStyle(
+                      color: mutedColor,
+                      fontSize: bodySize,
+                      height: 1.15,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -280,25 +501,59 @@ class TemplateThumbnailCard extends StatelessWidget {
           // Table Header
           Container(
             height: 9,
-            color: id == TemplateRegistry.minimal ? Colors.transparent : accentColor.withValues(alpha: 0.1),
+            color: id == TemplateRegistry.minimal
+                ? Colors.transparent
+                : accentColor.withValues(alpha: 0.1),
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Row(
               children: [
-                Expanded(flex: 3, child: Text('Item', style: TextStyle(color: accentColor, fontSize: headingSize, fontWeight: FontWeight.bold))),
-                Expanded(flex: 1, child: Text('Qty', style: TextStyle(color: accentColor, fontSize: headingSize, fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
-                Expanded(flex: 2, child: Text('Total', style: TextStyle(color: accentColor, fontSize: headingSize, fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    'Item',
+                    style: TextStyle(
+                      color: accentColor,
+                      fontSize: headingSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Qty',
+                    style: TextStyle(
+                      color: accentColor,
+                      fontSize: headingSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    'Total',
+                    style: TextStyle(
+                      color: accentColor,
+                      fontSize: headingSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
               ],
             ),
           ),
           Container(height: 0.8, color: accentColor.withValues(alpha: 0.3)),
-          
+
           // Table Rows
           _buildDummyRow('Web Design', '1', '₹15,000'),
           _buildDummyRow('Hosting', '12', '₹2,400'),
           _buildDummyRow('Maintenance', '1', '₹5,000'),
-          
+
           const Spacer(),
-          
+
           // Totals
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -315,9 +570,22 @@ class TemplateThumbnailCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('PAYMENT', style: TextStyle(color: accentColor, fontSize: 2.5, fontWeight: FontWeight.bold)),
-                      const Text('UPI: user@upi', style: TextStyle(color: Colors.black87, fontSize: 2.5)),
-                      const Text('Bank: HDFC A/c..', style: TextStyle(color: Colors.black87, fontSize: 2.5)),
+                      Text(
+                        'PAYMENT',
+                        style: TextStyle(
+                          color: accentColor,
+                          fontSize: 2.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Text(
+                        'UPI: user@upi',
+                        style: TextStyle(color: Colors.black87, fontSize: 2.5),
+                      ),
+                      const Text(
+                        'Bank: HDFC A/c..',
+                        style: TextStyle(color: Colors.black87, fontSize: 2.5),
+                      ),
                     ],
                   ),
                 )
@@ -326,36 +594,83 @@ class TemplateThumbnailCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Subtotal: ₹22,400', style: TextStyle(color: mutedColor, fontSize: bodySize)),
+                  Text(
+                    'Subtotal: ₹22,400',
+                    style: TextStyle(color: mutedColor, fontSize: bodySize),
+                  ),
                   const SizedBox(height: 0.5),
-                  Text('Tax (18%): ₹4,032', style: TextStyle(color: mutedColor, fontSize: bodySize)),
+                  Text(
+                    'Tax (18%): ₹4,032',
+                    style: TextStyle(color: mutedColor, fontSize: bodySize),
+                  ),
                   const SizedBox(height: 1),
-                  Text('Total: ₹26,432', style: TextStyle(color: textColor, fontSize: titleSize, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Total: ₹26,432',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 4),
-          
+
           // Footer
-          if (id == TemplateRegistry.modernCrimson || id == TemplateRegistry.bold)
+          if (id == TemplateRegistry.modernCrimson ||
+              id == TemplateRegistry.bold)
             Container(height: 2.5, color: accentColor)
           else
-            Container(height: 1.5, width: double.infinity, color: Colors.grey[300]),
+            Container(
+              height: 1.5,
+              width: double.infinity,
+              color: Colors.grey[300],
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildDummyRow(String item, String qty, String total, {Color? bgColor}) {
+  Widget _buildDummyRow(
+    String item,
+    String qty,
+    String total, {
+    Color? bgColor,
+  }) {
     return Container(
       color: bgColor,
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       child: Row(
         children: [
-          Expanded(flex: 3, child: Text(item, style: const TextStyle(fontSize: 3.2, color: Colors.black87))),
-          Expanded(flex: 1, child: Text(qty, style: const TextStyle(fontSize: 3.2, color: Colors.black54), textAlign: TextAlign.center)),
-          Expanded(flex: 2, child: Text(total, style: const TextStyle(fontSize: 3.2, color: Colors.black87, fontWeight: FontWeight.w500), textAlign: TextAlign.right)),
+          Expanded(
+            flex: 3,
+            child: Text(
+              item,
+              style: const TextStyle(fontSize: 3.2, color: Colors.black87),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              qty,
+              style: const TextStyle(fontSize: 3.2, color: Colors.black54),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              total,
+              style: const TextStyle(
+                fontSize: 3.2,
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
         ],
       ),
     );

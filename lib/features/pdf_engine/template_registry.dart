@@ -33,49 +33,56 @@ class TemplateRegistry {
     TemplateInfo(
       id: modernCrimson,
       name: 'Modern Crimson',
-      description: 'Signature RedInvoice layout with refined crimson accents and carded totals.',
+      description:
+          'Signature RedInvoice layout with refined crimson accents and carded totals.',
       icon: Icons.auto_awesome,
       accentColor: AppColors.primary,
     ),
     TemplateInfo(
       id: sunsetOrange,
       name: 'Sunset Orange',
-      description: 'Warm peach quotation layout with carded party boxes, bold orange header, and signature seal.',
+      description:
+          'Warm peach quotation layout with carded party boxes, bold orange header, and signature seal.',
       icon: Icons.wb_sunny_outlined,
       accentColor: Color(0xFFF26522),
     ),
     TemplateInfo(
       id: minimal,
       name: 'Classic Minimal',
-      description: 'Ultra-clean monochrome with generous whitespace and Swiss typography.',
+      description:
+          'Ultra-clean monochrome with generous whitespace and Swiss typography.',
       icon: Icons.crop_square,
       accentColor: AppColors.textPrimary,
     ),
     TemplateInfo(
       id: corporate,
       name: 'Corporate Professional',
-      description: 'Formal business grid with full GST, HSN/SAC columns, and bank details.',
+      description:
+          'Formal business grid with full GST, HSN/SAC columns, and bank details.',
       icon: Icons.business_center_outlined,
       accentColor: Color(0xFF1E3A8A),
     ),
     TemplateInfo(
       id: elegant,
       name: 'Artisan Elegant',
-      description: 'Warm editorial styling with refined serif headings and subtle dividers.',
+      description:
+          'Warm editorial styling with refined serif headings and subtle dividers.',
       icon: Icons.palette_outlined,
       accentColor: Color(0xFF78350F),
     ),
     TemplateInfo(
       id: compact,
       name: 'Compact Slip',
-      description: 'High-density single-page format for service visits, trade work, and repairs.',
+      description:
+          'High-density single-page format for service visits, trade work, and repairs.',
       icon: Icons.receipt_outlined,
       accentColor: Color(0xFF374151),
     ),
     TemplateInfo(
       id: bold,
       name: 'Bold Editorial',
-      description: 'High-contrast dark header band with punchy amounts and authoritative branding.',
+      description:
+          'High-contrast dark header band with punchy amounts and authoritative branding.',
       icon: Icons.view_headline,
       accentColor: Color(0xFF0F172A),
     ),

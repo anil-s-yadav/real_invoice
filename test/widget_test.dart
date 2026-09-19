@@ -12,7 +12,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('RedInvoice App smoke test with BLoC and Theming', (WidgetTester tester) async {
+  testWidgets('RedInvoice App smoke test with BLoC and Theming', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const RedInvoiceRoot());
 
     // Pump frames to render widget tree without hanging on animations
@@ -25,25 +27,28 @@ void main() {
     expect(find.text('Skip'), findsOneWidget);
   });
 
-  test('ThemeCubit defaults to ThemeMode.system and updates properly', () async {
-    SharedPreferences.setMockInitialValues({});
-    final themeCubit = ThemeCubit();
+  test(
+    'ThemeCubit defaults to ThemeMode.system and updates properly',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final themeCubit = ThemeCubit();
 
-    // Default must be system device theme
-    expect(themeCubit.state, equals(ThemeMode.system));
+      // Default must be system device theme
+      expect(themeCubit.state, equals(ThemeMode.system));
 
-    // Change to dark mode
-    await themeCubit.setThemeMode(ThemeMode.dark);
-    expect(themeCubit.state, equals(ThemeMode.dark));
+      // Change to dark mode
+      await themeCubit.setThemeMode(ThemeMode.dark);
+      expect(themeCubit.state, equals(ThemeMode.dark));
 
-    // Change to light mode
-    await themeCubit.setThemeMode(ThemeMode.light);
-    expect(themeCubit.state, equals(ThemeMode.light));
+      // Change to light mode
+      await themeCubit.setThemeMode(ThemeMode.light);
+      expect(themeCubit.state, equals(ThemeMode.light));
 
-    // Return to system mode
-    await themeCubit.setThemeMode(ThemeMode.system);
-    expect(themeCubit.state, equals(ThemeMode.system));
+      // Return to system mode
+      await themeCubit.setThemeMode(ThemeMode.system);
+      expect(themeCubit.state, equals(ThemeMode.system));
 
-    await themeCubit.close();
-  });
+      await themeCubit.close();
+    },
+  );
 }

@@ -7,7 +7,7 @@ class CustomerRepository {
   final AppDatabase _appDatabase;
 
   CustomerRepository({AppDatabase? appDatabase})
-      : _appDatabase = appDatabase ?? AppDatabase.instance;
+    : _appDatabase = appDatabase ?? AppDatabase.instance;
 
   Future<List<Customer>> getAllCustomers() async {
     final db = await _appDatabase.database;
@@ -53,10 +53,6 @@ class CustomerRepository {
 
   Future<void> deleteCustomer(String id) async {
     final db = await _appDatabase.database;
-    await db.delete(
-      DatabaseTables.customers,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete(DatabaseTables.customers, where: 'id = ?', whereArgs: [id]);
   }
 }

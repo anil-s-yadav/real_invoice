@@ -22,7 +22,7 @@ class DefaultTemplatesScreen extends StatefulWidget {
 class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   static const List<DocumentType> _types = [
     DocumentType.invoice,
     DocumentType.quotation,
@@ -104,7 +104,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
-                bottom: PreferredSize(
+        bottom: PreferredSize(
           preferredSize: const Size.fromHeight(54),
           child: Container(
             height: 42,
@@ -113,10 +113,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
             decoration: BoxDecoration(
               color: const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFFE2E8F0),
-                width: 0.8,
-              ),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
             ),
             child: TabBar(
               controller: _tabController,
@@ -179,7 +176,9 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
             children: _types.map((type) {
               final templates = TemplateRegistry.getTemplatesFor(type);
               final currentDefaultId = _getDefaultTemplateId(type, profile);
-              final currentTemplate = TemplateRegistry.getById(currentDefaultId);
+              final currentTemplate = TemplateRegistry.getById(
+                currentDefaultId,
+              );
               final color = _getDocumentColor(type);
               final icon = _getDocumentIcon(type);
 
@@ -190,11 +189,16 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.withValues(alpha: 0.15)),
+                        border: Border.all(
+                          color: Colors.grey.withValues(alpha: 0.15),
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.02),
@@ -232,7 +236,8 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                                     ),
                                   ),
                                   const TextSpan(
-                                    text: ' • Tap any design to preview & set default',
+                                    text:
+                                        ' • Tap any design to preview & set default',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textSecondary,
@@ -251,12 +256,13 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                   Expanded(
                     child: GridView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.72,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 20,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.72,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 20,
+                          ),
                       itemCount: templates.length,
                       itemBuilder: (context, index) {
                         final t = templates[index];
@@ -266,7 +272,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                           template: t,
                           isSelected: isSelected,
                           documentType: type,
-                          
+
                           onTap: () {
                             TemplatePreviewScreen.show(
                               context: context,
@@ -274,19 +280,23 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                               documentType: type,
                               profile: profile,
                               isDefault: isSelected,
-                              
+
                               onSetDefault: () {
                                 final updatedProfile = profile.copyWith(
-                                  defaultInvoiceTemplateId: type == DocumentType.invoice
+                                  defaultInvoiceTemplateId:
+                                      type == DocumentType.invoice
                                       ? t.id
                                       : profile.defaultInvoiceTemplateId,
-                                  defaultQuotationTemplateId: type == DocumentType.quotation
+                                  defaultQuotationTemplateId:
+                                      type == DocumentType.quotation
                                       ? t.id
                                       : profile.defaultQuotationTemplateId,
-                                  defaultReceiptTemplateId: type == DocumentType.receipt
+                                  defaultReceiptTemplateId:
+                                      type == DocumentType.receipt
                                       ? t.id
                                       : profile.defaultReceiptTemplateId,
-                                  defaultProformaTemplateId: type == DocumentType.proforma
+                                  defaultProformaTemplateId:
+                                      type == DocumentType.proforma
                                       ? t.id
                                       : profile.defaultProformaTemplateId,
                                 );
@@ -295,7 +305,9 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                                 );
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('${t.name} set as default for ${type.displayName}'),
+                                    content: Text(
+                                      '${t.name} set as default for ${type.displayName}',
+                                    ),
                                     duration: const Duration(seconds: 2),
                                     backgroundColor: AppColors.statusPaidText,
                                   ),

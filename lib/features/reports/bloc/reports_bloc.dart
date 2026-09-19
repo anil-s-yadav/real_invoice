@@ -46,7 +46,8 @@ class ReportsLoaded extends ReportsState {
 class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
   final DocumentRepository documentRepository;
 
-  ReportsBloc({required this.documentRepository}) : super(const ReportsInitial()) {
+  ReportsBloc({required this.documentRepository})
+    : super(const ReportsInitial()) {
     on<GenerateReportEvent>((event, emit) async {
       emit(const ReportsLoading());
       try {

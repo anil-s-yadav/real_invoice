@@ -27,28 +27,36 @@ void main() {
       expect(words, equals('Rupees One Lakh Fifty Thousand Only'));
 
       final wordsWithPaise = CurrencyFormatter.toWords(1250.50);
-      expect(wordsWithPaise, equals('Rupees One Thousand Two Hundred and Fifty and Fifty Paise Only'));
+      expect(
+        wordsWithPaise,
+        equals(
+          'Rupees One Thousand Two Hundred and Fifty and Fifty Paise Only',
+        ),
+      );
     });
   });
 
   group('Document Item & Accounting Calculations', () {
-    test('calculates line item gross, discount, tax, and lineTotal accurately', () {
-      const item = DocumentItem(
-        id: 'item_1',
-        documentId: 'doc_1',
-        title: 'Consulting',
-        quantity: 10,
-        unitPrice: 1000.0,
-        discountPercent: 10.0, // 10% off
-        taxPercent: 18.0, // 18% GST
-      );
+    test(
+      'calculates line item gross, discount, tax, and lineTotal accurately',
+      () {
+        const item = DocumentItem(
+          id: 'item_1',
+          documentId: 'doc_1',
+          title: 'Consulting',
+          quantity: 10,
+          unitPrice: 1000.0,
+          discountPercent: 10.0, // 10% off
+          taxPercent: 18.0, // 18% GST
+        );
 
-      expect(item.grossAmount, equals(10000.0));
-      expect(item.discountAmount, equals(1000.0));
-      expect(item.taxableAmount, equals(9000.0));
-      expect(item.taxAmount, equals(1620.0)); // 18% of 9000
-      expect(item.lineTotal, equals(10620.0));
-    });
+        expect(item.grossAmount, equals(10000.0));
+        expect(item.discountAmount, equals(1000.0));
+        expect(item.taxableAmount, equals(9000.0));
+        expect(item.taxAmount, equals(1620.0)); // 18% of 9000
+        expect(item.lineTotal, equals(10620.0));
+      },
+    );
 
     test('calculates overall document total and round off adjustment', () {
       const item1 = DocumentItem(
@@ -78,59 +86,64 @@ void main() {
       expect(doc.totalAmount, equals(doc.totalAmount.roundToDouble()));
     });
 
-    test('calculates payment status: draft, partial, paid, and balance due', () {
-      final now = DateTime.now();
-      const item = DocumentItem(
-        id: 'item_1',
-        documentId: 'doc_1',
-        title: 'Product',
-        quantity: 1,
-        unitPrice: 1000.0,
-        taxPercent: 0.0,
-      );
+    test(
+      'calculates payment status: draft, partial, paid, and balance due',
+      () {
+        final now = DateTime.now();
+        const item = DocumentItem(
+          id: 'item_1',
+          documentId: 'doc_1',
+          title: 'Product',
+          quantity: 1,
+          unitPrice: 1000.0,
+          taxPercent: 0.0,
+        );
 
-      final unpaidDoc = DocumentModel(
-        id: 'doc_1',
-        docNumber: 'INV-2026-0001',
-        docType: DocumentType.invoice,
-        issueDate: now,
-        dueDate: now.add(const Duration(days: 15)),
-        status: DocumentStatus.sent,
-        items: [item],
-        payments: const [],
-        createdAt: now,
-        updatedAt: now,
-      );
+        final unpaidDoc = DocumentModel(
+          id: 'doc_1',
+          docNumber: 'INV-2026-0001',
+          docType: DocumentType.invoice,
+          issueDate: now,
+          dueDate: now.add(const Duration(days: 15)),
+          status: DocumentStatus.sent,
+          items: [item],
+          payments: const [],
+          createdAt: now,
+          updatedAt: now,
+        );
 
-      expect(unpaidDoc.balanceDue, equals(1000.0));
-      expect(unpaidDoc.calculatedStatus, equals(DocumentStatus.sent));
+        expect(unpaidDoc.balanceDue, equals(1000.0));
+        expect(unpaidDoc.calculatedStatus, equals(DocumentStatus.sent));
 
-      // Partial payment
-      final partialPayment = PaymentRecord(
-        id: 'pay_1',
-        documentId: 'doc_1',
-        paymentDate: now,
-        amount: 400.0,
-        createdAt: now,
-      );
-      final partialDoc = unpaidDoc.copyWith(payments: [partialPayment]);
-      expect(partialDoc.totalPaid, equals(400.0));
-      expect(partialDoc.balanceDue, equals(600.0));
-      expect(partialDoc.calculatedStatus, equals(DocumentStatus.partial));
+        // Partial payment
+        final partialPayment = PaymentRecord(
+          id: 'pay_1',
+          documentId: 'doc_1',
+          paymentDate: now,
+          amount: 400.0,
+          createdAt: now,
+        );
+        final partialDoc = unpaidDoc.copyWith(payments: [partialPayment]);
+        expect(partialDoc.totalPaid, equals(400.0));
+        expect(partialDoc.balanceDue, equals(600.0));
+        expect(partialDoc.calculatedStatus, equals(DocumentStatus.partial));
 
-      // Full payment
-      final fullPayment = PaymentRecord(
-        id: 'pay_2',
-        documentId: 'doc_1',
-        paymentDate: now,
-        amount: 600.0,
-        createdAt: now,
-      );
-      final paidDoc = unpaidDoc.copyWith(payments: [partialPayment, fullPayment]);
-      expect(paidDoc.totalPaid, equals(1000.0));
-      expect(paidDoc.balanceDue, equals(0.0));
-      expect(paidDoc.calculatedStatus, equals(DocumentStatus.paid));
-    });
+        // Full payment
+        final fullPayment = PaymentRecord(
+          id: 'pay_2',
+          documentId: 'doc_1',
+          paymentDate: now,
+          amount: 600.0,
+          createdAt: now,
+        );
+        final paidDoc = unpaidDoc.copyWith(
+          payments: [partialPayment, fullPayment],
+        );
+        expect(paidDoc.totalPaid, equals(1000.0));
+        expect(paidDoc.balanceDue, equals(0.0));
+        expect(paidDoc.calculatedStatus, equals(DocumentStatus.paid));
+      },
+    );
   });
 
   group('Template Registry & PDF Generation', () {

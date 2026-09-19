@@ -28,14 +28,16 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      emit(DocumentLoaded(
-        documents,
-        typeFilter: event.type,
-        statusFilter: event.status,
-        searchQuery: event.searchQuery,
-        startDateFilter: event.startDate,
-        endDateFilter: event.endDate,
-      ));
+      emit(
+        DocumentLoaded(
+          documents,
+          typeFilter: event.type,
+          statusFilter: event.status,
+          searchQuery: event.searchQuery,
+          startDateFilter: event.startDate,
+          endDateFilter: event.endDate,
+        ),
+      );
     } catch (e) {
       emit(DocumentError(e.toString()));
     }
@@ -47,7 +49,9 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
   ) async {
     try {
       await repository.saveDocument(event.document);
-      final currentLoaded = state is DocumentLoaded ? state as DocumentLoaded : null;
+      final currentLoaded = state is DocumentLoaded
+          ? state as DocumentLoaded
+          : null;
       final documents = await repository.getAllDocuments(
         type: currentLoaded?.typeFilter,
         status: currentLoaded?.statusFilter,
@@ -55,14 +59,16 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         startDate: currentLoaded?.startDateFilter,
         endDate: currentLoaded?.endDateFilter,
       );
-      emit(DocumentLoaded(
-        documents,
-        typeFilter: currentLoaded?.typeFilter,
-        statusFilter: currentLoaded?.statusFilter,
-        searchQuery: currentLoaded?.searchQuery ?? '',
-        startDateFilter: currentLoaded?.startDateFilter,
-        endDateFilter: currentLoaded?.endDateFilter,
-      ));
+      emit(
+        DocumentLoaded(
+          documents,
+          typeFilter: currentLoaded?.typeFilter,
+          statusFilter: currentLoaded?.statusFilter,
+          searchQuery: currentLoaded?.searchQuery ?? '',
+          startDateFilter: currentLoaded?.startDateFilter,
+          endDateFilter: currentLoaded?.endDateFilter,
+        ),
+      );
     } catch (e) {
       emit(DocumentError(e.toString()));
     }
@@ -74,7 +80,9 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
   ) async {
     try {
       await repository.deleteDocument(event.id);
-      final currentLoaded = state is DocumentLoaded ? state as DocumentLoaded : null;
+      final currentLoaded = state is DocumentLoaded
+          ? state as DocumentLoaded
+          : null;
       final documents = await repository.getAllDocuments(
         type: currentLoaded?.typeFilter,
         status: currentLoaded?.statusFilter,
@@ -82,14 +90,16 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         startDate: currentLoaded?.startDateFilter,
         endDate: currentLoaded?.endDateFilter,
       );
-      emit(DocumentLoaded(
-        documents,
-        typeFilter: currentLoaded?.typeFilter,
-        statusFilter: currentLoaded?.statusFilter,
-        searchQuery: currentLoaded?.searchQuery ?? '',
-        startDateFilter: currentLoaded?.startDateFilter,
-        endDateFilter: currentLoaded?.endDateFilter,
-      ));
+      emit(
+        DocumentLoaded(
+          documents,
+          typeFilter: currentLoaded?.typeFilter,
+          statusFilter: currentLoaded?.statusFilter,
+          searchQuery: currentLoaded?.searchQuery ?? '',
+          startDateFilter: currentLoaded?.startDateFilter,
+          endDateFilter: currentLoaded?.endDateFilter,
+        ),
+      );
     } catch (e) {
       emit(DocumentError(e.toString()));
     }
@@ -119,7 +129,9 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         );
       }
 
-      final currentLoaded = state is DocumentLoaded ? state as DocumentLoaded : null;
+      final currentLoaded = state is DocumentLoaded
+          ? state as DocumentLoaded
+          : null;
       final documents = await repository.getAllDocuments(
         type: currentLoaded?.typeFilter,
         status: currentLoaded?.statusFilter,
@@ -127,16 +139,18 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         startDate: currentLoaded?.startDateFilter,
         endDate: currentLoaded?.endDateFilter,
       );
-      emit(DocumentActionSuccess(
-        'Payment recorded',
-        documents: documents,
-        typeFilter: currentLoaded?.typeFilter,
-        statusFilter: currentLoaded?.statusFilter,
-        searchQuery: currentLoaded?.searchQuery ?? '',
-        startDateFilter: currentLoaded?.startDateFilter,
-        endDateFilter: currentLoaded?.endDateFilter,
-        resultingDocument: receiptDoc,
-      ));
+      emit(
+        DocumentActionSuccess(
+          'Payment recorded',
+          documents: documents,
+          typeFilter: currentLoaded?.typeFilter,
+          statusFilter: currentLoaded?.statusFilter,
+          searchQuery: currentLoaded?.searchQuery ?? '',
+          startDateFilter: currentLoaded?.startDateFilter,
+          endDateFilter: currentLoaded?.endDateFilter,
+          resultingDocument: receiptDoc,
+        ),
+      );
     } catch (e) {
       emit(DocumentError(e.toString()));
     }
@@ -147,8 +161,12 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
     Emitter<DocumentState> emit,
   ) async {
     try {
-      final invoice = await repository.convertQuotationToInvoice(event.quotationId);
-      final currentLoaded = state is DocumentLoaded ? state as DocumentLoaded : null;
+      final invoice = await repository.convertQuotationToInvoice(
+        event.quotationId,
+      );
+      final currentLoaded = state is DocumentLoaded
+          ? state as DocumentLoaded
+          : null;
       final documents = await repository.getAllDocuments(
         type: currentLoaded?.typeFilter,
         status: currentLoaded?.statusFilter,
@@ -156,16 +174,18 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
         startDate: currentLoaded?.startDateFilter,
         endDate: currentLoaded?.endDateFilter,
       );
-      emit(DocumentActionSuccess(
-        'Quotation converted to Invoice',
-        documents: documents,
-        typeFilter: currentLoaded?.typeFilter,
-        statusFilter: currentLoaded?.statusFilter,
-        searchQuery: currentLoaded?.searchQuery ?? '',
-        startDateFilter: currentLoaded?.startDateFilter,
-        endDateFilter: currentLoaded?.endDateFilter,
-        resultingDocument: invoice,
-      ));
+      emit(
+        DocumentActionSuccess(
+          'Quotation converted to Invoice',
+          documents: documents,
+          typeFilter: currentLoaded?.typeFilter,
+          statusFilter: currentLoaded?.statusFilter,
+          searchQuery: currentLoaded?.searchQuery ?? '',
+          startDateFilter: currentLoaded?.startDateFilter,
+          endDateFilter: currentLoaded?.endDateFilter,
+          resultingDocument: invoice,
+        ),
+      );
     } catch (e) {
       emit(DocumentError(e.toString()));
     }

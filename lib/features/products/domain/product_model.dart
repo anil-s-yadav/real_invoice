@@ -63,7 +63,9 @@ class ProductItem {
       unit: map['unit'] as String? ?? 'pcs',
       defaultTaxPercent: (map['defaultTaxPercent'] as num?)?.toDouble() ?? 18.0,
       hsnSacCode: map['hsnSacCode'] as String?,
-      createdAt: DateTime.tryParse(map['createdAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(map['createdAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 }

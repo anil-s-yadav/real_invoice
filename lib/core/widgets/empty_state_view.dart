@@ -38,16 +38,14 @@ class EmptyStateView extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.border, width: 1.5),
               ),
-              child: Icon(
-                icon,
-                size: 32,
-                color: AppColors.textSecondary,
-              ),
+              child: Icon(icon, size: 32, color: AppColors.textSecondary),
             ),
             const SizedBox(height: AppDimensions.xl),
             Text(
               title,
-              style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w700),
+              style: AppTypography.titleLarge.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppDimensions.sm),
@@ -55,7 +53,9 @@ class EmptyStateView extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 320),
               child: Text(
                 description,
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),

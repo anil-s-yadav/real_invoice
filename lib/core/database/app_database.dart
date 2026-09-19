@@ -17,7 +17,8 @@ class AppDatabase {
   }
 
   Future<Database> _initDB(String filePath) async {
-    if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    if (!kIsWeb &&
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
     }
@@ -42,34 +43,58 @@ class AppDatabase {
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           try {
-            await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultInvoiceTemplateId TEXT');
-            await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultQuotationTemplateId TEXT');
-            await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultReceiptTemplateId TEXT');
-            await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultProformaTemplateId TEXT');
-            await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN paymentDetailsJson TEXT');
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultInvoiceTemplateId TEXT',
+            );
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultQuotationTemplateId TEXT',
+            );
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultReceiptTemplateId TEXT',
+            );
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN defaultProformaTemplateId TEXT',
+            );
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN paymentDetailsJson TEXT',
+            );
           } catch (_) {}
         }
         if (oldVersion < 3) {
           try {
-            await db.execute('ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN stampPath TEXT');
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.businessProfiles} ADD COLUMN stampPath TEXT',
+            );
           } catch (_) {}
         }
         if (oldVersion < 4) {
           try {
-            await db.execute('ALTER TABLE ${DatabaseTables.documents} ADD COLUMN poNumber TEXT');
-            await db.execute('ALTER TABLE ${DatabaseTables.documents} ADD COLUMN subject TEXT');
-            await db.execute('ALTER TABLE ${DatabaseTables.documents} ADD COLUMN shippingCharges REAL DEFAULT 0.0');
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.documents} ADD COLUMN poNumber TEXT',
+            );
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.documents} ADD COLUMN subject TEXT',
+            );
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.documents} ADD COLUMN shippingCharges REAL DEFAULT 0.0',
+            );
           } catch (_) {}
         }
         if (oldVersion < 5) {
           try {
-            await db.execute('ALTER TABLE ${DatabaseTables.documents} ADD COLUMN includePaymentDetails INTEGER DEFAULT 1');
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.documents} ADD COLUMN includePaymentDetails INTEGER DEFAULT 1',
+            );
           } catch (_) {}
         }
         if (oldVersion < 6) {
           try {
-            await db.execute('ALTER TABLE ${DatabaseTables.documents} ADD COLUMN selectedBankDetailId TEXT');
-            await db.execute('ALTER TABLE ${DatabaseTables.documents} ADD COLUMN selectedUpiDetailId TEXT');
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.documents} ADD COLUMN selectedBankDetailId TEXT',
+            );
+            await db.execute(
+              'ALTER TABLE ${DatabaseTables.documents} ADD COLUMN selectedUpiDetailId TEXT',
+            );
           } catch (_) {}
         }
       },

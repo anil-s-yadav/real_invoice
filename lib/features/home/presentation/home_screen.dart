@@ -6,6 +6,7 @@ import '../../../core/constants/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/settings_tile.dart';
+import '../../../core/widgets/status_badge.dart';
 import '../../business_profile/presentation/manage_company_list_screen.dart';
 import '../../documents/data/document_repository.dart';
 import '../../documents/domain/document_model.dart';
@@ -18,7 +19,8 @@ import '../../settings/presentation/user_profile_screen.dart';
 import '../../reports/presentation/reports_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final VoidCallback onNavigateToDocuments;
+  final void Function({DocumentType? type, DocumentStatus? status})
+  onNavigateToDocuments;
   final VoidCallback onNavigateToCustomers;
   final VoidCallback onNavigateToProducts;
   final VoidCallback onNavigateToSettings;
@@ -46,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final businessName = profile?.businessName;
         final isProfileConfigured =
             businessName != null && businessName.trim().isNotEmpty;
+        final isLoading = state is! HomeLoaded;
 
         return Scaffold(
           appBar: AppBar(
@@ -78,15 +81,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      isProfileConfigured
-                          ? businessName
-                          : 'Tap to setup profile',
+                      isLoading
+                          ? 'Loading...'
+                          : (isProfileConfigured
+                                ? businessName
+                                : 'Tap to setup profile'),
                       style: AppTypography.bodySmall.copyWith(
                         fontSize: 11,
-                        color: isProfileConfigured
+                        color: (isProfileConfigured || isLoading)
                             ? AppColors.textSecondary
                             : AppColors.primary,
-                        fontWeight: isProfileConfigured
+                        fontWeight: (isProfileConfigured || isLoading)
                             ? FontWeight.normal
                             : FontWeight.w600,
                       ),
@@ -186,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Premium Welcome Offer Banner
-                  if (!isProfileConfigured)
+                  if (!isLoading && !isProfileConfigured)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Container(
@@ -209,7 +214,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const ManageCompanyListScreen(),
+                                  builder: (_) =>
+                                      const ManageCompanyListScreen(),
                                 ),
                               );
                             },
@@ -269,7 +275,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
 
                   // 1. Overview Dashboard
-                  _buildOverviewDashboard(state is HomeLoaded ? state.stats : null),
+                  _buildOverviewDashboard(
+                    state is HomeLoaded ? state.stats : null,
+                  ),
                   const SizedBox(height: AppDimensions.xxxl),
 
                   // 2. Create Document (Quick Actions - BIG)
@@ -319,56 +327,120 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: AppDimensions.xxxl),
 
-                  // OVERDUE ALERT UI
+                  // OVERDUE NOTIFICATION CARD (Native HomeScreen Theme)
                   if (state is HomeLoaded && state.stats.overdueCount > 0)
                     Padding(
                       padding: const EdgeInsets.only(bottom: AppDimensions.xl),
                       child: Container(
-                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.red.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.shade200),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade100,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.warning_amber_rounded,
-                                color: Colors.red,
-                                size: 24,
-                              ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.border),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => widget.onNavigateToDocuments(
+                              status: DocumentStatus.overdue,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    '${state.stats.overdueCount} Overdue Bill${state.stats.overdueCount > 1 ? 's' : ''}',
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                  // Clean rounded alert icon
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFEF2F2),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Icon(
+                                      Icons.warning_amber_rounded,
+                                      color: Color(0xFFDC2626),
+                                      size: 22,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Amount: ${CurrencyFormatter.format(state.stats.overdueTotal, symbol: profile?.currencySymbol ?? "₹")}',
-                                    style: TextStyle(
-                                      color: Colors.red.shade700,
-                                      fontWeight: FontWeight.w600,
+                                  const SizedBox(width: 14),
+
+                                  // Overdue text
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${state.stats.overdueCount} Overdue Bill${state.stats.overdueCount > 1 ? 's' : ''}',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.textPrimary,
+                                            letterSpacing: -0.2,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          '${state.stats.overdueCount > 1 ? 'Payments are' : 'Payment is'} past the due date',
+                                          style: const TextStyle(
+                                            fontSize: 12.5,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+
+                                  // View Action Button
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 7,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFEF2F2),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: const Color(0xFFFECACA),
+                                        width: 0.8,
+                                      ),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'View',
+                                          style: TextStyle(
+                                            fontSize: 12.5,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFFDC2626),
+                                          ),
+                                        ),
+                                        SizedBox(width: 4),
+                                        Icon(
+                                          Icons.arrow_forward_rounded,
+                                          size: 13,
+                                          color: Color(0xFFDC2626),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -481,7 +553,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            stats == null ? '-' : CurrencyFormatter.formatCompact(stats.unpaidTotal),
+            stats == null
+                ? '-'
+                : CurrencyFormatter.formatCompact(stats.unpaidTotal),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 36,
@@ -532,7 +606,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        stats == null ? '-' : CurrencyFormatter.formatCompact(stats.overdueTotal),
+                        stats == null
+                            ? '-'
+                            : CurrencyFormatter.formatCompact(
+                                stats.overdueTotal,
+                              ),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -583,7 +661,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        stats == null ? '-' : CurrencyFormatter.formatCompact(stats.paidTotal),
+                        stats == null
+                            ? '-'
+                            : CurrencyFormatter.formatCompact(stats.paidTotal),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -780,4 +860,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

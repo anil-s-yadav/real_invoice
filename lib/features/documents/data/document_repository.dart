@@ -16,7 +16,6 @@ class SummaryStats {
   final int overdueCount;
   final double paidTotal;
   final int paidCount;
-  
 
   const SummaryStats({
     this.unpaidTotal = 0.0,
@@ -25,7 +24,6 @@ class SummaryStats {
     this.overdueCount = 0,
     this.paidTotal = 0.0,
     this.paidCount = 0,
-    
   });
 }
 
@@ -35,7 +33,7 @@ class DocumentRepository {
   bool _hasCheckedSeeding = false;
 
   DocumentRepository({AppDatabase? appDatabase})
-      : _appDatabase = appDatabase ?? AppDatabase.instance;
+    : _appDatabase = appDatabase ?? AppDatabase.instance;
 
   Future<void> checkAndSeedSampleDocuments() async {
     if (_hasCheckedSeeding) return;
@@ -97,16 +95,26 @@ class DocumentRepository {
       whereClauses.add('issueDate >= ?');
       whereArgs.add(startDate.toIso8601String());
     }
-    
+
     if (endDate != null) {
       whereClauses.add('issueDate <= ?');
       // Add 1 day and subtract 1 millisecond to include the entire end date
-      final endOfDay = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999);
+      final endOfDay = DateTime(
+        endDate.year,
+        endDate.month,
+        endDate.day,
+        23,
+        59,
+        59,
+        999,
+      );
       whereArgs.add(endOfDay.toIso8601String());
     }
 
     if (searchQuery != null && searchQuery.trim().isNotEmpty) {
-      whereClauses.add('(docNumber LIKE ? OR customerSnapshot LIKE ? OR notes LIKE ?)');
+      whereClauses.add(
+        '(docNumber LIKE ? OR customerSnapshot LIKE ? OR notes LIKE ?)',
+      );
       final q = '%${searchQuery.trim()}%';
       whereArgs.addAll([q, q, q]);
     }
@@ -138,7 +146,9 @@ class DocumentRepository {
         whereArgs: [docId],
         orderBy: 'paymentDate DESC',
       );
-      final payments = paymentRows.map((m) => PaymentRecord.fromMap(m)).toList();
+      final payments = paymentRows
+          .map((m) => PaymentRecord.fromMap(m))
+          .toList();
 
       results.add(DocumentModel.fromMap(row, items: items, payments: payments));
     }
@@ -171,7 +181,11 @@ class DocumentRepository {
     );
     final payments = paymentRows.map((m) => PaymentRecord.fromMap(m)).toList();
 
-    return DocumentModel.fromMap(docRows.first, items: items, payments: payments);
+    return DocumentModel.fromMap(
+      docRows.first,
+      items: items,
+      payments: payments,
+    );
   }
 
   Future<void> saveDocument(DocumentModel document) async {
@@ -287,7 +301,8 @@ class DocumentRepository {
       );
 
       if (docHeader.isNotEmpty) {
-        final totalAmount = (docHeader.first['totalAmount'] as num?)?.toDouble() ?? 0.0;
+        final totalAmount =
+            (docHeader.first['totalAmount'] as num?)?.toDouble() ?? 0.0;
         final DocumentStatus newStatus;
         if (totalPaid >= totalAmount && totalAmount > 0) {
           newStatus = DocumentStatus.paid;
@@ -342,7 +357,6 @@ class DocumentRepository {
     return '$prefix$nextNumber';
   }
 
-  
   Future<DocumentModel> convertProformaToInvoice(String proformaId) async {
     final proforma = await getDocumentById(proformaId);
     if (proforma == null) {
@@ -359,10 +373,7 @@ class DocumentRepository {
     // 3. Create new Invoice
     final newInvoiceId = _uuid.v4();
     final newItems = proforma.items.map((item) {
-      return item.copyWith(
-        id: _uuid.v4(),
-        documentId: newInvoiceId,
-      );
+      return item.copyWith(id: _uuid.v4(), documentId: newInvoiceId);
     }).toList();
 
     final invoice = DocumentModel(
@@ -395,7 +406,7 @@ class DocumentRepository {
     return invoice;
   }
 
-Future<DocumentModel> convertQuotationToInvoice(String quotationId) async {
+  Future<DocumentModel> convertQuotationToInvoice(String quotationId) async {
     final quotation = await getDocumentById(quotationId);
     if (quotation == null) {
       throw Exception('Quotation not found');
@@ -411,10 +422,7 @@ Future<DocumentModel> convertQuotationToInvoice(String quotationId) async {
     // 3. Create new Invoice
     final newInvoiceId = _uuid.v4();
     final newItems = quotation.items.map((item) {
-      return item.copyWith(
-        id: _uuid.v4(),
-        documentId: newInvoiceId,
-      );
+      return item.copyWith(id: _uuid.v4(), documentId: newInvoiceId);
     }).toList();
 
     final invoice = DocumentModel(
@@ -536,7 +544,6 @@ Future<DocumentModel> convertQuotationToInvoice(String quotationId) async {
     int overdueCount = 0;
     double paidTotal = 0;
     int paidCount = 0;
-    
 
     for (final doc in docs) {
       final status = doc['status'] as String;
@@ -567,7 +574,6 @@ Future<DocumentModel> convertQuotationToInvoice(String quotationId) async {
       overdueCount: overdueCount,
       paidTotal: paidTotal,
       paidCount: paidCount,
-      
     );
   }
 }

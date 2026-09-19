@@ -58,9 +58,7 @@ class AppTheme {
             horizontal: AppDimensions.lg,
             vertical: AppDimensions.md,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDimensions.roundedMd,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppDimensions.roundedMd),
           textStyle: AppTypography.labelLarge.copyWith(color: Colors.white),
         ),
       ),
@@ -73,9 +71,7 @@ class AppTheme {
             horizontal: AppDimensions.lg,
             vertical: AppDimensions.md,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDimensions.roundedMd,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppDimensions.roundedMd),
           textStyle: AppTypography.labelLarge,
         ),
       ),
@@ -96,8 +92,12 @@ class AppTheme {
           horizontal: AppDimensions.lg,
           vertical: AppDimensions.md,
         ),
-        hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textMuted),
-        labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+        hintStyle: AppTypography.bodyMedium.copyWith(
+          color: AppColors.textMuted,
+        ),
+        labelStyle: AppTypography.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
         border: OutlineInputBorder(
           borderRadius: AppDimensions.roundedMd,
           borderSide: const BorderSide(color: AppColors.border, width: 1),
@@ -112,11 +112,17 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppDimensions.roundedMd,
-          borderSide: const BorderSide(color: AppColors.statusOverdueText, width: 1),
+          borderSide: const BorderSide(
+            color: AppColors.statusOverdueText,
+            width: 1,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppDimensions.roundedMd,
-          borderSide: const BorderSide(color: AppColors.statusOverdueText, width: 1.5),
+          borderSide: const BorderSide(
+            color: AppColors.statusOverdueText,
+            width: 1.5,
+          ),
         ),
       ),
       dividerTheme: const DividerThemeData(
@@ -200,9 +206,7 @@ class AppTheme {
             horizontal: AppDimensions.lg,
             vertical: AppDimensions.md,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDimensions.roundedMd,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppDimensions.roundedMd),
           textStyle: AppTypography.labelLarge.copyWith(color: Colors.white),
         ),
       ),
@@ -215,9 +219,7 @@ class AppTheme {
             horizontal: AppDimensions.lg,
             vertical: AppDimensions.md,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDimensions.roundedMd,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppDimensions.roundedMd),
           textStyle: AppTypography.labelLarge,
         ),
       ),
@@ -254,11 +256,17 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppDimensions.roundedMd,
-          borderSide: const BorderSide(color: AppColors.statusOverdueText, width: 1),
+          borderSide: const BorderSide(
+            color: AppColors.statusOverdueText,
+            width: 1,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppDimensions.roundedMd,
-          borderSide: const BorderSide(color: AppColors.statusOverdueText, width: 1.5),
+          borderSide: const BorderSide(
+            color: AppColors.statusOverdueText,
+            width: 1.5,
+          ),
         ),
       ),
       dividerTheme: const DividerThemeData(

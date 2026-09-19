@@ -12,9 +12,7 @@ class UserProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('User Profile'),
-      ),
+      appBar: AppBar(title: const Text('User Profile')),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           AuthUser? user;
@@ -23,7 +21,8 @@ class UserProfileScreen extends StatelessWidget {
           }
 
           final String displayName = user?.displayName ?? 'Guest User';
-          final String email = user?.email ?? 'Sign in to sync your data across devices.';
+          final String email =
+              user?.email ?? 'Sign in to sync your data across devices.';
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppDimensions.lg),
@@ -45,9 +44,7 @@ class UserProfileScreen extends StatelessWidget {
                 const SizedBox(height: AppDimensions.xs),
                 Text(
                   email,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                  ),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: AppDimensions.xxl),
                 AppCard(
@@ -71,9 +68,7 @@ class UserProfileScreen extends StatelessWidget {
                       const Text(
                         'Your business profile, invoices, products, and customers will automatically sync with the cloud to keep them safe.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                        ),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: AppDimensions.xl),
                       if (user == null)
@@ -81,7 +76,7 @@ class UserProfileScreen extends StatelessWidget {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              // Handled by main.dart routing, if they are here, they bypassed auth? 
+                              // Handled by main.dart routing, if they are here, they bypassed auth?
                               // Actually, the app now requires auth to get into the main flow.
                             },
                             child: const Text('Sign In / Register'),
@@ -93,7 +88,9 @@ class UserProfileScreen extends StatelessWidget {
                           child: OutlinedButton(
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Edit profile coming soon!')),
+                                const SnackBar(
+                                  content: Text('Edit profile coming soon!'),
+                                ),
                               );
                             },
                             child: const Text('Edit Profile'),
@@ -104,18 +101,24 @@ class UserProfileScreen extends StatelessWidget {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              context.read<AuthBloc>().add(const SignOutRequestedEvent());
-                              Navigator.of(context).popUntil((route) => route.isFirst);
+                              context.read<AuthBloc>().add(
+                                const SignOutRequestedEvent(),
+                              );
+                              Navigator.of(
+                                context,
+                              ).popUntil((route) => route.isFirst);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red.withValues(alpha: 0.1),
+                              backgroundColor: Colors.red.withValues(
+                                alpha: 0.1,
+                              ),
                               foregroundColor: Colors.red,
                               elevation: 0,
                             ),
                             child: const Text('Logout'),
                           ),
                         ),
-                      ]
+                      ],
                     ],
                   ),
                 ),

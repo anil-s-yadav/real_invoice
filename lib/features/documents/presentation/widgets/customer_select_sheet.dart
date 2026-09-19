@@ -48,7 +48,12 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
         children: [
           // Top action: Add new customer button
           Padding(
-            padding: const EdgeInsets.fromLTRB(AppDimensions.lg, AppDimensions.sm, AppDimensions.lg, AppDimensions.xs),
+            padding: const EdgeInsets.fromLTRB(
+              AppDimensions.lg,
+              AppDimensions.sm,
+              AppDimensions.lg,
+              AppDimensions.xs,
+            ),
             child: AppButton(
               label: 'Add New Customer',
               icon: Icons.person_add_outlined,
@@ -72,7 +77,11 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
               onChanged: (val) => setState(() => _searchQuery = val.trim()),
               decoration: InputDecoration(
                 hintText: 'Search customer name or phone...',
-                prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.textMuted),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  size: 20,
+                  color: AppColors.textMuted,
+                ),
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
               ),
@@ -110,15 +119,21 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
                   return ListView.separated(
                     padding: const EdgeInsets.all(AppDimensions.lg),
                     itemCount: filtered.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: AppDimensions.xs),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: AppDimensions.xs),
                     itemBuilder: (context, index) {
                       final customer = filtered[index];
-                      final isSelected = widget.selectedCustomer?.id == customer.id;
+                      final isSelected =
+                          widget.selectedCustomer?.id == customer.id;
 
                       return AppCard(
-                        backgroundColor: isSelected ? AppColors.primaryLight : AppColors.surface,
+                        backgroundColor: isSelected
+                            ? AppColors.primaryLight
+                            : AppColors.surface,
                         border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.border,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.border,
                           width: isSelected ? 1.5 : 1.0,
                         ),
                         padding: const EdgeInsets.symmetric(
@@ -135,18 +150,28 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
                                   Text(
                                     customer.name,
                                     style: AppTypography.titleMedium.copyWith(
-                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w700
+                                          : FontWeight.w600,
                                     ),
                                   ),
-                                  if (customer.phone != null && customer.phone!.isNotEmpty) ...[
+                                  if (customer.phone != null &&
+                                      customer.phone!.isNotEmpty) ...[
                                     const SizedBox(height: 2),
-                                    Text(customer.phone!, style: AppTypography.bodySmall),
+                                    Text(
+                                      customer.phone!,
+                                      style: AppTypography.bodySmall,
+                                    ),
                                   ],
                                 ],
                               ),
                             ),
                             if (isSelected)
-                              const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+                              const Icon(
+                                Icons.check_circle,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
                           ],
                         ),
                       );
@@ -154,7 +179,9 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
                   );
                 }
                 if (state is CustomerLoading) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
                 }
                 return const Center(child: Text('Error loading customers'));
               },

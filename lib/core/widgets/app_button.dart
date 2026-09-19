@@ -57,7 +57,10 @@ class AppButton extends StatelessWidget {
       case AppButtonVariant.danger:
         bgColor = AppColors.statusOverdueBg;
         fgColor = AppColors.statusOverdueText;
-        borderSide = const BorderSide(color: AppColors.statusOverdueBorder, width: 1);
+        borderSide = const BorderSide(
+          color: AppColors.statusOverdueBorder,
+          width: 1,
+        );
         break;
     }
 

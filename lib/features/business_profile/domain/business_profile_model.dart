@@ -78,7 +78,8 @@ class BusinessProfile {
     this.upiId,
     this.signaturePath,
     this.stampPath,
-    this.defaultTerms = '1. Payment is due within 15 days of invoice date.\n2. Please mention invoice number in bank transfer/UPI notes.',
+    this.defaultTerms =
+        '1. Payment is due within 15 days of invoice date.\n2. Please mention invoice number in bank transfer/UPI notes.',
     this.defaultNotes = 'Thank you for your business!',
     this.currencyCode = 'INR',
     this.currencySymbol = '₹',
@@ -137,10 +138,14 @@ class BusinessProfile {
       defaultNotes: defaultNotes ?? this.defaultNotes,
       currencyCode: currencyCode ?? this.currencyCode,
       currencySymbol: currencySymbol ?? this.currencySymbol,
-      defaultInvoiceTemplateId: defaultInvoiceTemplateId ?? this.defaultInvoiceTemplateId,
-      defaultQuotationTemplateId: defaultQuotationTemplateId ?? this.defaultQuotationTemplateId,
-      defaultReceiptTemplateId: defaultReceiptTemplateId ?? this.defaultReceiptTemplateId,
-      defaultProformaTemplateId: defaultProformaTemplateId ?? this.defaultProformaTemplateId,
+      defaultInvoiceTemplateId:
+          defaultInvoiceTemplateId ?? this.defaultInvoiceTemplateId,
+      defaultQuotationTemplateId:
+          defaultQuotationTemplateId ?? this.defaultQuotationTemplateId,
+      defaultReceiptTemplateId:
+          defaultReceiptTemplateId ?? this.defaultReceiptTemplateId,
+      defaultProformaTemplateId:
+          defaultProformaTemplateId ?? this.defaultProformaTemplateId,
       paymentDetails: paymentDetails ?? this.paymentDetails,
     );
   }
@@ -170,7 +175,9 @@ class BusinessProfile {
       'defaultQuotationTemplateId': defaultQuotationTemplateId,
       'defaultReceiptTemplateId': defaultReceiptTemplateId,
       'defaultProformaTemplateId': defaultProformaTemplateId,
-      'paymentDetailsJson': jsonEncode(paymentDetails.map((e) => e.toMap()).toList()),
+      'paymentDetailsJson': jsonEncode(
+        paymentDetails.map((e) => e.toMap()).toList(),
+      ),
     };
   }
 
@@ -179,7 +186,9 @@ class BusinessProfile {
     if (map['paymentDetailsJson'] != null) {
       try {
         final List<dynamic> decoded = jsonDecode(map['paymentDetailsJson']);
-        parsedPayments = decoded.map((e) => PaymentDetail.fromMap(e as Map<String, dynamic>)).toList();
+        parsedPayments = decoded
+            .map((e) => PaymentDetail.fromMap(e as Map<String, dynamic>))
+            .toList();
       } catch (e) {
         // Fallback or ignore
       }
@@ -201,14 +210,20 @@ class BusinessProfile {
       upiId: map['upiId'] as String?,
       signaturePath: map['signaturePath'] as String?,
       stampPath: map['stampPath'] as String?,
-      defaultTerms: map['defaultTerms'] as String? ?? '1. Payment is due within 15 days.',
-      defaultNotes: map['defaultNotes'] as String? ?? 'Thank you for your business!',
+      defaultTerms:
+          map['defaultTerms'] as String? ?? '1. Payment is due within 15 days.',
+      defaultNotes:
+          map['defaultNotes'] as String? ?? 'Thank you for your business!',
       currencyCode: map['currencyCode'] as String? ?? 'INR',
       currencySymbol: map['currencySymbol'] as String? ?? '₹',
-      defaultInvoiceTemplateId: map['defaultInvoiceTemplateId'] as String? ?? 'modern_crimson',
-      defaultQuotationTemplateId: map['defaultQuotationTemplateId'] as String? ?? 'modern_crimson',
-      defaultReceiptTemplateId: map['defaultReceiptTemplateId'] as String? ?? 'modern_crimson',
-      defaultProformaTemplateId: map['defaultProformaTemplateId'] as String? ?? 'modern_crimson',
+      defaultInvoiceTemplateId:
+          map['defaultInvoiceTemplateId'] as String? ?? 'modern_crimson',
+      defaultQuotationTemplateId:
+          map['defaultQuotationTemplateId'] as String? ?? 'modern_crimson',
+      defaultReceiptTemplateId:
+          map['defaultReceiptTemplateId'] as String? ?? 'modern_crimson',
+      defaultProformaTemplateId:
+          map['defaultProformaTemplateId'] as String? ?? 'modern_crimson',
       paymentDetails: parsedPayments,
     );
   }

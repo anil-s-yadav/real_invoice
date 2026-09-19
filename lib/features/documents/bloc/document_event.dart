@@ -65,13 +65,13 @@ class RecordPaymentEvent extends DocumentEvent {
 
   @override
   List<Object?> get props => [
-        documentId,
-        amount,
-        paymentMethod,
-        referenceNumber,
-        notes,
-        generateReceipt,
-      ];
+    documentId,
+    amount,
+    paymentMethod,
+    referenceNumber,
+    notes,
+    generateReceipt,
+  ];
 }
 
 class ConvertQuotationEvent extends DocumentEvent {

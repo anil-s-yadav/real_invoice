@@ -47,9 +47,16 @@ class ConfirmDialog extends StatelessWidget {
       title: Text(title, style: AppTypography.titleLarge),
       content: Text(
         message,
-        style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+        style: AppTypography.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
       ),
-      actionsPadding: const EdgeInsets.fromLTRB(AppDimensions.lg, 0, AppDimensions.lg, AppDimensions.lg),
+      actionsPadding: const EdgeInsets.fromLTRB(
+        AppDimensions.lg,
+        0,
+        AppDimensions.lg,
+        AppDimensions.lg,
+      ),
       actions: [
         Row(
           children: [
@@ -64,7 +71,9 @@ class ConfirmDialog extends StatelessWidget {
             Expanded(
               child: AppButton(
                 label: confirmLabel,
-                variant: isDestructive ? AppButtonVariant.danger : AppButtonVariant.primary,
+                variant: isDestructive
+                    ? AppButtonVariant.danger
+                    : AppButtonVariant.primary,
                 onPressed: () => Navigator.of(context).pop(true),
               ),
             ),

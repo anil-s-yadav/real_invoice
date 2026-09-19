@@ -16,7 +16,10 @@ class ProductEditorSheet extends StatefulWidget {
 
   const ProductEditorSheet({super.key, this.initialProduct});
 
-  static Future<ProductItem?> show(BuildContext context, {ProductItem? product}) {
+  static Future<ProductItem?> show(
+    BuildContext context, {
+    ProductItem? product,
+  }) {
     return AppBottomSheet.show<ProductItem>(
       context: context,
       title: product != null ? 'Edit Item / Service' : 'New Item / Service',
@@ -40,7 +43,16 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
   String? _priceError;
   bool _isSaving = false;
 
-  final List<String> _commonUnits = ['pcs', 'hrs', 'service', 'days', 'kg', 'month', 'visit', 'box'];
+  final List<String> _commonUnits = [
+    'pcs',
+    'hrs',
+    'service',
+    'days',
+    'kg',
+    'month',
+    'visit',
+    'box',
+  ];
   final List<double> _taxRates = [0.0, 5.0, 12.0, 18.0, 28.0];
 
   @override
@@ -94,7 +106,9 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
       unitPrice: price,
       unit: _selectedUnit,
       defaultTaxPercent: _selectedTaxPercent,
-      hsnSacCode: _hsnController.text.trim().isNotEmpty ? _hsnController.text.trim() : null,
+      hsnSacCode: _hsnController.text.trim().isNotEmpty
+          ? _hsnController.text.trim()
+          : null,
       createdAt: widget.initialProduct?.createdAt ?? DateTime.now(),
     );
 
@@ -140,12 +154,20 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                   controller: _priceController,
                   label: 'Price per Unit *',
                   hint: '0.00',
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   prefix: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Center(
                       widthFactor: 1.0,
-                      child: Text('₹', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        '₹',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                   errorText: _priceError,
@@ -185,8 +207,12 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                     selectedColor: AppColors.primaryLight,
                     backgroundColor: AppColors.surface,
                     labelStyle: TextStyle(
-                      color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                     side: BorderSide(
                       color: isSelected ? AppColors.primary : AppColors.border,
@@ -210,12 +236,16 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
             children: _taxRates.map((rate) {
               final isSelected = _selectedTaxPercent == rate;
               return ChoiceChip(
-                label: Text(rate == 0 ? 'Exempt (0%)' : '${rate.toStringAsFixed(0)}%'),
+                label: Text(
+                  rate == 0 ? 'Exempt (0%)' : '${rate.toStringAsFixed(0)}%',
+                ),
                 selected: isSelected,
                 selectedColor: AppColors.primaryLight,
                 backgroundColor: AppColors.surface,
                 labelStyle: TextStyle(
-                  color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
                 side: BorderSide(
@@ -237,7 +267,9 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
           ),
           const SizedBox(height: AppDimensions.xl),
           AppButton(
-            label: widget.initialProduct != null ? 'Update Item' : 'Save to Catalog',
+            label: widget.initialProduct != null
+                ? 'Update Item'
+                : 'Save to Catalog',
             onPressed: _handleSave,
             isLoading: _isSaving,
             icon: Icons.check,

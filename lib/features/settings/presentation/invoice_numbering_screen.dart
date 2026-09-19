@@ -37,10 +37,18 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
   }
 
   Future<void> _loadSettings() async {
-    final invPrefix = await _settingsRepo.getPrefixForType(DocumentType.invoice);
-    final estPrefix = await _settingsRepo.getPrefixForType(DocumentType.quotation);
-    final recPrefix = await _settingsRepo.getPrefixForType(DocumentType.receipt);
-    final proPrefix = await _settingsRepo.getPrefixForType(DocumentType.proforma);
+    final invPrefix = await _settingsRepo.getPrefixForType(
+      DocumentType.invoice,
+    );
+    final estPrefix = await _settingsRepo.getPrefixForType(
+      DocumentType.quotation,
+    );
+    final recPrefix = await _settingsRepo.getPrefixForType(
+      DocumentType.receipt,
+    );
+    final proPrefix = await _settingsRepo.getPrefixForType(
+      DocumentType.proforma,
+    );
     final incYear = await _settingsRepo.getIncludeYear();
     final padding = await _settingsRepo.getPaddingDigits();
 
@@ -76,19 +84,27 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
     setState(() => _isSaving = true);
     await _settingsRepo.setPrefixForType(
       DocumentType.invoice,
-      _invoicePrefixController.text.trim().isEmpty ? 'INV-' : _invoicePrefixController.text.trim(),
+      _invoicePrefixController.text.trim().isEmpty
+          ? 'INV-'
+          : _invoicePrefixController.text.trim(),
     );
     await _settingsRepo.setPrefixForType(
       DocumentType.quotation,
-      _quotationPrefixController.text.trim().isEmpty ? 'EST-' : _quotationPrefixController.text.trim(),
+      _quotationPrefixController.text.trim().isEmpty
+          ? 'EST-'
+          : _quotationPrefixController.text.trim(),
     );
     await _settingsRepo.setPrefixForType(
       DocumentType.receipt,
-      _receiptPrefixController.text.trim().isEmpty ? 'REC-' : _receiptPrefixController.text.trim(),
+      _receiptPrefixController.text.trim().isEmpty
+          ? 'REC-'
+          : _receiptPrefixController.text.trim(),
     );
     await _settingsRepo.setPrefixForType(
       DocumentType.proforma,
-      _proformaPrefixController.text.trim().isEmpty ? 'PRO-' : _proformaPrefixController.text.trim(),
+      _proformaPrefixController.text.trim().isEmpty
+          ? 'PRO-'
+          : _proformaPrefixController.text.trim(),
     );
     await _settingsRepo.setIncludeYear(_includeYear);
     await _settingsRepo.setPaddingDigits(_paddingDigits);
@@ -187,7 +203,10 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: Row(
                       children: [
                         const Expanded(
@@ -260,7 +279,9 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
                                   },
                                   borderRadius: BorderRadius.circular(10),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? AppColors.primary
@@ -461,7 +482,10 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
               ),
               decoration: InputDecoration(
                 hintText: hint,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 8,
+                ),
                 isDense: true,
                 filled: true,
                 fillColor: AppColors.surfaceVariant.withValues(alpha: 0.5),
@@ -475,7 +499,10 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 1.5,
+                  ),
                 ),
               ),
             ),

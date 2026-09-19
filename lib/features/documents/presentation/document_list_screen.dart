@@ -1,7 +1,6 @@
 import '../data/document_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:real_invoice/features/documents/data/document_repository.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
@@ -20,7 +19,6 @@ import 'pdf_preview_screen.dart';
 import 'widgets/payment_entry_sheet.dart';
 import 'package:printing/printing.dart';
 import '../../pdf_engine/document_pdf_generator.dart';
-import '../../pdf_engine/template_registry.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 
@@ -54,14 +52,19 @@ extension DateFilterRangeExt on DateFilterRange {
 
 class DocumentListScreen extends StatefulWidget {
   final DocumentType? initialFilterType;
+  final DocumentStatus? initialFilterStatus;
 
-  const DocumentListScreen({super.key, this.initialFilterType});
+  const DocumentListScreen({
+    super.key,
+    this.initialFilterType,
+    this.initialFilterStatus,
+  });
 
   @override
-  State<DocumentListScreen> createState() => _DocumentListScreenState();
+  State<DocumentListScreen> createState() => DocumentListScreenState();
 }
 
-class _DocumentListScreenState extends State<DocumentListScreen> {
+class DocumentListScreenState extends State<DocumentListScreen> {
   final TextEditingController _searchController = TextEditingController();
   DocumentType? _selectedType;
   DocumentStatus? _selectedStatus;
@@ -75,11 +78,35 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
   void initState() {
     super.initState();
     _selectedType = widget.initialFilterType;
-    if (widget.initialFilterType != null) {
+    _selectedStatus = widget.initialFilterStatus;
+    if (widget.initialFilterType != null ||
+        widget.initialFilterStatus != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _applyFilter(type: widget.initialFilterType);
+        _applyFilter(
+          type: widget.initialFilterType,
+          status: widget.initialFilterStatus,
+        );
       });
     }
+  }
+
+  void setFilter({
+    DocumentType? type,
+    DocumentStatus? status,
+    bool clearType = false,
+    bool clearStatus = false,
+    bool clearSearch = true,
+  }) {
+    if (clearSearch) {
+      _searchController.clear();
+      _searchQuery = '';
+    }
+    _applyFilter(
+      type: type,
+      status: status,
+      clearType: clearType || type == null,
+      clearStatus: clearStatus,
+    );
   }
 
   @override
@@ -331,6 +358,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
         // ),
         body: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Filter Header
               Container(
@@ -344,8 +372,10 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                   ),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
                           child: SizedBox(
@@ -485,6 +515,135 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                         ],
                       ),
                     ),
+                    if (_selectedStatus != null ||
+                        _selectedDateRangeType != DateFilterRange.allTime) ...[
+                      const SizedBox(height: 10),
+                      Wrap(
+                        runAlignment: WrapAlignment.start,
+                        alignment: WrapAlignment.start,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          if (_selectedStatus != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _selectedStatus == DocumentStatus.overdue
+                                    ? AppColors.statusOverdueBg
+                                    : AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color:
+                                      _selectedStatus == DocumentStatus.overdue
+                                      ? AppColors.statusOverdueBorder
+                                      : AppColors.primary.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (_selectedStatus ==
+                                      DocumentStatus.overdue) ...[
+                                    const Icon(
+                                      Icons.warning_amber_rounded,
+                                      size: 14,
+                                      color: AppColors.statusOverdueText,
+                                    ),
+                                    const SizedBox(width: 4),
+                                  ],
+                                  InkWell(
+                                    onTap: _showStatusPicker,
+                                    child: Text(
+                                      'Status: ${_selectedStatus!.displayName}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color:
+                                            _selectedStatus ==
+                                                DocumentStatus.overdue
+                                            ? AppColors.statusOverdueText
+                                            : AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  InkWell(
+                                    onTap: () =>
+                                        _applyFilter(clearStatus: true),
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 15,
+                                      color:
+                                          _selectedStatus ==
+                                              DocumentStatus.overdue
+                                          ? AppColors.statusOverdueText
+                                          : AppColors.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (_selectedDateRangeType != DateFilterRange.allTime)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_month_outlined,
+                                    size: 14,
+                                    color: AppColors.primary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  InkWell(
+                                    onTap: _showDateRangePicker,
+                                    child: Text(
+                                      'Date: ${_getDateRangeChipText()}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  InkWell(
+                                    onTap: () => _applyFilter(
+                                      dateRangeType: DateFilterRange.allTime,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: const Icon(
+                                      Icons.close,
+                                      size: 15,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -600,6 +759,15 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       ),
     );
   }
+
+  String _getDateRangeChipText() {
+    if (_selectedDateRangeType == DateFilterRange.custom &&
+        _customStartDate != null &&
+        _customEndDate != null) {
+      return '${DateFormatter.formatShort(_customStartDate!)} - ${DateFormatter.formatShort(_customEndDate!)}';
+    }
+    return _selectedDateRangeType.displayName;
+  }
 }
 
 class _DocumentListItemCard extends StatelessWidget {
@@ -642,7 +810,6 @@ class _DocumentListItemCard extends StatelessWidget {
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      _buildTemplateChip(document.templateId),
                     ],
                   ),
                 ),
@@ -682,27 +849,68 @@ class _DocumentListItemCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            // Bottom Row: Date & Amount
+            // Bottom Row: Dates & Amount
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.calendar_today_outlined,
-                      size: 14,
-                      color: AppColors.textMuted,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      DateFormatter.formatShort(document.issueDate),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.calendar_today_outlined,
+                            size: 13,
+                            color: AppColors.textMuted,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Created: ${DateFormatter.formatShort(document.issueDate)}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      if (document.docType != DocumentType.receipt) ...[
+                        const SizedBox(height: 3),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.event_outlined,
+                              size: 13,
+                              color: effectiveStatus == DocumentStatus.overdue
+                                  ? AppColors.statusOverdueText
+                                  : AppColors.textMuted,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              'Due: ${DateFormatter.formatShort(document.dueDate)}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: effectiveStatus == DocumentStatus.overdue
+                                    ? AppColors.statusOverdueText
+                                    : AppColors.textSecondary,
+                                fontWeight:
+                                    effectiveStatus == DocumentStatus.overdue
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   CurrencyFormatter.format(document.totalAmount),
                   style: const TextStyle(
@@ -763,7 +971,18 @@ class _DocumentListItemCard extends StatelessWidget {
             if (document.docType == DocumentType.proforma) {
               final repo = context.read<DocumentRepository>();
               await repo.convertProformaToInvoice(document.id);
-              context.read<DocumentBloc>().add(const LoadDocumentsEvent());
+              if (!context.mounted) return;
+              final currentLoaded =
+                  context.read<DocumentBloc>().state as DocumentLoaded?;
+              context.read<DocumentBloc>().add(
+                LoadDocumentsEvent(
+                  type: currentLoaded?.typeFilter,
+                  status: currentLoaded?.statusFilter,
+                  searchQuery: currentLoaded?.searchQuery ?? '',
+                  startDate: currentLoaded?.startDateFilter,
+                  endDate: currentLoaded?.endDateFilter,
+                ),
+              );
             } else {
               context.read<DocumentBloc>().add(
                 ConvertQuotationEvent(document.id),
@@ -776,7 +995,18 @@ class _DocumentListItemCard extends StatelessWidget {
               document.id,
               DocumentStatus.accepted,
             );
-            context.read<DocumentBloc>().add(const LoadDocumentsEvent());
+            if (!context.mounted) return;
+            final currentLoaded =
+                context.read<DocumentBloc>().state as DocumentLoaded?;
+            context.read<DocumentBloc>().add(
+              LoadDocumentsEvent(
+                type: currentLoaded?.typeFilter,
+                status: currentLoaded?.statusFilter,
+                searchQuery: currentLoaded?.searchQuery ?? '',
+                startDate: currentLoaded?.startDateFilter,
+                endDate: currentLoaded?.endDateFilter,
+              ),
+            );
           } else if (val == 'delete') {
             final confirmed = await ConfirmDialog.show(
               context,
@@ -942,33 +1172,6 @@ class _DocumentListItemCard extends StatelessWidget {
           color: textColor,
           letterSpacing: 0.3,
         ),
-      ),
-    );
-  }
-
-  Widget _buildTemplateChip(String templateId) {
-    final template = TemplateRegistry.getById(templateId);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.palette_outlined, size: 10, color: template.accentColor),
-          const SizedBox(width: 3),
-          Text(
-            template.name,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
       ),
     );
   }

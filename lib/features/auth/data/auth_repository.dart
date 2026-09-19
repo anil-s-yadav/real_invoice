@@ -56,14 +56,10 @@ class DummyAuthRepository implements AuthRepository {
   }
 
   Future<AuthUser> _doDummySignIn(String id, String name) async {
-    final user = AuthUser(
-      id: id,
-      email: '$id@example.com',
-      displayName: name,
-    );
+    final user = AuthUser(id: id, email: '$id@example.com', displayName: name);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_authKey, true);
-    
+
     _currentUser = user;
     _userController.add(_currentUser);
     return user;
@@ -74,7 +70,7 @@ class DummyAuthRepository implements AuthRepository {
     await Future.delayed(const Duration(milliseconds: 500));
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_authKey, false);
-    
+
     _currentUser = null;
     _userController.add(null);
   }

@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingCubit extends Cubit<bool> {
   static const String _onboardingKey = 'hasCompletedOnboarding';
-  
+
   OnboardingCubit() : super(false) {
     _loadOnboardingStatus();
   }

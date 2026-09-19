@@ -15,7 +15,8 @@ class ManageCompanyListScreen extends StatefulWidget {
   const ManageCompanyListScreen({super.key});
 
   @override
-  State<ManageCompanyListScreen> createState() => _ManageCompanyListScreenState();
+  State<ManageCompanyListScreen> createState() =>
+      _ManageCompanyListScreenState();
 }
 
 class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
@@ -68,7 +69,10 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Companies', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Manage Companies',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: AppColors.canvas,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
@@ -86,7 +90,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                       children: [
                         // Compact Buy Premium Tab (Visible only on Free plan)
                         _buildCompactPremiumTab(context),
-                        
+
                         // Header
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,7 +104,10 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
@@ -120,25 +127,27 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                     ),
                   ),
                 ),
-                
+
                 // Grid
                 SliverPadding(
-                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 100),
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 100,
+                  ),
                   sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.80,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final profile = _profiles[index];
-                        final isActive = profile.id == _activeId;
-                        return _buildCompanyCard(profile, isActive);
-                      },
-                      childCount: _profiles.length,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.80,
+                        ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final profile = _profiles[index];
+                      final isActive = profile.id == _activeId;
+                      return _buildCompanyCard(profile, isActive);
+                    }, childCount: _profiles.length),
                   ),
                 ),
               ],
@@ -166,7 +175,9 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isActive ? AppColors.primary : Colors.grey.withValues(alpha: 0.2),
+          color: isActive
+              ? AppColors.primary
+              : Colors.grey.withValues(alpha: 0.2),
           width: isActive ? 2 : 1,
         ),
         boxShadow: [
@@ -192,18 +203,29 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                     CircleAvatar(
                       radius: 20,
                       backgroundColor: AppColors.canvas,
-                      backgroundImage: profile.logoPath != null && profile.logoPath!.isNotEmpty
+                      backgroundImage:
+                          profile.logoPath != null &&
+                              profile.logoPath!.isNotEmpty
                           ? FileImage(File(profile.logoPath!))
                           : null,
-                      child: profile.logoPath == null || profile.logoPath!.isEmpty
-                          ? const Icon(Icons.business, size: 20, color: AppColors.textSecondary)
+                      child:
+                          profile.logoPath == null || profile.logoPath!.isEmpty
+                          ? const Icon(
+                              Icons.business,
+                              size: 20,
+                              color: AppColors.textSecondary,
+                            )
                           : null,
                     ),
                     SizedBox(
                       width: 24,
                       height: 24,
                       child: PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
+                        icon: const Icon(
+                          Icons.more_vert,
+                          size: 20,
+                          color: AppColors.textSecondary,
+                        ),
                         padding: EdgeInsets.zero,
                         onSelected: (val) async {
                           if (val == 'delete') {
@@ -216,9 +238,16 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                               value: 'delete',
                               child: Row(
                                 children: [
-                                  Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                                  Icon(
+                                    Icons.delete_outline,
+                                    size: 18,
+                                    color: Colors.red,
+                                  ),
                                   SizedBox(width: 8),
-                                  Text('Delete', style: TextStyle(color: Colors.red)),
+                                  Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ],
                               ),
                             ),
@@ -228,10 +257,12 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                
+
                 // Name
                 Text(
-                  profile.businessName.isEmpty ? 'Unnamed Company' : profile.businessName,
+                  profile.businessName.isEmpty
+                      ? 'Unnamed Company'
+                      : profile.businessName,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -241,14 +272,17 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                
+
                 // Extra Info
                 if (profile.gstin != null && profile.gstin!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 2),
                     child: Text(
                       'GST: ${profile.gstin}',
-                      style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -258,21 +292,29 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                     padding: const EdgeInsets.only(bottom: 2),
                     child: Text(
                       '${profile.email}',
-                      style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                if (profile.phone != null && profile.phone!.isNotEmpty && (profile.gstin == null || profile.gstin!.isEmpty))
+                if (profile.phone != null &&
+                    profile.phone!.isNotEmpty &&
+                    (profile.gstin == null || profile.gstin!.isEmpty))
                   Text(
                     '${profile.phone}',
-                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  
+
                 const Spacer(),
-                
+
                 // Active status / button
                 SizedBox(
                   width: double.infinity,
@@ -286,7 +328,11 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.check_circle, size: 14, color: AppColors.primary),
+                              Icon(
+                                Icons.check_circle,
+                                size: 14,
+                                color: AppColors.primary,
+                              ),
                               SizedBox(width: 4),
                               Text(
                                 'Active',
@@ -305,7 +351,9 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            backgroundColor: Colors.grey.withValues(alpha: 0.05),
+                            backgroundColor: Colors.grey.withValues(
+                              alpha: 0.05,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -323,7 +371,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
               ],
             ),
           ),
-          
+
           if (isActive)
             Positioned(
               top: 0,
@@ -359,13 +407,14 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
               borderRadius: BorderRadius.circular(12),
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const SubscriptionScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
                 );
               },
               child: Ink(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 9,
+                ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
@@ -419,10 +468,15 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                               DecoratedBox(
                                 decoration: BoxDecoration(
                                   color: AppColors.premiumGold,
-                                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(4),
+                                  ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 1,
+                                  ),
                                   child: Text(
                                     'PRO',
                                     style: TextStyle(
@@ -452,7 +506,10 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.premiumGold.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
@@ -491,4 +548,3 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
     );
   }
 }
-

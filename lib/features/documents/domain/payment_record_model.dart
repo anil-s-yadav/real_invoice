@@ -58,12 +58,16 @@ class PaymentRecord {
     return PaymentRecord(
       id: map['id'] as String,
       documentId: map['documentId'] as String? ?? '',
-      paymentDate: DateTime.tryParse(map['paymentDate'] as String? ?? '') ?? DateTime.now(),
+      paymentDate:
+          DateTime.tryParse(map['paymentDate'] as String? ?? '') ??
+          DateTime.now(),
       amount: (map['amount'] as num?)?.toDouble() ?? 0.0,
       paymentMethod: map['paymentMethod'] as String? ?? 'UPI',
       referenceNumber: map['referenceNumber'] as String?,
       notes: map['notes'] as String?,
-      createdAt: DateTime.tryParse(map['createdAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(map['createdAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 }

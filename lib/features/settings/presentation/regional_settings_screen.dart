@@ -43,7 +43,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     final state = context.read<BusinessProfileBloc>().state;
-    
+
     if (state is BusinessProfileLoaded) {
       _selectedCurrencyCode = state.profile.currencyCode;
       _selectedCurrencySymbol = state.profile.currencySymbol;
@@ -67,7 +67,9 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
         currencyCode: _selectedCurrencyCode,
         currencySymbol: _selectedCurrencySymbol,
       );
-      context.read<BusinessProfileBloc>().add(UpdateBusinessProfileEvent(updatedProfile));
+      context.read<BusinessProfileBloc>().add(
+        UpdateBusinessProfileEvent(updatedProfile),
+      );
     }
 
     if (mounted) {
@@ -92,24 +94,44 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
             String searchQuery = '';
             return StatefulBuilder(
               builder: (context, setStateDialog) {
-                final filteredItems = items.where((i) => i.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+                final filteredItems = items
+                    .where(
+                      (i) =>
+                          i.toLowerCase().contains(searchQuery.toLowerCase()),
+                    )
+                    .toList();
                 return Dialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(16),
-                        child: Text('Select Option', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          'Select Option',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: TextField(
                           decoration: InputDecoration(
                             hintText: 'Search...',
                             prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0,
+                            ),
                           ),
                           onChanged: (val) {
                             setStateDialog(() {
@@ -152,7 +174,15 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
           children: [
             Icon(icon, color: AppColors.primary, size: 20),
             const SizedBox(width: 12),
-            Expanded(child: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))),
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
             const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
           ],
         ),
@@ -163,15 +193,16 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        title: const Text('Regional Settings', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Regional Settings',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: AppColors.canvas,
         elevation: 0,
         foregroundColor: AppColors.textPrimary,
@@ -182,30 +213,56 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.public, size: 48, color: AppColors.primary),
+                    const Icon(
+                      Icons.public,
+                      size: 48,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(height: 16),
-                    const Text('Regional Settings', style: AppTypography.displayMedium),
+                    const Text(
+                      'Regional Settings',
+                      style: AppTypography.displayMedium,
+                    ),
                     const SizedBox(height: 8),
-                    const Text('Choose your preferred language, operating country, and default currency.', style: AppTypography.bodyMedium),
+                    const Text(
+                      'Choose your preferred language, operating country, and default currency.',
+                      style: AppTypography.bodyMedium,
+                    ),
                     const SizedBox(height: 32),
 
                     // Language
-                    const Text('App Language', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const Text(
+                      'App Language',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     _buildSearchableDropdown(
                       value: _selectedLanguage,
                       items: _languages,
-                      onChanged: (val) => setState(() => _selectedLanguage = val),
+                      onChanged: (val) =>
+                          setState(() => _selectedLanguage = val),
                       icon: Icons.language,
                     ),
                     const SizedBox(height: 24),
 
                     // Country & Currency
-                    const Text('Operating Country & Currency', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const Text(
+                      'Operating Country & Currency',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     _buildSearchableDropdown(
                       value: _selectedCountry,
@@ -213,7 +270,9 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                       onChanged: (val) {
                         setState(() {
                           _selectedCountry = val;
-                          final country = _countries.firstWhere((c) => c['name'] == val);
+                          final country = _countries.firstWhere(
+                            (c) => c['name'] == val,
+                          );
                           _selectedCurrencyCode = country['currency']!;
                           _selectedCurrencySymbol = country['symbol']!;
                         });
@@ -230,10 +289,25 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.payments_outlined, color: AppColors.textSecondary, size: 20),
+                          const Icon(
+                            Icons.payments_outlined,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
                           const SizedBox(width: 12),
-                          const Expanded(child: Text('Default Currency', style: TextStyle(color: AppColors.textSecondary))),
-                          Text('\ (\)', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                          const Expanded(
+                            child: Text(
+                              'Default Currency',
+                              style: TextStyle(color: AppColors.textSecondary),
+                            ),
+                          ),
+                          Text(
+                            '\ (\)',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -241,7 +315,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                 ),
               ),
             ),
-            
+
             // Bottom Controls
             Padding(
               padding: const EdgeInsets.all(24),
@@ -259,4 +333,3 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
     );
   }
 }
-

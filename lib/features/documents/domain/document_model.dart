@@ -5,12 +5,7 @@ import '../../customers/domain/customer_model.dart';
 import 'document_item_model.dart';
 import 'payment_record_model.dart';
 
-enum DocumentType {
-  invoice,
-  quotation,
-  receipt,
-  proforma,
-}
+enum DocumentType { invoice, quotation, receipt, proforma }
 
 extension DocumentTypeX on DocumentType {
   String get displayName {
@@ -61,7 +56,8 @@ class DocumentModel {
   final bool includePaymentDetails;
   final String? selectedBankDetailId;
   final String? selectedUpiDetailId;
-  final String templateId; // 'modern_crimson', 'minimal', 'professional', 'elegant', 'compact', 'bold'
+  final String
+  templateId; // 'modern_crimson', 'minimal', 'professional', 'elegant', 'compact', 'bold'
   final String? notes;
   final String? terms;
   final String? relatedDocId;
@@ -96,10 +92,12 @@ class DocumentModel {
   });
 
   /// Raw sum of all items' gross amount (qty * price)
-  double get grossSubtotal => items.fold(0.0, (sum, item) => sum + item.grossAmount);
+  double get grossSubtotal =>
+      items.fold(0.0, (sum, item) => sum + item.grossAmount);
 
   /// Line-level discounts total
-  double get itemDiscountsTotal => items.fold(0.0, (sum, item) => sum + item.discountAmount);
+  double get itemDiscountsTotal =>
+      items.fold(0.0, (sum, item) => sum + item.discountAmount);
 
   /// Subtotal after item-level discounts
   double get subtotal => grossSubtotal - itemDiscountsTotal;
@@ -117,7 +115,8 @@ class DocumentModel {
   double get taxableAmount => max(0.0, subtotal - overallDiscountAmount);
 
   /// Total tax calculated across items
-  double get totalTaxAmount => items.fold(0.0, (sum, item) => sum + item.taxAmount);
+  double get totalTaxAmount =>
+      items.fold(0.0, (sum, item) => sum + item.taxAmount);
 
   /// Net amount before roundoff
   double get rawTotalAmount => taxableAmount + totalTaxAmount + shippingCharges;
@@ -200,7 +199,8 @@ class DocumentModel {
       poNumber: poNumber ?? this.poNumber,
       subject: subject ?? this.subject,
       shippingCharges: shippingCharges ?? this.shippingCharges,
-      includePaymentDetails: includePaymentDetails ?? this.includePaymentDetails,
+      includePaymentDetails:
+          includePaymentDetails ?? this.includePaymentDetails,
       selectedBankDetailId: selectedBankDetailId ?? this.selectedBankDetailId,
       selectedUpiDetailId: selectedUpiDetailId ?? this.selectedUpiDetailId,
       templateId: templateId ?? this.templateId,
@@ -218,7 +218,9 @@ class DocumentModel {
       'docNumber': docNumber,
       'docType': docType.name,
       'customerId': customerId,
-      'customerSnapshot': customerSnapshot != null ? jsonEncode(customerSnapshot!.toMap()) : null,
+      'customerSnapshot': customerSnapshot != null
+          ? jsonEncode(customerSnapshot!.toMap())
+          : null,
       'issueDate': issueDate.toIso8601String(),
       'dueDate': dueDate.toIso8601String(),
       'status': status.name,
@@ -253,7 +255,9 @@ class DocumentModel {
     final customerRaw = map['customerSnapshot'] as String?;
     if (customerRaw != null && customerRaw.isNotEmpty) {
       try {
-        snapshot = Customer.fromMap(jsonDecode(customerRaw) as Map<String, dynamic>);
+        snapshot = Customer.fromMap(
+          jsonDecode(customerRaw) as Map<String, dynamic>,
+        );
       } catch (_) {}
     }
 
@@ -266,15 +270,20 @@ class DocumentModel {
       ),
       customerId: map['customerId'] as String?,
       customerSnapshot: snapshot,
-      issueDate: DateTime.tryParse(map['issueDate'] as String? ?? '') ?? DateTime.now(),
-      dueDate: DateTime.tryParse(map['dueDate'] as String? ?? '') ?? DateTime.now().add(const Duration(days: 15)),
+      issueDate:
+          DateTime.tryParse(map['issueDate'] as String? ?? '') ??
+          DateTime.now(),
+      dueDate:
+          DateTime.tryParse(map['dueDate'] as String? ?? '') ??
+          DateTime.now().add(const Duration(days: 15)),
       status: DocumentStatus.values.firstWhere(
         (e) => e.name == map['status'],
         orElse: () => DocumentStatus.sent,
       ),
       items: items,
       payments: payments,
-      overallDiscountValue: (map['overallDiscountValue'] as num?)?.toDouble() ?? 0.0,
+      overallDiscountValue:
+          (map['overallDiscountValue'] as num?)?.toDouble() ?? 0.0,
       overallDiscountType: DiscountType.values.firstWhere(
         (e) => e.name == map['overallDiscountType'],
         orElse: () => DiscountType.percentage,
@@ -289,8 +298,12 @@ class DocumentModel {
       notes: map['notes'] as String?,
       terms: map['terms'] as String?,
       relatedDocId: map['relatedDocId'] as String?,
-      createdAt: DateTime.tryParse(map['createdAt'] as String? ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(map['updatedAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(map['createdAt'] as String? ?? '') ??
+          DateTime.now(),
+      updatedAt:
+          DateTime.tryParse(map['updatedAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 }
