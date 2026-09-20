@@ -17,6 +17,9 @@ import '../bloc/home_state.dart';
 import '../../subscription/presentation/subscription_screen.dart';
 import '../../settings/presentation/user_profile_screen.dart';
 import '../../reports/presentation/reports_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../auth/bloc/auth_bloc.dart';
+import '../../auth/domain/auth_user_model.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function({DocumentType? type, DocumentStatus? status})
@@ -157,23 +160,54 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-              // 3. User Profile Icon
-              IconButton(
-                icon: const Icon(
-                  Icons.account_circle_outlined,
-                  size: 28,
-                  color: AppColors.textPrimary,
-                ),
-                tooltip: 'User Profile',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const UserProfileScreen(),
+              // 3. User Profile Avatar
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, authState) {
+                  final AuthUser? user = authState is Authenticated ? authState.user : null;
+                  final photoUrl = user?.photoUrl;
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const UserProfileScreen(),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                        child: photoUrl != null && photoUrl.isNotEmpty
+                            ? ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: photoUrl,
+                                  width: 32,
+                                  height: 32,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Icon(
+                                    Icons.person,
+                                    size: 20,
+                                    color: AppColors.primary,
+                                  ),
+                                  errorWidget: (context, url, error) => const Icon(
+                                    Icons.person,
+                                    size: 20,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              )
+                            : const Icon(
+                                Icons.person,
+                                size: 20,
+                                color: AppColors.primary,
+                              ),
+                      ),
                     ),
                   );
                 },
               ),
-              const SizedBox(width: 4),
+
             ],
           ),
           body: RefreshIndicator(

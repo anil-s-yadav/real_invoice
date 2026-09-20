@@ -28,11 +28,13 @@ import 'features/reports/bloc/reports_bloc.dart';
 import 'features/subscriptions/bloc/subscription_bloc.dart';
 import 'features/onboarding/bloc/onboarding_cubit.dart';
 import 'features/onboarding/presentation/onboarding_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AppBlocObserver();
-
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Initialize SQLite FFI for desktop platforms and test environments
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     sqfliteFfiInit();
@@ -50,7 +52,7 @@ class RedInvoiceRoot extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthRepository>(
-          create: (_) => DummyAuthRepository(),
+          create: (_) => FirebaseAuthRepository(),
         ),
         RepositoryProvider(create: (_) => BusinessProfileRepository()),
         RepositoryProvider(create: (_) => CustomerRepository()),
