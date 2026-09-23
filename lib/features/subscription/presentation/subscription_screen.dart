@@ -834,7 +834,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   Future<void> _sendEmail(String email) async {
     final uri = Uri.parse(
-      'mailto:$email?subject=RedInvoice%20Subscription%20Query',
+      'mailto:$email?subject=invoz%20Subscription%20Query',
     );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
@@ -1308,7 +1308,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () =>
-                                _sendEmail('support@redinvoice.app'),
+                                _sendEmail('support@invoz.app'),
                             icon: const Icon(
                               Icons.mail_outline,
                               size: 16,

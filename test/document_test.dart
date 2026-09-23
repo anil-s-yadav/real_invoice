@@ -1,15 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:real_invoice/core/utils/currency_formatter.dart';
-import 'package:real_invoice/core/widgets/status_badge.dart';
-import 'package:real_invoice/features/business_profile/domain/business_profile_model.dart';
-import 'package:real_invoice/features/customers/domain/customer_model.dart';
-import 'package:real_invoice/features/documents/domain/document_item_model.dart';
-import 'package:real_invoice/features/documents/domain/document_model.dart';
-import 'package:real_invoice/features/documents/domain/payment_record_model.dart';
-import 'package:real_invoice/features/pdf_engine/document_pdf_generator.dart';
-import 'package:real_invoice/features/pdf_engine/template_registry.dart';
+import 'package:invoz/core/utils/currency_formatter.dart';
+import 'package:invoz/core/widgets/status_badge.dart';
+import 'package:invoz/features/business_profile/domain/business_profile_model.dart';
+import 'package:invoz/features/customers/domain/customer_model.dart';
+import 'package:invoz/features/documents/domain/document_item_model.dart';
+import 'package:invoz/features/documents/domain/document_model.dart';
+import 'package:invoz/features/documents/domain/payment_record_model.dart';
+import 'package:invoz/features/pdf_engine/document_pdf_generator.dart';
+import 'package:invoz/features/pdf_engine/template_registry.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('CurrencyFormatter Tests', () {
     test('formats Indian rupee numbering accurately', () {
       final formatted = CurrencyFormatter.format(150000.00);

@@ -34,7 +34,7 @@ class TemplateRegistry {
       id: modernCrimson,
       name: 'Modern Crimson',
       description:
-          'Signature RedInvoice layout with refined crimson accents and carded totals.',
+          'Signature invoz layout with refined crimson accents and carded totals.',
       icon: Icons.auto_awesome,
       accentColor: AppColors.primary,
     ),

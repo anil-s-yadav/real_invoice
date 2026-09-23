@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// RedInvoice "Deep Indigo" Color Palette
+/// invoz "Deep Indigo" Color Palette
 /// Trustworthy, professional, modern, and calm.
 class AppColors {
   AppColors._();

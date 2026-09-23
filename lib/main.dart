@@ -41,18 +41,20 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
 
-  runApp(const RedInvoiceRoot());
+  runApp(const InvozRoot());
 }
 
-class RedInvoiceRoot extends StatelessWidget {
-  const RedInvoiceRoot({super.key});
+class InvozRoot extends StatelessWidget {
+  final AuthRepository? authRepository;
+
+  const InvozRoot({super.key, this.authRepository});
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthRepository>(
-          create: (_) => FirebaseAuthRepository(),
+          create: (_) => authRepository ?? FirebaseAuthRepository(),
         ),
         RepositoryProvider(create: (_) => BusinessProfileRepository()),
         RepositoryProvider(create: (_) => CustomerRepository()),
@@ -103,14 +105,14 @@ class RedInvoiceRoot extends StatelessWidget {
           ),
           BlocProvider(create: (_) => OnboardingCubit()),
         ],
-        child: const RedInvoiceApp(),
+        child: const InvozApp(),
       ),
     );
   }
 }
 
-class RedInvoiceApp extends StatelessWidget {
-  const RedInvoiceApp({super.key});
+class InvozApp extends StatelessWidget {
+  const InvozApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +136,7 @@ class RedInvoiceApp extends StatelessWidget {
                 }
 
                 return MaterialApp(
-                  title: 'RedInvoice',
+                  title: 'invoz',
                   debugShowCheckedModeBanner: false,
                   themeMode: themeMode,
                   theme: AppTheme.lightTheme,

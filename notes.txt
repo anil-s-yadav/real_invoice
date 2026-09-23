@@ -1,0 +1,65 @@
+This is a great pivot. Moving to Firebase unlocks cross-device syncing, push notifications, and premium features, but it requires careful architectural planning—especially since you currently have a working local SQLite database.
+
+Before we write any code, here is a comprehensive blueprint for your Firebase architecture, structured from the database schema to the execution plan.
+
+1. Firestore Database Structure (NoSQL)
+Since security and data isolation are critical for an invoicing app, we will use a User-Centric Hierarchical Structure.
+
+users (Collection) -> Document ID: userId (from Firebase Auth)
+email, displayName, createdAt
+subscription (Map):
+planType (e.g., "free", "pro", "premium")
+expiresAt (Timestamp)
+maxCompaniesAllowed (Int)
+isActive (Boolean)
+templateConfig (Map): (Global or per-company template preferences)
+templateId
+version
+customizations (JSON string of colors, fonts)
+users/{userId}/devices (Subcollection for Device Management) -> Document ID: deviceId
+fcmToken (For Push Notifications)
+deviceModel (e.g., "iPhone 14 Pro", "Samsung S23")
+lastActive (Timestamp)
+platform ("ios", "android", "web")
+users/{userId}/companies (Subcollection) -> Document ID: companyId
+Business details (Name, GSTIN, Address, etc.)
+logoUrl, stampUrl, signatureUrl (Links to Firebase Storage)
+users/{userId}/companies/{companyId}/customers (Subcollection)
+users/{userId}/companies/{companyId}/products (Subcollection)
+users/{userId}/companies/{companyId}/documents (Subcollection)
+Invoices, Estimates, Receipts, etc.
+status, dueDate, totalAmount (Crucial for the overdue push notifications)
+2. Firebase Storage Structure
+We will use Firebase Storage to keep your database lightweight.
+
+/templates/thumbnails/{templateId}.jpg (Publicly readable. We store thumbnails here, but the code to generate the PDF stays in the app with dummy data for the preview).
+/users/{userId}/companies/{companyId}/assets/logo.png (Protected by security rules).
+/users/{userId}/companies/{companyId}/assets/signature.png
+/users/{userId}/companies/{companyId}/assets/stamp.png
+3. Missing Considerations (Crucial Architecture Questions)
+Before we start, we need to decide on these:
+
+SQLite vs Firestore Offline Persistence: You currently use SQLite. Firestore has excellent built-in offline caching. We should plan to replace SQLite entirely with Firestore. Building a custom 2-way sync between SQLite and Firestore is a massive headache. Firestore will let users work offline and auto-sync when the internet returns.
+Subscription Validation: We shouldn't trust the client app to update the expiresAt or planType directly (users can hack this). We will need to use a tool like RevenueCat or Firebase Extensions (In-App Purchases) to verify payments securely on the backend.
+Firebase Security Rules: We must write strict rules so User A can never read/write User B's invoices or company data.
+4. Step-by-Step Execution Plan (Easy to Challenging)
+We will tackle this in phases, building independent modules first so we don't break your existing app.
+
+Phase 1: Foundation & Assets (Easy & Independent)
+Step 1: Setup Firebase Security Rules for Firestore and Storage.
+Step 2: Upload Template Thumbnails to Firebase Storage manually (via Firebase Console) and update the app's TemplateGallery to fetch these images from Storage instead of local assets.
+Phase 2: User Profile & Device Management (Moderate)
+Step 3: Create the logic to register a device upon login (save device model and FCM token to the users/{userId}/devices subcollection).
+Step 4: Build the "Logged-in Devices" UI in the User Profile.
+Step 5: Implement the "Log Out All Devices" button. (How it works: The app deletes all device docs for that user. We can use a Firebase Cloud Function to revoke refresh tokens so they are actually forced out).
+Phase 3: Core Data Migration (Moderate)
+Step 6: Refactor the Repositories (Company, Customer, Product, Document) to read/write from Firestore instead of SQLite.
+Step 7: Implement Firebase Storage uploads for the Logo, Stamp, and Signature when creating/editing a company.
+Phase 4: Premium Packages & Limitations (Challenging)
+Step 8: Build the Subscription UI and store the subscription Map on the user document.
+Step 9: Implement the "Company Count Limit". When the user clicks "Add Company", the app checks users/{userId}/companies count against maxCompaniesAllowed in their subscription.
+Phase 5: Cloud Functions & Push Notifications (Most Challenging)
+Step 10: Set up a Firebase Cloud Function with a Cron Job (Scheduled Task) that runs once a day. It will scan for:
+Invoices where status == 'sent' and dueDate is within 3 days.
+User subscriptions where expiresAt is within 3 days.
+Step 11: The Cloud Function sends targeted Push Notifications (FCM) to the tokens stored in the user's devices subcollection.

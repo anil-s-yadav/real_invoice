@@ -1,6 +1,6 @@
-# real_invoice
+# invoz
 
-A new Flutter project.
+Modern mobile invoicing and billing application built with Flutter.
 
 ## Getting Started
 

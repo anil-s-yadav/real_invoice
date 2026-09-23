@@ -7,7 +7,6 @@ import '../domain/document_item_model.dart';
 import '../domain/document_model.dart';
 import '../domain/payment_record_model.dart';
 import '../../settings/data/invoice_settings_repository.dart';
-import 'sample_documents_seeder.dart';
 
 class SummaryStats {
   final double unpaidTotal;
@@ -30,40 +29,35 @@ class SummaryStats {
 class DocumentRepository {
   final AppDatabase _appDatabase;
   final _uuid = const Uuid();
-  bool _hasCheckedSeeding = false;
+  bool _hasCheckedPurge = false;
 
   DocumentRepository({AppDatabase? appDatabase})
     : _appDatabase = appDatabase ?? AppDatabase.instance;
 
-  Future<void> checkAndSeedSampleDocuments() async {
-    if (_hasCheckedSeeding) return;
-    _hasCheckedSeeding = true;
+  Future<void> purgeSampleData() async {
+    if (_hasCheckedPurge) return;
+    _hasCheckedPurge = true;
 
     try {
       final db = await _appDatabase.database;
-      final sampleDocs = SampleDocumentsSeeder.generateSampleDocuments();
-
-      for (final doc in sampleDocs) {
-        final existing = await db.query(
-          DatabaseTables.documents,
-          columns: ['id'],
-          where: 'id = ?',
-          whereArgs: [doc.id],
-          limit: 1,
-        );
-        if (existing.isEmpty) {
-          if (doc.customerSnapshot != null) {
-            await db.insert(
-              DatabaseTables.customers,
-              doc.customerSnapshot!.toMap(),
-              conflictAlgorithm: ConflictAlgorithm.ignore,
-            );
-          }
-          await saveDocument(doc);
-        }
-      }
+      await db.delete(
+        DatabaseTables.documents,
+        where: "id LIKE 'sample-%'",
+      );
+      await db.delete(
+        DatabaseTables.documentItems,
+        where: "documentId LIKE 'sample-%' OR id LIKE 'item-%'",
+      );
+      await db.delete(
+        DatabaseTables.paymentRecords,
+        where: "documentId LIKE 'sample-%' OR id LIKE 'pay-%'",
+      );
+      await db.delete(
+        DatabaseTables.customers,
+        where: "id LIKE 'cust-%' OR id LIKE 'sample-%'",
+      );
     } catch (_) {
-      // Ignore seeding errors in transient or mock states
+      // Ignore cleanup errors
     }
   }
 
@@ -75,7 +69,7 @@ class DocumentRepository {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    await checkAndSeedSampleDocuments();
+    await purgeSampleData();
     final db = await _appDatabase.database;
 
     final whereClauses = <String>[];
@@ -526,7 +520,7 @@ class DocumentRepository {
   }
 
   Future<SummaryStats> getSummaryStats() async {
-    await checkAndSeedSampleDocuments();
+    await purgeSampleData();
     final db = await _appDatabase.database;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day).toIso8601String();

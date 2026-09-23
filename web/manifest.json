@@ -1,6 +1,6 @@
 {
-    "name": "real_invoice",
-    "short_name": "real_invoice",
+    "name": "invoz",
+    "short_name": "invoz",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

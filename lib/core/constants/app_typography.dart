@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// RedInvoice Typography System
+/// invoz Typography System
 /// Crisp, highly-readable modern sans hierarchy with tabular figures for accounting numbers.
 class AppTypography {
   AppTypography._();

@@ -12,7 +12,7 @@ class AppDatabase {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('red_invoice.db');
+    _database = await _initDB('invoz.db');
     return _database!;
   }
 
@@ -25,6 +25,17 @@ class AppDatabase {
 
     final dbPath = await getDatabasesPath();
     final path = p.join(dbPath, filePath);
+
+    // If migrating from legacy red_invoice.db to invoz.db
+    if (filePath == 'invoz.db') {
+      try {
+        final legacyFile = File(p.join(dbPath, 'red_invoice.db'));
+        final newFile = File(path);
+        if (await legacyFile.exists() && !await newFile.exists()) {
+          await legacyFile.copy(path);
+        }
+      } catch (_) {}
+    }
 
     return await openDatabase(
       path,

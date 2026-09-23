@@ -100,9 +100,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthLoading());
       try {
         final user = await authRepository.signInWithGoogle();
-        emit(Authenticated(user: user));
+        if (user != null) {
+          emit(Authenticated(user: user));
+        } else {
+          emit(const Unauthenticated());
+        }
       } catch (e) {
-        emit(AuthError('Failed to sign in with Google: $e'));
+        String msg = 'Failed to sign in with Google: $e';
+        if (e.toString().contains('ApiException: 10')) {
+          msg = 'Google Sign-In configuration error (ApiException: 10). Add your SHA-1 fingerprint in Firebase Console.';
+        }
+        emit(AuthError(msg));
         emit(const Unauthenticated());
       }
     });

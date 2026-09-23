@@ -51,7 +51,7 @@ class SignInScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppDimensions.xxxl),
                   const Text(
-                    'Welcome to RedInvoice',
+                    'Welcome to invoz',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,

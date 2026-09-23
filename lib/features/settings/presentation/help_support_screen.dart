@@ -10,7 +10,7 @@ class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
 
   static const String _supportPhone = '+91 98765 43210';
-  static const String _supportEmail = 'support@redinvoice.app';
+  static const String _supportEmail = 'support@invoz.app';
   static const String _whatsappNumber = '919876543210';
 
   static const List<Map<String, String>> _faqs = [
@@ -27,7 +27,7 @@ class HelpSupportScreen extends StatelessWidget {
     {
       'question': 'Is my financial and business data secure?',
       'answer':
-          'Yes, absolutely. RedInvoice is 100% offline-first. All your customer information, invoices, items, and company profiles are stored locally on your device in an encrypted SQLite database. No data is shared or uploaded to external servers without your permission.',
+          'Yes, absolutely. invoz is 100% offline-first. All your customer information, invoices, items, and company profiles are stored locally on your device in an encrypted SQLite database. No data is shared or uploaded to external servers without your permission.',
     },
     {
       'question': 'How do I print or share an invoice PDF?',
@@ -237,7 +237,7 @@ class HelpSupportScreen extends StatelessWidget {
     final uri = Uri(
       scheme: 'mailto',
       path: _supportEmail,
-      queryParameters: {'subject': 'RedInvoice Support Request'},
+      queryParameters: {'subject': 'invoz Support Request'},
     );
     try {
       if (await canLaunchUrl(uri)) {
@@ -264,7 +264,7 @@ class HelpSupportScreen extends StatelessWidget {
 
   Future<void> _handleOpenWhatsApp(BuildContext context) async {
     final uri = Uri.parse(
-      'https://wa.me/$_whatsappNumber?text=Hello%20RedInvoice%20Support',
+      'https://wa.me/$_whatsappNumber?text=Hello%20invoz%20Support',
     );
     try {
       if (await canLaunchUrl(uri)) {

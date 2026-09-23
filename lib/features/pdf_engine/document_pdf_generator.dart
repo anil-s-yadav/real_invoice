@@ -40,7 +40,7 @@ class DocumentPdfGenerator {
       title: '${document.docType.displayName} ${document.docNumber}',
       author: profile.businessName.isNotEmpty
           ? profile.businessName
-          : 'RedInvoice',
+          : 'invoz',
       theme: pw.ThemeData.withFont(
         base: font,
         bold: boldFont,
@@ -151,7 +151,7 @@ class DocumentPdfGenerator {
     return CurrencyFormatter.format(amount, symbol: sym);
   }
 
-  // 1. MODERN CRIMSON (Signature RedInvoice style)
+  // 1. MODERN CRIMSON (Signature invoz style)
   static List<pw.Widget> _buildModernCrimson(
     pw.Context context,
     DocumentModel doc,

@@ -9,7 +9,7 @@ import '../domain/auth_user_model.dart';
 
 abstract class AuthRepository {
   Stream<AuthUser?> get user;
-  Future<AuthUser> signInWithGoogle();
+  Future<AuthUser?> signInWithGoogle();
   Future<AuthUser> signInWithApple();
   Future<void> signOut();
   Future<AuthUser?> getCurrentUser();
@@ -46,10 +46,10 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<AuthUser> signInWithGoogle() async {
+  Future<AuthUser?> signInWithGoogle() async {
     final googleUser = await _googleSignIn.signIn();
     if (googleUser == null) {
-      throw Exception('Google sign-in was cancelled.');
+      return null;
     }
     final googleAuth = await googleUser.authentication;
     final credential = fb.GoogleAuthProvider.credential(

@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'RedInvoice',
+                      'invoz',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
