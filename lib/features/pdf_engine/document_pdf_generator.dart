@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:http/http.dart' as http;
 import '../../core/utils/currency_formatter.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../core/widgets/status_badge.dart';
@@ -53,9 +54,12 @@ class DocumentPdfGenerator {
     Uint8List? logoBytes;
     if (profile.logoPath != null && profile.logoPath!.isNotEmpty) {
       try {
-        final file = File(profile.logoPath!);
-        if (await file.exists()) {
-          logoBytes = await file.readAsBytes();
+        if (profile.logoPath!.startsWith('http')) {
+          final response = await http.get(Uri.parse(profile.logoPath!));
+          if (response.statusCode == 200) logoBytes = response.bodyBytes;
+        } else {
+          final file = File(profile.logoPath!);
+          if (await file.exists()) logoBytes = await file.readAsBytes();
         }
       } catch (_) {}
     }
@@ -63,9 +67,12 @@ class DocumentPdfGenerator {
     Uint8List? signatureBytes;
     if (profile.signaturePath != null && profile.signaturePath!.isNotEmpty) {
       try {
-        final file = File(profile.signaturePath!);
-        if (await file.exists()) {
-          signatureBytes = await file.readAsBytes();
+        if (profile.signaturePath!.startsWith('http')) {
+          final response = await http.get(Uri.parse(profile.signaturePath!));
+          if (response.statusCode == 200) signatureBytes = response.bodyBytes;
+        } else {
+          final file = File(profile.signaturePath!);
+          if (await file.exists()) signatureBytes = await file.readAsBytes();
         }
       } catch (_) {}
     }

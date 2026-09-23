@@ -5,7 +5,13 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import '../domain/auth_user_model.dart';
+import '../domain/device_model.dart';
 
 abstract class AuthRepository {
   Stream<AuthUser?> get user;
@@ -13,6 +19,8 @@ abstract class AuthRepository {
   Future<AuthUser> signInWithApple();
   Future<void> signOut();
   Future<AuthUser?> getCurrentUser();
+  Future<void> registerDevice();
+  Future<void> logOutAllDevices();
 }
 
 class FirebaseAuthRepository implements AuthRepository {
@@ -124,5 +132,103 @@ class FirebaseAuthRepository implements AuthRepository {
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
     return digest.toString();
+  }
+
+  @override
+  Future<void> registerDevice() async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) return;
+
+    try {
+      // 1. Ensure the parent user document exists
+      final userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userDoc = await userDocRef.get();
+      if (!userDoc.exists) {
+        await userDocRef.set({
+          'email': user.email ?? '',
+          'displayName': user.displayName ?? 'Unknown User',
+          'createdAt': FieldValue.serverTimestamp(),
+          'isActive': true,
+        }, SetOptions(merge: true));
+      }
+
+      // 2. Register the device
+      final messaging = FirebaseMessaging.instance;
+      String? token;
+      
+      // Request permission for iOS (ignored on Android)
+      if (!kIsWeb && Platform.isIOS) {
+        await messaging.requestPermission();
+      }
+      
+      token = await messaging.getToken();
+
+      final deviceInfo = DeviceInfoPlugin();
+      String deviceModel = 'Unknown Device';
+      String platformStr = 'unknown';
+
+      if (kIsWeb) {
+        final webInfo = await deviceInfo.webBrowserInfo;
+        deviceModel = webInfo.userAgent ?? 'Web Browser';
+        platformStr = 'web';
+      } else if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        deviceModel = '${androidInfo.brand} ${androidInfo.model}';
+        platformStr = 'android';
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        deviceModel = iosInfo.name;
+        platformStr = 'ios';
+      }
+
+      // Generate a stable device ID or just use token as doc ID (but token changes)
+      // Better to use a hash of the device name + platform or let Firestore generate it
+      // Let's use a combination of platform and model as a simple stable ID for this example
+      final deviceId = _sha256ofString(deviceModel + platformStr).substring(0, 16);
+
+      final device = DeviceModel(
+        deviceId: deviceId,
+        fcmToken: token,
+        deviceModel: deviceModel,
+        lastActive: DateTime.now(),
+        platform: platformStr,
+      );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('devices')
+          .doc(deviceId)
+          .set(device.toFirestore(), SetOptions(merge: true));
+    } catch (e) {
+      print('Failed to register device: $e');
+    }
+  }
+
+  @override
+  Future<void> logOutAllDevices() async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) return;
+
+    try {
+      final devicesRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('devices');
+
+      final snapshot = await devicesRef.get();
+      final batch = FirebaseFirestore.instance.batch();
+
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
+      
+      // Finally, sign out locally
+      await signOut();
+    } catch (e) {
+      throw Exception('Failed to log out all devices: $e');
+    }
   }
 }

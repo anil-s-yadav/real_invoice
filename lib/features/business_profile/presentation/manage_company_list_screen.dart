@@ -200,9 +200,10 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                     radius: 22,
                     backgroundColor: AppColors.canvas,
                     backgroundImage:
-                        profile.logoPath != null &&
-                            profile.logoPath!.isNotEmpty
-                        ? FileImage(File(profile.logoPath!))
+                        profile.logoPath != null && profile.logoPath!.isNotEmpty
+                        ? (profile.logoPath!.startsWith('http') 
+                            ? NetworkImage(profile.logoPath!) as ImageProvider 
+                            : FileImage(File(profile.logoPath!)))
                         : null,
                     child:
                         profile.logoPath == null || profile.logoPath!.isEmpty

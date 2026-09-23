@@ -7,6 +7,9 @@ import '../../../core/widgets/app_card.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/domain/auth_user_model.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key});
 
@@ -95,6 +98,117 @@ class UserProfileScreen extends StatelessWidget {
                         _buildInfoRow(Icons.email_outlined, 'Email', email),
                         const Divider(height: 24),
                         _buildInfoRow(Icons.fingerprint, 'User ID', user.id),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: AppDimensions.lg),
+
+                // Device Management Card
+                if (user != null)
+                  AppCard(
+                    padding: const EdgeInsets.all(AppDimensions.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.devices, color: AppColors.primary),
+                            SizedBox(width: 12),
+                            Text(
+                              'Device Management',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppDimensions.sm),
+                        const Text(
+                          'Manage the devices logged into your account.',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                        ),
+                        const SizedBox(height: AppDimensions.md),
+                        StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(user.id)
+                              .collection('devices')
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              );
+                            }
+                            
+                            if (snapshot.hasError || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Text('No devices found.', style: TextStyle(color: AppColors.textSecondary, fontStyle: FontStyle.italic)),
+                              );
+                            }
+
+                            final devices = snapshot.data!.docs;
+
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: devices.length,
+                              separatorBuilder: (_, __) => const Divider(height: 1),
+                              itemBuilder: (context, index) {
+                                final data = devices[index].data() as Map<String, dynamic>;
+                                
+                                // Format device model name nicely
+                                String modelName = data['deviceModel'] as String? ?? 'Unknown Device';
+                                
+                                final platform = data['platform'] as String? ?? '';
+                                final platformIcon = platform.toLowerCase() == 'ios' 
+                                    ? Icons.phone_iphone
+                                    : Icons.android;
+
+                                // Format timestamp
+                                String lastActiveStr = 'Unknown';
+                                if (data['lastActive'] != null) {
+                                  try {
+                                    final dt = (data['lastActive'] as Timestamp).toDate();
+                                    lastActiveStr = DateFormat('MMM d, yyyy - h:mm a').format(dt);
+                                  } catch (_) {}
+                                }
+
+                                return ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: CircleAvatar(
+                                    backgroundColor: AppColors.canvas,
+                                    child: Icon(platformIcon, color: AppColors.textPrimary, size: 20),
+                                  ),
+                                  title: Text(
+                                    modelName,
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  ),
+                                  subtitle: Text(
+                                    'Last active: $lastActiveStr',
+                                    style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        const SizedBox(height: AppDimensions.lg),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _showLogOutAllDevicesConfirmation(context),
+                            icon: const Icon(Icons.logout, color: Colors.orange),
+                            label: const Text('Log Out All Devices', style: TextStyle(color: Colors.orange)),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.orange),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -204,6 +318,32 @@ class UserProfileScreen extends StatelessWidget {
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLogOutAllDevicesConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Log Out All Devices'),
+        content: const Text(
+            'This will sign you out from all devices currently logged into your account. Are you sure you want to proceed?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.read<AuthBloc>().add(const LogOutAllDevicesRequestedEvent());
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.orange),
+            child: const Text('Log Out All'),
           ),
         ],
       ),

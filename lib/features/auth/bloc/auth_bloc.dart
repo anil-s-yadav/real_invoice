@@ -35,6 +35,10 @@ class SignOutRequestedEvent extends AuthEvent {
   const SignOutRequestedEvent();
 }
 
+class LogOutAllDevicesRequestedEvent extends AuthEvent {
+  const LogOutAllDevicesRequestedEvent();
+}
+
 // States
 abstract class AuthState extends Equatable {
   const AuthState();
@@ -82,6 +86,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthLoading());
       final user = await authRepository.getCurrentUser();
       if (user != null) {
+        await authRepository.registerDevice();
         emit(Authenticated(user: user));
       } else {
         emit(const Unauthenticated());
@@ -101,6 +106,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = await authRepository.signInWithGoogle();
         if (user != null) {
+          await authRepository.registerDevice();
           emit(Authenticated(user: user));
         } else {
           emit(const Unauthenticated());
@@ -119,6 +125,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthLoading());
       try {
         final user = await authRepository.signInWithApple();
+        await authRepository.registerDevice();
         emit(Authenticated(user: user));
       } catch (e) {
         emit(AuthError('Failed to sign in with Apple: $e'));
@@ -130,6 +137,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthLoading());
       await authRepository.signOut();
       emit(const Unauthenticated());
+    });
+
+    on<LogOutAllDevicesRequestedEvent>((event, emit) async {
+      emit(const AuthLoading());
+      try {
+        await authRepository.logOutAllDevices();
+        emit(const Unauthenticated());
+      } catch (e) {
+        emit(AuthError('Failed to log out all devices: $e'));
+        emit(const Unauthenticated());
+      }
     });
   }
 }

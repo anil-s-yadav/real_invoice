@@ -23,6 +23,12 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {}
+
+  @override
+  Future<void> registerDevice() async {}
+
+  @override
+  Future<void> logOutAllDevices() async {}
 }
 
 void main() {

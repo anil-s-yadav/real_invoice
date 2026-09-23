@@ -1,12 +1,12 @@
-import 'package:sqflite/sqflite.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import '../../../core/database/app_database.dart';
-import '../../../core/database/database_tables.dart';
-import '../../../core/widgets/status_badge.dart';
 import '../domain/document_item_model.dart';
 import '../domain/document_model.dart';
 import '../domain/payment_record_model.dart';
 import '../../settings/data/invoice_settings_repository.dart';
+import '../../../core/widgets/status_badge.dart';
 
 class SummaryStats {
   final double unpaidTotal;
@@ -27,38 +27,28 @@ class SummaryStats {
 }
 
 class DocumentRepository {
-  final AppDatabase _appDatabase;
+  static const String _activeProfileKey = 'active_profile_id';
   final _uuid = const Uuid();
-  bool _hasCheckedPurge = false;
 
-  DocumentRepository({AppDatabase? appDatabase})
-    : _appDatabase = appDatabase ?? AppDatabase.instance;
+  String get _userId {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('User not authenticated');
+    return user.uid;
+  }
 
-  Future<void> purgeSampleData() async {
-    if (_hasCheckedPurge) return;
-    _hasCheckedPurge = true;
+  Future<String> _getCompanyId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_activeProfileKey) ?? 'default_profile';
+  }
 
-    try {
-      final db = await _appDatabase.database;
-      await db.delete(
-        DatabaseTables.documents,
-        where: "id LIKE 'sample-%'",
-      );
-      await db.delete(
-        DatabaseTables.documentItems,
-        where: "documentId LIKE 'sample-%' OR id LIKE 'item-%'",
-      );
-      await db.delete(
-        DatabaseTables.paymentRecords,
-        where: "documentId LIKE 'sample-%' OR id LIKE 'pay-%'",
-      );
-      await db.delete(
-        DatabaseTables.customers,
-        where: "id LIKE 'cust-%' OR id LIKE 'sample-%'",
-      );
-    } catch (_) {
-      // Ignore cleanup errors
-    }
+  Future<CollectionReference<Map<String, dynamic>>> _getDocumentsRef() async {
+    final companyId = await _getCompanyId();
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(_userId)
+        .collection('companies')
+        .doc(companyId)
+        .collection('documents');
   }
 
   Future<List<DocumentModel>> getAllDocuments({
@@ -69,185 +59,71 @@ class DocumentRepository {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    await purgeSampleData();
-    final db = await _appDatabase.database;
+    try {
+      final ref = await _getDocumentsRef();
+      Query<Map<String, dynamic>> query = ref;
 
-    final whereClauses = <String>[];
-    final whereArgs = <dynamic>[];
+      if (type != null) {
+        query = query.where('docType', isEqualTo: type.name);
+      }
+      if (status != null) {
+        query = query.where('status', isEqualTo: status.name);
+      }
+      if (startDate != null) {
+        query = query.where('issueDate', isGreaterThanOrEqualTo: startDate.toIso8601String());
+      }
+      if (endDate != null) {
+        final endOfDay = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999);
+        query = query.where('issueDate', isLessThanOrEqualTo: endOfDay.toIso8601String());
+      }
+      
+      query = query.orderBy('issueDate', descending: true);
+      if (limit != null) {
+        query = query.limit(limit);
+      }
 
-    if (type != null) {
-      whereClauses.add('docType = ?');
-      whereArgs.add(type.name);
+      final snapshot = await query.get();
+      var docs = snapshot.docs.map((doc) => DocumentModel.fromMap(doc.data())).toList();
+
+      if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+        final q = searchQuery.trim().toLowerCase();
+        docs = docs.where((doc) {
+          return doc.docNumber.toLowerCase().contains(q) ||
+                 (doc.customerSnapshot?.name.toLowerCase().contains(q) ?? false) ||
+                 (doc.notes?.toLowerCase().contains(q) ?? false);
+        }).toList();
+      }
+
+      return docs;
+    } catch (e) {
+      print('Error getting documents: $e');
+      return [];
     }
-
-    if (status != null) {
-      whereClauses.add('status = ?');
-      whereArgs.add(status.name);
-    }
-
-    if (startDate != null) {
-      whereClauses.add('issueDate >= ?');
-      whereArgs.add(startDate.toIso8601String());
-    }
-
-    if (endDate != null) {
-      whereClauses.add('issueDate <= ?');
-      // Add 1 day and subtract 1 millisecond to include the entire end date
-      final endOfDay = DateTime(
-        endDate.year,
-        endDate.month,
-        endDate.day,
-        23,
-        59,
-        59,
-        999,
-      );
-      whereArgs.add(endOfDay.toIso8601String());
-    }
-
-    if (searchQuery != null && searchQuery.trim().isNotEmpty) {
-      whereClauses.add(
-        '(docNumber LIKE ? OR customerSnapshot LIKE ? OR notes LIKE ?)',
-      );
-      final q = '%${searchQuery.trim()}%';
-      whereArgs.addAll([q, q, q]);
-    }
-
-    final where = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
-
-    final docRows = await db.query(
-      DatabaseTables.documents,
-      where: where,
-      whereArgs: whereArgs.isNotEmpty ? whereArgs : null,
-      orderBy: 'issueDate DESC, createdAt DESC',
-      limit: limit,
-    );
-
-    final List<DocumentModel> results = [];
-    for (final row in docRows) {
-      final docId = row['id'] as String;
-
-      final itemRows = await db.query(
-        DatabaseTables.documentItems,
-        where: 'documentId = ?',
-        whereArgs: [docId],
-      );
-      final items = itemRows.map((m) => DocumentItem.fromMap(m)).toList();
-
-      final paymentRows = await db.query(
-        DatabaseTables.paymentRecords,
-        where: 'documentId = ?',
-        whereArgs: [docId],
-        orderBy: 'paymentDate DESC',
-      );
-      final payments = paymentRows
-          .map((m) => PaymentRecord.fromMap(m))
-          .toList();
-
-      results.add(DocumentModel.fromMap(row, items: items, payments: payments));
-    }
-
-    return results;
   }
 
   Future<DocumentModel?> getDocumentById(String id) async {
-    final db = await _appDatabase.database;
-    final docRows = await db.query(
-      DatabaseTables.documents,
-      where: 'id = ?',
-      whereArgs: [id],
-      limit: 1,
-    );
-    if (docRows.isEmpty) return null;
-
-    final itemRows = await db.query(
-      DatabaseTables.documentItems,
-      where: 'documentId = ?',
-      whereArgs: [id],
-    );
-    final items = itemRows.map((m) => DocumentItem.fromMap(m)).toList();
-
-    final paymentRows = await db.query(
-      DatabaseTables.paymentRecords,
-      where: 'documentId = ?',
-      whereArgs: [id],
-      orderBy: 'paymentDate DESC',
-    );
-    final payments = paymentRows.map((m) => PaymentRecord.fromMap(m)).toList();
-
-    return DocumentModel.fromMap(
-      docRows.first,
-      items: items,
-      payments: payments,
-    );
+    final ref = await _getDocumentsRef();
+    final doc = await ref.doc(id).get();
+    if (!doc.exists) return null;
+    return DocumentModel.fromMap(doc.data()!);
   }
 
   Future<void> saveDocument(DocumentModel document) async {
-    final db = await _appDatabase.database;
-
-    await db.transaction((txn) async {
-      // 1. Save document header
-      await txn.insert(
-        DatabaseTables.documents,
-        document.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-
-      // 2. Clear existing items and insert new ones
-      await txn.delete(
-        DatabaseTables.documentItems,
-        where: 'documentId = ?',
-        whereArgs: [document.id],
-      );
-
-      for (final item in document.items) {
-        await txn.insert(
-          DatabaseTables.documentItems,
-          item.copyWith(documentId: document.id).toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-
-      // 3. Upsert payments if provided
-      for (final payment in document.payments) {
-        await txn.insert(
-          DatabaseTables.paymentRecords,
-          payment.copyWith(documentId: document.id).toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-    });
+    final ref = await _getDocumentsRef();
+    await ref.doc(document.id).set(document.toMap(), SetOptions(merge: true));
   }
 
   Future<void> deleteDocument(String id) async {
-    final db = await _appDatabase.database;
-    await db.transaction((txn) async {
-      await txn.delete(
-        DatabaseTables.documentItems,
-        where: 'documentId = ?',
-        whereArgs: [id],
-      );
-      await txn.delete(
-        DatabaseTables.paymentRecords,
-        where: 'documentId = ?',
-        whereArgs: [id],
-      );
-      await txn.delete(
-        DatabaseTables.documents,
-        where: 'id = ?',
-        whereArgs: [id],
-      );
-    });
+    final ref = await _getDocumentsRef();
+    await ref.doc(id).delete();
   }
 
   Future<void> updateDocumentStatus(String id, DocumentStatus newStatus) async {
-    final db = await _appDatabase.database;
-    await db.update(
-      DatabaseTables.documents,
-      {'status': newStatus.name, 'updatedAt': DateTime.now().toIso8601String()},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    final ref = await _getDocumentsRef();
+    await ref.doc(id).update({
+      'status': newStatus.name,
+      'updatedAt': DateTime.now().toIso8601String(),
+    });
   }
 
   Future<void> recordPayment({
@@ -258,7 +134,11 @@ class DocumentRepository {
     String? notes,
     DateTime? paymentDate,
   }) async {
-    final db = await _appDatabase.database;
+    final ref = await _getDocumentsRef();
+    final doc = await ref.doc(documentId).get();
+    if (!doc.exists) return;
+
+    final document = DocumentModel.fromMap(doc.data()!);
     final now = DateTime.now();
 
     final payment = PaymentRecord(
@@ -272,99 +152,69 @@ class DocumentRepository {
       createdAt: now,
     );
 
-    await db.transaction((txn) async {
-      await txn.insert(DatabaseTables.paymentRecords, payment.toMap());
+    final updatedPayments = List<PaymentRecord>.from(document.payments)..add(payment);
+    final totalPaid = updatedPayments.fold<double>(0.0, (sum, p) => sum + p.amount);
 
-      // Recalculate amount paid
-      final rows = await txn.query(
-        DatabaseTables.paymentRecords,
-        columns: ['amount'],
-        where: 'documentId = ?',
-        whereArgs: [documentId],
-      );
-      final totalPaid = rows.fold<double>(
-        0.0,
-        (sum, row) => sum + ((row['amount'] as num?)?.toDouble() ?? 0.0),
-      );
+    DocumentStatus newStatus;
+    if (totalPaid >= document.totalAmount && document.totalAmount > 0) {
+      newStatus = DocumentStatus.paid;
+    } else if (totalPaid > 0) {
+      newStatus = DocumentStatus.partial;
+    } else {
+      newStatus = DocumentStatus.sent;
+    }
 
-      final docHeader = await txn.query(
-        DatabaseTables.documents,
-        columns: ['totalAmount', 'status'],
-        where: 'id = ?',
-        whereArgs: [documentId],
-      );
-
-      if (docHeader.isNotEmpty) {
-        final totalAmount =
-            (docHeader.first['totalAmount'] as num?)?.toDouble() ?? 0.0;
-        final DocumentStatus newStatus;
-        if (totalPaid >= totalAmount && totalAmount > 0) {
-          newStatus = DocumentStatus.paid;
-        } else if (totalPaid > 0) {
-          newStatus = DocumentStatus.partial;
-        } else {
-          newStatus = DocumentStatus.sent;
-        }
-
-        await txn.update(
-          DatabaseTables.documents,
-          {
-            'amountPaid': totalPaid,
-            'status': newStatus.name,
-            'updatedAt': now.toIso8601String(),
-          },
-          where: 'id = ?',
-          whereArgs: [documentId],
-        );
-      }
+    await ref.doc(documentId).update({
+      'payments': updatedPayments.map((e) => e.toMap()).toList(),
+      'amountPaid': totalPaid,
+      'status': newStatus.name,
+      'updatedAt': now.toIso8601String(),
     });
   }
 
   Future<String> getNextDocumentNumber(DocumentType type) async {
-    final db = await _appDatabase.database;
-    final currentYear = DateTime.now().year;
-
     final settingsRepo = InvoiceSettingsRepository();
     final customPrefix = await settingsRepo.getPrefixForType(type);
     final includeYear = await settingsRepo.getIncludeYear();
     final padding = await settingsRepo.getPaddingDigits();
-
+    
+    final currentYear = DateTime.now().year;
     final prefix = includeYear ? '$customPrefix$currentYear-' : customPrefix;
 
-    final results = await db.query(
-      DatabaseTables.documents,
-      columns: ['docNumber'],
-      where: 'docType = ? AND docNumber LIKE ?',
-      whereArgs: [type.name, '$prefix%'],
-      orderBy: 'docNumber DESC',
-      limit: 1,
-    );
+    try {
+      final ref = await _getDocumentsRef();
+      final querySnapshot = await ref
+          .where('docType', isEqualTo: type.name)
+          // Note: Firestore string matching for prefixes
+          .where('docNumber', isGreaterThanOrEqualTo: prefix)
+          .where('docNumber', isLessThan: '$prefix\uf8ff')
+          .orderBy('docNumber', descending: true)
+          .limit(1)
+          .get();
 
-    if (results.isEmpty) {
+      if (querySnapshot.docs.isEmpty) {
+        return '$prefix${1.toString().padLeft(padding, '0')}';
+      }
+
+      final lastNumberStr = querySnapshot.docs.first.data()['docNumber'] as String;
+      final suffix = lastNumberStr.replaceFirst(prefix, '');
+      final number = int.tryParse(suffix) ?? 0;
+      final nextNumber = (number + 1).toString().padLeft(padding, '0');
+      return '$prefix$nextNumber';
+    } catch (e) {
+      print('Error getting next doc number: $e');
       return '$prefix${1.toString().padLeft(padding, '0')}';
     }
-
-    final lastNumberStr = results.first['docNumber'] as String;
-    final suffix = lastNumberStr.replaceFirst(prefix, '');
-    final number = int.tryParse(suffix) ?? 0;
-    final nextNumber = (number + 1).toString().padLeft(padding, '0');
-    return '$prefix$nextNumber';
   }
 
   Future<DocumentModel> convertProformaToInvoice(String proformaId) async {
     final proforma = await getDocumentById(proformaId);
-    if (proforma == null) {
-      throw Exception('Proforma not found');
-    }
+    if (proforma == null) throw Exception('Proforma not found');
 
-    // 1. Mark proforma as accepted (optional, just good to know it's processed)
     await updateDocumentStatus(proformaId, DocumentStatus.accepted);
-
-    // 2. Generate new Invoice Number
     final nextInvoiceNumber = await getNextDocumentNumber(DocumentType.invoice);
     final now = DateTime.now();
 
-    // 3. Create new Invoice
     final newInvoiceId = _uuid.v4();
     final newItems = proforma.items.map((item) {
       return item.copyWith(id: _uuid.v4(), documentId: newInvoiceId);
@@ -402,18 +252,12 @@ class DocumentRepository {
 
   Future<DocumentModel> convertQuotationToInvoice(String quotationId) async {
     final quotation = await getDocumentById(quotationId);
-    if (quotation == null) {
-      throw Exception('Quotation not found');
-    }
+    if (quotation == null) throw Exception('Quotation not found');
 
-    // 1. Mark quotation as accepted
     await updateDocumentStatus(quotationId, DocumentStatus.accepted);
-
-    // 2. Generate new Invoice Number
     final nextInvoiceNumber = await getNextDocumentNumber(DocumentType.invoice);
     final now = DateTime.now();
 
-    // 3. Create new Invoice
     final newInvoiceId = _uuid.v4();
     final newItems = quotation.items.map((item) {
       return item.copyWith(id: _uuid.v4(), documentId: newInvoiceId);
@@ -452,12 +296,9 @@ class DocumentRepository {
     String? notes,
   }) async {
     final invoice = await getDocumentById(invoiceId);
-    if (invoice == null) {
-      throw Exception('Invoice not found');
-    }
+    if (invoice == null) throw Exception('Invoice not found');
 
     final now = DateTime.now();
-    // 1. Record payment on the invoice
     await recordPayment(
       documentId: invoiceId,
       amount: amount,
@@ -467,7 +308,6 @@ class DocumentRepository {
       paymentDate: now,
     );
 
-    // 2. Generate receipt document
     final nextReceiptNumber = await getNextDocumentNumber(DocumentType.receipt);
     final receiptId = _uuid.v4();
 
@@ -520,54 +360,53 @@ class DocumentRepository {
   }
 
   Future<SummaryStats> getSummaryStats() async {
-    await purgeSampleData();
-    final db = await _appDatabase.database;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day).toIso8601String();
 
-    final docs = await db.query(
-      DatabaseTables.documents,
-      columns: ['docType', 'status', 'totalAmount', 'amountPaid', 'dueDate'],
-      where: 'docType = ?',
-      whereArgs: [DocumentType.invoice.name],
-    );
+    try {
+      final ref = await _getDocumentsRef();
+      final snapshot = await ref.where('docType', isEqualTo: DocumentType.invoice.name).get();
+      
+      double unpaidTotal = 0;
+      int unpaidCount = 0;
+      double overdueTotal = 0;
+      int overdueCount = 0;
+      double paidTotal = 0;
+      int paidCount = 0;
 
-    double unpaidTotal = 0;
-    int unpaidCount = 0;
-    double overdueTotal = 0;
-    int overdueCount = 0;
-    double paidTotal = 0;
-    int paidCount = 0;
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final status = data['status'] as String? ?? '';
+        final total = (data['totalAmount'] as num?)?.toDouble() ?? 0.0;
+        final paid = (data['amountPaid'] as num?)?.toDouble() ?? 0.0;
+        final dueDate = data['dueDate'] as String? ?? '';
+        final remaining = (total - paid).clamp(0.0, double.infinity);
 
-    for (final doc in docs) {
-      final status = doc['status'] as String;
-      final total = (doc['totalAmount'] as num?)?.toDouble() ?? 0.0;
-      final paid = (doc['amountPaid'] as num?)?.toDouble() ?? 0.0;
-      final dueDate = doc['dueDate'] as String;
-      final remaining = (total - paid).clamp(0.0, double.infinity);
+        if (status == DocumentStatus.paid.name || remaining <= 0) {
+          paidTotal += paid;
+          paidCount++;
+        } else {
+          unpaidTotal += remaining;
+          unpaidCount++;
 
-      if (status == DocumentStatus.paid.name || remaining <= 0) {
-        paidTotal += paid;
-        paidCount++;
-      } else {
-        // Unpaid or Partial
-        unpaidTotal += remaining;
-        unpaidCount++;
-
-        if (dueDate.compareTo(today) < 0) {
-          overdueTotal += remaining;
-          overdueCount++;
+          if (dueDate.isNotEmpty && dueDate.compareTo(today) < 0) {
+            overdueTotal += remaining;
+            overdueCount++;
+          }
         }
       }
-    }
 
-    return SummaryStats(
-      unpaidTotal: unpaidTotal,
-      unpaidCount: unpaidCount,
-      overdueTotal: overdueTotal,
-      overdueCount: overdueCount,
-      paidTotal: paidTotal,
-      paidCount: paidCount,
-    );
+      return SummaryStats(
+        unpaidTotal: unpaidTotal,
+        unpaidCount: unpaidCount,
+        overdueTotal: overdueTotal,
+        overdueCount: overdueCount,
+        paidTotal: paidTotal,
+        paidCount: paidCount,
+      );
+    } catch (e) {
+      print('Error getting stats: $e');
+      return const SummaryStats();
+    }
   }
 }

@@ -467,14 +467,23 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 if (profile.logoPath != null && profile.logoPath!.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
-                    child: Image.file(
-                      File(profile.logoPath!),
-                      width: 32,
-                      height: 32,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) =>
-                          const Icon(Icons.business, color: AppColors.primary),
-                    ),
+                    child: profile.logoPath!.startsWith('http')
+                        ? Image.network(
+                            profile.logoPath!,
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) =>
+                                const Icon(Icons.business, color: AppColors.primary),
+                          )
+                        : Image.file(
+                            File(profile.logoPath!),
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) =>
+                                const Icon(Icons.business, color: AppColors.primary),
+                          ),
                   )
                 else
                   const Icon(Icons.business, color: AppColors.primary),

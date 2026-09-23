@@ -14,6 +14,7 @@ import '../../business_profile/bloc/business_profile_event.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 import '../../navigation/main_nav_scaffold.dart';
 import '../../business_profile/domain/business_profile_model.dart';
+import '../../business_profile/data/business_profile_repository.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final bool isAddingNewCompany;
@@ -161,30 +162,44 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _finishAndNavigate(profile);
   }
 
+  bool _isSaving = false;
+
   Future<void> _finishAndNavigate(BusinessProfile profile) async {
-    if (!widget.isAddingNewCompany) {
-      if (mounted) {
-        await context.read<OnboardingCubit>().completeOnboarding();
-      }
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('app_language', _selectedLanguage);
-      await prefs.setString('app_country', _selectedCountry);
-    }
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
 
-    if (mounted) {
+    try {
+      if (!widget.isAddingNewCompany) {
+        if (mounted) {
+          await context.read<OnboardingCubit>().completeOnboarding();
+        }
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('app_language', _selectedLanguage);
+        await prefs.setString('app_country', _selectedCountry);
+      }
+
       if (profile.businessName.isNotEmpty) {
-        context.read<BusinessProfileBloc>().add(
-          UpdateBusinessProfileEvent(profile),
-        );
+        // Await the repository directly so it finishes before we navigate
+        final repo = context.read<BusinessProfileRepository>();
+        final savedProfile = await repo.saveProfile(profile);
+        
+        if (mounted) {
+          // Tell the bloc to load this specific profile
+          context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
+        }
       }
 
-      if (widget.isAddingNewCompany) {
-        Navigator.of(context).pop();
-      } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MainNavScaffold()),
-        );
+      if (mounted) {
+        if (widget.isAddingNewCompany) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const MainNavScaffold()),
+          );
+        }
       }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -370,7 +385,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       label: _currentPage == _totalPages - 1
                           ? 'Complete Setup'
                           : 'Continue',
-                      onPressed: _nextPage,
+                      isLoading: _isSaving,
+                      onPressed: _isSaving ? null : _nextPage,
                     ),
                   ),
                 ],
@@ -660,7 +676,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: imagePath != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(22),
-                        child: Image.file(File(imagePath), fit: BoxFit.contain),
+                        child: imagePath.startsWith('http')
+                            ? Image.network(imagePath, fit: BoxFit.contain)
+                            : Image.file(File(imagePath), fit: BoxFit.contain),
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,

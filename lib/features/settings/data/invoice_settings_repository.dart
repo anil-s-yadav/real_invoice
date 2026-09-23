@@ -1,110 +1,144 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../documents/domain/document_model.dart';
 
 class InvoiceSettingsRepository {
-  static const String _keyInvoicePrefix = 'numbering_invoice_prefix';
-  static const String _keyQuotationPrefix = 'numbering_quotation_prefix';
-  static const String _keyReceiptPrefix = 'numbering_receipt_prefix';
-  static const String _keyProformaPrefix = 'numbering_proforma_prefix';
-  static const String _keyIncludeYear = 'numbering_include_year';
-  static const String _keyPaddingDigits = 'numbering_padding_digits';
+  static const String _keyInvoicePrefix = 'invoicePrefix';
+  static const String _keyQuotationPrefix = 'quotationPrefix';
+  static const String _keyReceiptPrefix = 'receiptPrefix';
+  static const String _keyProformaPrefix = 'proformaPrefix';
+  static const String _keyIncludeYear = 'includeYear';
+  static const String _keyPaddingDigits = 'paddingDigits';
 
-  static const String _keyDefaultTaxRate = 'default_tax_rate';
-  static const String _keyDefaultDiscountRate = 'default_discount_rate';
-  static const String _keyDefaultTaxLabel = 'default_tax_label';
-  static const String _keyDefaultTaxEnabled = 'default_tax_enabled';
+  static const String _keyDefaultTaxRate = 'defaultTaxRate';
+  static const String _keyDefaultDiscountRate = 'defaultDiscountRate';
+  static const String _keyDefaultTaxLabel = 'defaultTaxLabel';
+  static const String _keyDefaultTaxEnabled = 'defaultTaxEnabled';
+
+  DocumentReference<Map<String, dynamic>>? get _settingsRef {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('settings')
+        .doc('invoice_settings');
+  }
+
+  Future<Map<String, dynamic>> _getSettingsMap() async {
+    final ref = _settingsRef;
+    if (ref == null) return {};
+    
+    try {
+      final doc = await ref.get();
+      if (doc.exists) {
+        return doc.data() ?? {};
+      }
+    } catch (e) {
+      print('Error fetching settings: $e');
+    }
+    return {};
+  }
+
+  Future<void> _updateSetting(String key, dynamic value) async {
+    final ref = _settingsRef;
+    if (ref == null) return;
+    
+    try {
+      await ref.set({key: value}, SetOptions(merge: true));
+    } catch (e) {
+      print('Error saving setting $key: $e');
+    }
+  }
 
   // Numbering preferences
   Future<String> getPrefixForType(DocumentType type) async {
-    final prefs = await SharedPreferences.getInstance();
+    final data = await _getSettingsMap();
     switch (type) {
       case DocumentType.invoice:
-        return prefs.getString(_keyInvoicePrefix) ?? 'INV-';
+        return data[_keyInvoicePrefix] as String? ?? 'INV-';
       case DocumentType.quotation:
-        return prefs.getString(_keyQuotationPrefix) ?? 'EST-';
+        return data[_keyQuotationPrefix] as String? ?? 'EST-';
       case DocumentType.receipt:
-        return prefs.getString(_keyReceiptPrefix) ?? 'REC-';
+        return data[_keyReceiptPrefix] as String? ?? 'REC-';
       case DocumentType.proforma:
-        return prefs.getString(_keyProformaPrefix) ?? 'PRO-';
+        return data[_keyProformaPrefix] as String? ?? 'PRO-';
     }
   }
 
   Future<void> setPrefixForType(DocumentType type, String prefix) async {
-    final prefs = await SharedPreferences.getInstance();
     switch (type) {
       case DocumentType.invoice:
-        await prefs.setString(_keyInvoicePrefix, prefix);
+        await _updateSetting(_keyInvoicePrefix, prefix);
         break;
       case DocumentType.quotation:
-        await prefs.setString(_keyQuotationPrefix, prefix);
+        await _updateSetting(_keyQuotationPrefix, prefix);
         break;
       case DocumentType.receipt:
-        await prefs.setString(_keyReceiptPrefix, prefix);
+        await _updateSetting(_keyReceiptPrefix, prefix);
         break;
       case DocumentType.proforma:
-        await prefs.setString(_keyProformaPrefix, prefix);
+        await _updateSetting(_keyProformaPrefix, prefix);
         break;
     }
   }
 
   Future<bool> getIncludeYear() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_keyIncludeYear) ?? true;
+    final data = await _getSettingsMap();
+    return data[_keyIncludeYear] as bool? ?? true;
   }
 
   Future<void> setIncludeYear(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyIncludeYear, value);
+    await _updateSetting(_keyIncludeYear, value);
   }
 
   Future<int> getPaddingDigits() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_keyPaddingDigits) ?? 4;
+    final data = await _getSettingsMap();
+    return data[_keyPaddingDigits] as int? ?? 4;
   }
 
   Future<void> setPaddingDigits(int value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_keyPaddingDigits, value);
+    await _updateSetting(_keyPaddingDigits, value);
   }
 
   // Tax & Discount preferences
   Future<double> getDefaultTaxRate() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getDouble(_keyDefaultTaxRate) ?? 18.0;
+    final data = await _getSettingsMap();
+    final value = data[_keyDefaultTaxRate];
+    if (value is num) return value.toDouble();
+    return 18.0;
   }
 
   Future<void> setDefaultTaxRate(double rate) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_keyDefaultTaxRate, rate);
+    await _updateSetting(_keyDefaultTaxRate, rate);
   }
 
   Future<double> getDefaultDiscountRate() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getDouble(_keyDefaultDiscountRate) ?? 0.0;
+    final data = await _getSettingsMap();
+    final value = data[_keyDefaultDiscountRate];
+    if (value is num) return value.toDouble();
+    return 0.0;
   }
 
   Future<void> setDefaultDiscountRate(double rate) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_keyDefaultDiscountRate, rate);
+    await _updateSetting(_keyDefaultDiscountRate, rate);
   }
 
   Future<String> getDefaultTaxLabel() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_keyDefaultTaxLabel) ?? 'GST';
+    final data = await _getSettingsMap();
+    return data[_keyDefaultTaxLabel] as String? ?? 'GST';
   }
 
   Future<void> setDefaultTaxLabel(String label) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyDefaultTaxLabel, label);
+    await _updateSetting(_keyDefaultTaxLabel, label);
   }
 
   Future<bool> getDefaultTaxEnabled() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_keyDefaultTaxEnabled) ?? true;
+    final data = await _getSettingsMap();
+    return data[_keyDefaultTaxEnabled] as bool? ?? true;
   }
 
   Future<void> setDefaultTaxEnabled(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyDefaultTaxEnabled, enabled);
+    await _updateSetting(_keyDefaultTaxEnabled, enabled);
   }
 }

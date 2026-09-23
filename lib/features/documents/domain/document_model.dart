@@ -241,6 +241,8 @@ class DocumentModel {
       'roundOff': roundOff,
       'totalAmount': totalAmount,
       'amountPaid': totalPaid,
+      'items': items.map((e) => e.toMap()).toList(),
+      'payments': payments.map((e) => e.toMap()).toList(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -259,6 +261,18 @@ class DocumentModel {
           jsonDecode(customerRaw) as Map<String, dynamic>,
         );
       } catch (_) {}
+    }
+
+    List<DocumentItem> parsedItems = items;
+    if (parsedItems.isEmpty && map['items'] != null) {
+      final List<dynamic> itemsData = map['items'] as List<dynamic>;
+      parsedItems = itemsData.map((e) => DocumentItem.fromMap(e as Map<String, dynamic>)).toList();
+    }
+
+    List<PaymentRecord> parsedPayments = payments;
+    if (parsedPayments.isEmpty && map['payments'] != null) {
+      final List<dynamic> paymentsData = map['payments'] as List<dynamic>;
+      parsedPayments = paymentsData.map((e) => PaymentRecord.fromMap(e as Map<String, dynamic>)).toList();
     }
 
     return DocumentModel(
@@ -280,8 +294,8 @@ class DocumentModel {
         (e) => e.name == map['status'],
         orElse: () => DocumentStatus.sent,
       ),
-      items: items,
-      payments: payments,
+      items: parsedItems,
+      payments: parsedPayments,
       overallDiscountValue:
           (map['overallDiscountValue'] as num?)?.toDouble() ?? 0.0,
       overallDiscountType: DiscountType.values.firstWhere(

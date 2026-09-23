@@ -328,10 +328,15 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                 child: hasImage
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          File(imagePath),
-                          fit: BoxFit.contain,
-                        ),
+                        child: imagePath.startsWith('http')
+                            ? Image.network(
+                                imagePath,
+                                fit: BoxFit.contain,
+                              )
+                            : Image.file(
+                                File(imagePath),
+                                fit: BoxFit.contain,
+                              ),
                       )
                     : Icon(
                         Icons.add_photo_alternate_outlined,
