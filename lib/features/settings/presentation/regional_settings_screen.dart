@@ -168,9 +168,11 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkSurface : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkBorder : AppColors.border,
+          ),
         ),
         child: Row(
           children: [
@@ -198,16 +200,14 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: const Text(
           'Regional Settings',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: AppColors.canvas,
-        elevation: 0,
-        foregroundColor: AppColors.textPrimary,
         centerTitle: true,
       ),
       body: SafeArea(
@@ -228,14 +228,18 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                       color: AppColors.primary,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'Regional Settings',
-                      style: AppTypography.displayMedium,
+                      style: AppTypography.displayMedium.copyWith(
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Choose your preferred language, operating country, and default currency.',
-                      style: AppTypography.bodyMedium,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                      ),
                     ),
                     const SizedBox(height: 32),
 
@@ -285,9 +289,11 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceVariant,
+                        color: isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(
+                          color: isDark ? AppColors.darkBorder : AppColors.border,
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -305,9 +311,9 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                           ),
                           Text(
                             '$_selectedCurrencyCode ($_selectedCurrencySymbol)',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                             ),
                           ),
                         ],

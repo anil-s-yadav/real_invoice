@@ -178,11 +178,22 @@ class UserProfileScreen extends StatelessWidget {
                                   } catch (_) {}
                                 }
 
+                                final isDark =
+                                    Theme.of(context).brightness == Brightness.dark;
+
                                 return ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   leading: CircleAvatar(
-                                    backgroundColor: AppColors.canvas,
-                                    child: Icon(platformIcon, color: AppColors.textPrimary, size: 20),
+                                    backgroundColor: isDark
+                                        ? AppColors.darkSurfaceVariant
+                                        : AppColors.canvas,
+                                    child: Icon(
+                                      platformIcon,
+                                      color: isDark
+                                          ? AppColors.darkTextPrimary
+                                          : AppColors.textPrimary,
+                                      size: 20,
+                                    ),
                                   ),
                                   title: Text(
                                     modelName,

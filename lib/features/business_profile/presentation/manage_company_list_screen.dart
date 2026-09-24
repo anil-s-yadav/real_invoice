@@ -55,17 +55,15 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Manage Companies',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: AppColors.canvas,
-        foregroundColor: AppColors.textPrimary,
         elevation: 0,
       ),
-      backgroundColor: AppColors.canvas,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
@@ -83,12 +81,14 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Your Businesses',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
                               ),
                             ),
                             Container(
@@ -170,165 +170,179 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
         );
         if (result == true) _loadData();
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isActive
-                ? AppColors.primary
-                : Colors.grey.withValues(alpha: 0.2),
-            width: isActive ? 2 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+      child: Builder(
+        builder: (context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurface : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isActive
+                    ? AppColors.primary
+                    : (isDark
+                        ? AppColors.darkBorder
+                        : Colors.grey.withValues(alpha: 0.2)),
+                width: isActive ? 2 : 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Logo
-                  CircleAvatar(
-                    radius: 22,
-                    backgroundColor: AppColors.canvas,
-                    backgroundImage:
-                        profile.logoPath != null && profile.logoPath!.isNotEmpty
-                        ? (profile.logoPath!.startsWith('http') 
-                            ? NetworkImage(profile.logoPath!) as ImageProvider 
-                            : FileImage(File(profile.logoPath!)))
-                        : null,
-                    child:
-                        profile.logoPath == null || profile.logoPath!.isEmpty
-                        ? const Icon(
-                            Icons.business,
-                            size: 22,
-                            color: AppColors.textSecondary,
-                          )
-                        : null,
-                  ),
-                  const SizedBox(height: 10),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Logo
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundColor: isDark
+                            ? AppColors.darkSurfaceVariant
+                            : AppColors.canvas,
+                        backgroundImage:
+                            profile.logoPath != null && profile.logoPath!.isNotEmpty
+                                ? (profile.logoPath!.startsWith('http')
+                                    ? NetworkImage(profile.logoPath!)
+                                        as ImageProvider
+                                    : FileImage(File(profile.logoPath!)))
+                                : null,
+                        child:
+                            profile.logoPath == null || profile.logoPath!.isEmpty
+                                ? const Icon(
+                                    Icons.business,
+                                    size: 22,
+                                    color: AppColors.textSecondary,
+                                  )
+                                : null,
+                      ),
+                      const SizedBox(height: 10),
 
-                  // Name
-                  Text(
-                    profile.businessName.isEmpty
-                        ? 'Unnamed Company'
-                        : profile.businessName,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-
-                  // Extra Info
-                  if (profile.gstin != null && profile.gstin!.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Text(
-                        'GST: ${profile.gstin}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textSecondary,
-                        ),
-                        maxLines: 1,
+                      // Name
+                      Text(
+                        profile.businessName.isEmpty
+                            ? 'Unnamed Company'
+                            : profile.businessName,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  if (profile.email != null && profile.email!.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Text(
-                        '${profile.email}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  if (profile.phone != null &&
-                      profile.phone!.isNotEmpty &&
-                      (profile.gstin == null || profile.gstin!.isEmpty))
-                    Text(
-                      '${profile.phone}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      const SizedBox(height: 6),
 
-                  const Spacer(),
-
-                  // Active status / button
-                  SizedBox(
-                    width: double.infinity,
-                    child: isActive
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
+                      // Extra Info
+                      if (profile.gstin != null && profile.gstin!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text(
+                            'GST: ${profile.gstin}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
                             ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.check_circle,
-                                  size: 14,
-                                  color: AppColors.primary,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      if (profile.email != null && profile.email!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text(
+                            '${profile.email}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      if (profile.phone != null &&
+                          profile.phone!.isNotEmpty &&
+                          (profile.gstin == null || profile.gstin!.isEmpty))
+                        Text(
+                          '${profile.phone}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+
+                      const Spacer(),
+
+                      // Active status / button
+                      SizedBox(
+                        width: double.infinity,
+                        child: isActive
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Active',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle,
+                                      size: 14,
+                                      color: AppColors.primary,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Active',
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : TextButton(
+                                onPressed: () => _setActive(profile.id),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 6),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  backgroundColor: isDark
+                                      ? AppColors.darkSurfaceVariant
+                                      : Colors.grey.withValues(
+                                          alpha: 0.05,
+                                        ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                              ],
-                            ),
-                          )
-                        : TextButton(
-                            onPressed: () => _setActive(profile.id),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 6),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              backgroundColor: Colors.grey.withValues(
-                                alpha: 0.05,
+                                child: Text(
+                                  'Set Active',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'Set Active',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
             if (isActive)
               Positioned(
@@ -351,8 +365,10 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
               ),
           ],
         ),
-      ),
-    );
+      );
+    },
+  ),
+);
   }
 
   Widget _buildCompactPremiumTab(BuildContext context) {

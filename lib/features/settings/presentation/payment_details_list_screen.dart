@@ -51,6 +51,10 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
     );
   }
 
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _textPrimary =>
+      _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+
   Widget _buildSamplePreviewCard(
     BusinessProfile profile,
     List<PaymentDetail> details,
@@ -62,12 +66,12 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: hasDetails
               ? AppColors.primary.withValues(alpha: 0.3)
-              : AppColors.border,
+              : (_isDark ? AppColors.darkBorder : AppColors.border),
           width: hasDetails ? 1.5 : 1.0,
         ),
         boxShadow: [
@@ -86,8 +90,10 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: hasDetails
-                  ? AppColors.primary.withValues(alpha: 0.05)
-                  : AppColors.surfaceVariant.withValues(alpha: 0.6),
+                  ? AppColors.primary.withValues(alpha: _isDark ? 0.15 : 0.05)
+                  : (_isDark
+                      ? AppColors.darkSurfaceVariant
+                      : AppColors.surfaceVariant.withValues(alpha: 0.6)),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(15),
               ),
@@ -95,7 +101,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                 bottom: BorderSide(
                   color: hasDetails
                       ? AppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.border,
+                      : (_isDark ? AppColors.darkBorder : AppColors.border),
                 ),
               ),
             ),
@@ -136,12 +142,12 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                   decoration: BoxDecoration(
                     color: hasDetails
                         ? AppColors.primary.withValues(alpha: 0.1)
-                        : Colors.white,
+                        : (_isDark ? AppColors.darkSurfaceVariant : Colors.white),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
                       color: hasDetails
                           ? AppColors.primary.withValues(alpha: 0.2)
-                          : AppColors.border,
+                          : (_isDark ? AppColors.darkBorder : AppColors.border),
                     ),
                   ),
                   child: Text(
@@ -173,18 +179,22 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                       width: 68,
                       height: 68,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: _isDark
+                            ? AppColors.darkSurfaceVariant
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: AppColors.borderStrong,
+                          color: _isDark
+                              ? AppColors.darkBorder
+                              : AppColors.borderStrong,
                           width: 1,
                         ),
                       ),
                       alignment: Alignment.center,
-                      child: const Icon(
+                      child: Icon(
                         Icons.qr_code_2_rounded,
                         size: 56,
-                        color: AppColors.textPrimary,
+                        color: _textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -222,10 +232,10 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Text(
                                 'UPI (${u.title}): ${u.details}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
+                                  color: _textPrimary,
                                 ),
                               ),
                             ),
@@ -237,18 +247,18 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                               children: [
                                 Text(
                                   'Bank: ${b.title}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
+                                    color: _textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 1),
                                 Text(
                                   'A/C: ${b.details}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColors.textPrimary,
+                                    color: _textPrimary,
                                   ),
                                 ),
                                 if (b.extra != null && b.extra!.isNotEmpty)
@@ -264,28 +274,28 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                             ),
                           ),
                       ] else ...[
-                        const Text(
+                        Text(
                           'UPI (GPay / PhonePe): merchant@okaxis',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: _textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           'Bank: HDFC Bank',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: _textPrimary,
                           ),
                         ),
-                        const Text(
+                        Text(
                           'A/C: 50200012345678',
                           style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.textPrimary,
+                            color: _textPrimary,
                           ),
                         ),
                         const Text(
@@ -310,15 +320,12 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: const Text(
           'Payment Profiles & QR Code',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: AppColors.canvas,
-        foregroundColor: AppColors.textPrimary,
         elevation: 0,
       ),
       body: BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
@@ -401,9 +408,11 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                     ),
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: _isDark ? AppColors.darkSurface : Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(
+                        color: _isDark ? AppColors.darkBorder : AppColors.border,
+                      ),
                     ),
                     child: Column(
                       children: [
@@ -413,12 +422,12 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                           color: AppColors.textMuted,
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'No Payment Profiles added yet',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
-                            color: AppColors.textPrimary,
+                            color: _textPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -466,10 +475,12 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: _isDark ? AppColors.darkSurface : Colors.white,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: AppColors.border.withValues(alpha: 0.8),
+                              color: _isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.border.withValues(alpha: 0.8),
                             ),
                           ),
                           child: ListTile(
@@ -497,9 +508,10 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                             ),
                             title: Text(
                               item.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15,
+                                color: _textPrimary,
                               ),
                             ),
                             subtitle: Padding(

@@ -41,6 +41,9 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -48,7 +51,7 @@ class AppTextField extends StatelessWidget {
         Text(
           label,
           style: AppTypography.titleSmall.copyWith(
-            color: AppColors.textPrimary,
+            color: textColor,
             fontSize: 13,
           ),
         ),
@@ -64,7 +67,7 @@ class AppTextField extends StatelessWidget {
           onSubmitted: onSubmitted,
           autofocus: autofocus,
           style: AppTypography.bodyLarge.copyWith(
-            color: AppColors.textPrimary,
+            color: textColor,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(

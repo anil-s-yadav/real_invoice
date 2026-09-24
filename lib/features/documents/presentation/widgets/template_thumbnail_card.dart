@@ -80,7 +80,9 @@ class TemplateThumbnailCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-              color: isSelected ? template.accentColor : AppColors.textPrimary,
+              color: isSelected
+                  ? template.accentColor
+                  : AppColors.textPrimary,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -282,41 +284,35 @@ class TemplateThumbnailCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              if (true)
-                Container(
-                  width: 35,
-                  padding: const EdgeInsets.all(2.5),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF3EC),
-                    borderRadius: BorderRadius.circular(2),
-                    border: Border.all(
-                      color: const Color(0xFFFED7AA),
-                      width: 0.5,
-                    ),
+              Container(
+                width: 35,
+                padding: const EdgeInsets.all(2.5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3EC),
+                  borderRadius: BorderRadius.circular(2),
+                  border: Border.all(
+                    color: const Color(0xFFFED7AA),
+                    width: 0.5,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'PAYMENT',
-                        style: TextStyle(
-                          color: accentColor,
-                          fontSize: 2.2,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Text(
-                        'UPI: user@upi',
-                        style: TextStyle(color: Colors.black87, fontSize: 2.2),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                Text(
-                  'Terms & Notes...',
-                  style: TextStyle(color: mutedColor, fontSize: 2.6),
                 ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'PAYMENT',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontSize: 2.2,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text(
+                      'UPI: user@upi',
+                      style: TextStyle(color: Colors.black87, fontSize: 2.2),
+                    ),
+                  ],
+                ),
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -559,38 +555,35 @@ class TemplateThumbnailCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              if (true)
-                Container(
-                  width: 35,
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!, width: 0.5),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'PAYMENT',
-                        style: TextStyle(
-                          color: accentColor,
-                          fontSize: 2.5,
-                          fontWeight: FontWeight.bold,
-                        ),
+              Container(
+                width: 35,
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!, width: 0.5),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'PAYMENT',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontSize: 2.5,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const Text(
-                        'UPI: user@upi',
-                        style: TextStyle(color: Colors.black87, fontSize: 2.5),
-                      ),
-                      const Text(
-                        'Bank: HDFC A/c..',
-                        style: TextStyle(color: Colors.black87, fontSize: 2.5),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                const SizedBox(),
+                    ),
+                    const Text(
+                      'UPI: user@upi',
+                      style: TextStyle(color: Colors.black87, fontSize: 2.5),
+                    ),
+                    const Text(
+                      'Bank: HDFC A/c..',
+                      style: TextStyle(color: Colors.black87, fontSize: 2.5),
+                    ),
+                  ],
+                ),
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [

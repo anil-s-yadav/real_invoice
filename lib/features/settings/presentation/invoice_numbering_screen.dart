@@ -122,6 +122,10 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
     }
   }
 
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _textPrimary =>
+      _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -134,7 +138,6 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: const Text(
           'Invoice Numbering',
@@ -209,7 +212,7 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -218,11 +221,11 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
-                                  color: AppColors.textPrimary,
+                                  color: _textPrimary,
                                 ),
                               ),
-                              SizedBox(height: 2),
-                              Text(
+                              const SizedBox(height: 2),
+                              const Text(
                                 'e.g. INV-2026-0001 instead of INV-0001',
                                 style: TextStyle(
                                   color: AppColors.textSecondary,
@@ -248,12 +251,12 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Number Length (Padding)',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
-                            color: AppColors.textPrimary,
+                            color: _textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -304,7 +307,7 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
                                             : FontWeight.w500,
                                         color: isSelected
                                             ? Colors.white
-                                            : AppColors.textPrimary,
+                                            : _textPrimary,
                                         height: 1.3,
                                       ),
                                     ),
@@ -340,9 +343,11 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: _isDark ? AppColors.darkBorder : AppColors.border,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -383,15 +388,19 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
           const SizedBox(height: 10),
           Text(
             _formatPreviewNumber(_invoicePrefixController.text),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.5,
-              color: AppColors.textPrimary,
+              color: _textPrimary,
             ),
           ),
           const SizedBox(height: 12),
-          Divider(height: 1, color: AppColors.border.withValues(alpha: 0.6)),
+          Divider(
+            height: 1,
+            color: (_isDark ? AppColors.darkBorder : AppColors.border)
+                .withValues(alpha: 0.6),
+          ),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -429,10 +438,10 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
         const SizedBox(height: 2),
         Text(
           number,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: _textPrimary,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -461,10 +470,10 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
-                color: AppColors.textPrimary,
+                color: _textPrimary,
               ),
             ),
           ),
@@ -475,10 +484,10 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
               controller: controller,
               textAlign: TextAlign.center,
               onChanged: (_) => setState(() {}),
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: _textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: hint,

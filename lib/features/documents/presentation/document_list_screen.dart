@@ -348,87 +348,98 @@ class DocumentListScreenState extends State<DocumentListScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.canvas,
-        // appBar: AppBar(
-        //   title: const Text('Documents', style: TextStyle(fontWeight: FontWeight.bold)),
-        //   centerTitle: true,
-        //   backgroundColor: AppColors.canvas,
-        //   foregroundColor: AppColors.textPrimary,
-        //   elevation: 0,
-        // ),
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Filter Header
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                decoration: BoxDecoration(
-                  color: AppColors.canvas,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: AppColors.border.withValues(alpha: 0.5),
+              Builder(
+                builder: (context) {
+                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                  return Container(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkCanvas : AppColors.canvas,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: isDark
+                              ? AppColors.darkBorder
+                              : AppColors.border.withValues(alpha: 0.5),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 44,
-                            child: TextField(
-                              controller: _searchController,
-                              onChanged: (val) =>
-                                  _applyFilter(query: val.trim()),
-                              style: const TextStyle(fontSize: 14),
-                              decoration: InputDecoration(
-                                hintText: 'Search doc number or client...',
-                                hintStyle: const TextStyle(
-                                  color: AppColors.textMuted,
-                                ),
-                                prefixIcon: const Icon(
-                                  Icons.search,
-                                  size: 20,
-                                  color: AppColors.textMuted,
-                                ),
-                                suffixIcon: _searchQuery.isNotEmpty
-                                    ? IconButton(
-                                        icon: const Icon(Icons.clear, size: 16),
-                                        onPressed: () {
-                                          _searchController.clear();
-                                          _applyFilter(query: '');
-                                        },
-                                      )
-                                    : null,
-                                filled: true,
-                                fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 0,
-                                  horizontal: 16,
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: AppColors.border.withValues(
-                                      alpha: 0.5,
-                                    ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 44,
+                                child: TextField(
+                                  controller: _searchController,
+                                  onChanged: (val) =>
+                                      _applyFilter(query: val.trim()),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
                                   ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: AppColors.primary,
+                                  decoration: InputDecoration(
+                                    hintText:
+                                        'Search doc number or client...',
+                                    hintStyle: const TextStyle(
+                                      color: AppColors.textMuted,
+                                    ),
+                                    prefixIcon: const Icon(
+                                      Icons.search,
+                                      size: 20,
+                                      color: AppColors.textMuted,
+                                    ),
+                                    suffixIcon: _searchQuery.isNotEmpty
+                                        ? IconButton(
+                                            icon: const Icon(
+                                              Icons.clear,
+                                              size: 16,
+                                            ),
+                                            onPressed: () {
+                                              _searchController.clear();
+                                              _applyFilter(query: '');
+                                            },
+                                          )
+                                        : null,
+                                    filled: true,
+                                    fillColor: isDark
+                                        ? AppColors.darkSurface
+                                        : Colors.white,
+                                    contentPadding:
+                                        const EdgeInsets.symmetric(
+                                          vertical: 0,
+                                          horizontal: 16,
+                                        ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: isDark
+                                            ? AppColors.darkBorder
+                                            : AppColors.border.withValues(
+                                                alpha: 0.5,
+                                              ),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
+                          const SizedBox(width: 8),
                         // Month Filter Button
                         InkWell(
                           onTap: _showDateRangePicker,
@@ -646,7 +657,9 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                     ],
                   ],
                 ),
-              ),
+              );
+            },
+          ),
 
               // Documents List
               Expanded(
@@ -732,6 +745,8 @@ class DocumentListScreenState extends State<DocumentListScreen> {
     required bool isSelected,
     required VoidCallback onSelected,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onSelected,
       child: AnimatedContainer(
@@ -740,18 +755,24 @@ class DocumentListScreenState extends State<DocumentListScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white,
+          color: isSelected
+              ? AppColors.primary
+              : (isDark ? AppColors.darkSurface : Colors.white),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
-                : AppColors.border.withValues(alpha: 0.5),
+                : (isDark
+                    ? AppColors.darkBorder
+                    : AppColors.border.withValues(alpha: 0.5)),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textPrimary,
+            color: isSelected
+                ? Colors.white
+                : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
             fontSize: 13,
           ),
@@ -776,6 +797,7 @@ class _DocumentListItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final effectiveStatus = document.calculatedStatus;
 
     return Padding(
@@ -804,10 +826,12 @@ class _DocumentListItemCard extends StatelessWidget {
                       _buildTypeBadge(document.docType),
                       Text(
                         document.docNumber,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: AppColors.textPrimary,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                         ),
                       ),
                     ],
@@ -837,9 +861,11 @@ class _DocumentListItemCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     document.customerSnapshot?.name ?? 'Walk-in Customer',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,

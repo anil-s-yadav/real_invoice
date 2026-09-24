@@ -31,7 +31,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       body: BlocBuilder<CustomerBloc, CustomerState>(
         builder: (context, state) {
           if (state is CustomerLoading) {
@@ -62,10 +61,12 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
               );
             }
 
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+
             return Column(
               children: [
                 Container(
-                  color: AppColors.canvas,
+                  color: isDark ? AppColors.darkCanvas : AppColors.canvas,
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                   child: SizedBox(
                     height: 44,
@@ -73,6 +74,12 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                       controller: _searchController,
                       onChanged: (val) =>
                           setState(() => _searchQuery = val.trim()),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Search by name, phone, or GSTIN...',
                         hintStyle: const TextStyle(color: AppColors.textMuted),
@@ -91,7 +98,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                               )
                             : null,
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: isDark
+                            ? AppColors.darkSurface
+                            : Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 0,
                           horizontal: 16,
@@ -99,7 +108,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            color: AppColors.border.withValues(alpha: 0.5),
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.border.withValues(alpha: 0.5),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
@@ -181,6 +192,8 @@ class _CustomerItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: AppCard(
@@ -212,10 +225,12 @@ class _CustomerItemCard extends StatelessWidget {
                 children: [
                   Text(
                     customer.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
-                      color: AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -224,16 +239,20 @@ class _CustomerItemCard extends StatelessWidget {
                   if (customer.phone != null && customer.phone!.isNotEmpty)
                     Text(
                       customer.phone!,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                         fontSize: 13,
                       ),
                     )
                   else if (customer.email != null && customer.email!.isNotEmpty)
                     Text(
                       customer.email!,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                         fontSize: 13,
                       ),
                     )
@@ -254,16 +273,22 @@ class _CustomerItemCard extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceVariant,
+                        color: isDark
+                            ? AppColors.darkSurfaceVariant
+                            : AppColors.surfaceVariant,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: AppColors.border.withValues(alpha: 0.5),
+                          color: isDark
+                              ? AppColors.darkBorder
+                              : AppColors.border.withValues(alpha: 0.5),
                         ),
                       ),
                       child: Text(
                         'GSTIN: ${customer.gstin}',
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
+                        style: TextStyle(
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,

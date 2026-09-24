@@ -119,6 +119,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       isDismissible: false,
       enableDrag: false,
       useSafeArea: true,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -128,6 +129,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
         return Container(
           height: screenHeight * 0.9,
+          color: Colors.white,
           padding: const EdgeInsets.only(top: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,6 +144,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     IconButton(
@@ -536,7 +539,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     canChangePageFormat: true,
                     canDebug: false,
                     scrollViewDecoration: const BoxDecoration(
-                      color: AppColors.surface,
+                      color: Color(0xFFF1F5F9),
                     ),
                     pdfPreviewPageDecoration: BoxDecoration(
                       color: Colors.white,

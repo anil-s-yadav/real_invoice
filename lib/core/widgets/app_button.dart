@@ -33,6 +33,13 @@ class AppButton extends StatelessWidget {
     Color fgColor;
     BorderSide? borderSide;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final surfaceVariant =
+        isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant;
+    final border = isDark ? AppColors.darkBorder : AppColors.border;
+
     switch (variant) {
       case AppButtonVariant.primary:
         bgColor = AppColors.primary;
@@ -40,14 +47,14 @@ class AppButton extends StatelessWidget {
         borderSide = BorderSide.none;
         break;
       case AppButtonVariant.secondary:
-        bgColor = AppColors.surfaceVariant;
-        fgColor = AppColors.textPrimary;
+        bgColor = surfaceVariant;
+        fgColor = textPrimary;
         borderSide = BorderSide.none;
         break;
       case AppButtonVariant.outline:
         bgColor = Colors.transparent;
-        fgColor = AppColors.textPrimary;
-        borderSide = const BorderSide(color: AppColors.border, width: 1.2);
+        fgColor = textPrimary;
+        borderSide = BorderSide(color: border, width: 1.2);
         break;
       case AppButtonVariant.text:
         bgColor = Colors.transparent;
@@ -55,10 +62,10 @@ class AppButton extends StatelessWidget {
         borderSide = BorderSide.none;
         break;
       case AppButtonVariant.danger:
-        bgColor = AppColors.statusOverdueBg;
-        fgColor = AppColors.statusOverdueText;
-        borderSide = const BorderSide(
-          color: AppColors.statusOverdueBorder,
+        bgColor = isDark ? const Color(0xFF450A0A) : AppColors.statusOverdueBg;
+        fgColor = isDark ? const Color(0xFFFCA5A5) : AppColors.statusOverdueText;
+        borderSide = BorderSide(
+          color: isDark ? const Color(0xFF7F1D1D) : AppColors.statusOverdueBorder,
           width: 1,
         );
         break;

@@ -17,11 +17,18 @@ class AppBottomSheet {
       context: context,
       isScrollControlled: isScrollControlled,
       useSafeArea: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final border = isDark ? AppColors.darkBorder : AppColors.border;
+        final borderStrong =
+            isDark ? AppColors.darkBorder : AppColors.borderStrong;
+        final textSecondary =
+            isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -36,7 +43,7 @@ class AppBottomSheet {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.borderStrong,
+                    color: borderStrong,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -52,13 +59,18 @@ class AppBottomSheet {
                     Expanded(
                       child: Text(
                         title,
-                        style: AppTypography.titleLarge.copyWith(fontSize: 18),
+                        style: AppTypography.titleLarge.copyWith(
+                          fontSize: 18,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
+                        ),
                       ),
                     ),
                     ?trailingAction,
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
-                      color: AppColors.textSecondary,
+                      color: textSecondary,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       onPressed: () => Navigator.of(context).pop(),
@@ -66,7 +78,7 @@ class AppBottomSheet {
                   ],
                 ),
               ),
-              const Divider(color: AppColors.border),
+              Divider(color: border),
               Flexible(child: child),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../documents/data/document_repository.dart';
+import '../../documents/domain/document_model.dart';
 
 abstract class ReportsEvent extends Equatable {
   const ReportsEvent();
@@ -36,11 +37,12 @@ class ReportsLoading extends ReportsState {
 
 class ReportsLoaded extends ReportsState {
   final SummaryStats stats;
+  final List<DocumentModel> documents;
 
-  const ReportsLoaded(this.stats);
+  const ReportsLoaded({required this.stats, required this.documents});
 
   @override
-  List<Object?> get props => [stats];
+  List<Object?> get props => [stats, documents];
 }
 
 class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
@@ -52,7 +54,8 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
       emit(const ReportsLoading());
       try {
         final stats = await documentRepository.getSummaryStats();
-        emit(ReportsLoaded(stats));
+        final documents = await documentRepository.getAllDocuments(type: DocumentType.invoice);
+        emit(ReportsLoaded(stats: stats, documents: documents));
       } catch (e) {
         emit(const ReportsInitial());
       }

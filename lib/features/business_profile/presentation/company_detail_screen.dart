@@ -122,10 +122,13 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     }
   }
 
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _textPrimary =>
+      _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: Text(
           _profile.businessName.isEmpty
@@ -133,8 +136,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
               : _profile.businessName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: AppColors.canvas,
-        foregroundColor: AppColors.textPrimary,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -291,10 +292,10 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: _textPrimary,
           ),
         ),
       ],
@@ -313,10 +314,12 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
       child: Container(
         height: 110,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _isDark ? AppColors.darkSurface : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.border.withValues(alpha: 0.4),
+            color: _isDark
+                ? AppColors.darkBorder
+                : AppColors.border.withValues(alpha: 0.4),
           ),
         ),
         child: Column(
@@ -348,9 +351,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 6),
-              decoration: const BoxDecoration(
-                color: AppColors.canvas,
-                borderRadius: BorderRadius.vertical(
+              decoration: BoxDecoration(
+                color: _isDark ? AppColors.darkSurfaceVariant : AppColors.canvas,
+                borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(11),
                 ),
               ),
@@ -388,10 +391,12 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _isDark ? AppColors.darkSurface : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: AppColors.border.withValues(alpha: 0.3),
+            color: _isDark
+                ? AppColors.darkBorder
+                : AppColors.border.withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -408,10 +413,10 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             const SizedBox(height: 4),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: _textPrimary,
               ),
             ),
           ],
@@ -427,10 +432,12 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _isDark ? AppColors.darkSurface : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: AppColors.border.withValues(alpha: 0.3),
+            color: _isDark
+                ? AppColors.darkBorder
+                : AppColors.border.withValues(alpha: 0.3),
           ),
         ),
         child: Text(

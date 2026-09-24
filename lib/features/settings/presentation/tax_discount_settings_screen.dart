@@ -96,6 +96,9 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
     }
   }
 
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _textPrimary => _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -108,7 +111,6 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: const Text(
           'Tax & Discounts',
@@ -141,12 +143,12 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Tax Label / Type',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
-                            color: AppColors.textPrimary,
+                            color: _textPrimary,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -174,7 +176,7 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                                     : FontWeight.w500,
                                 color: isSelected
                                     ? Colors.white
-                                    : AppColors.textPrimary,
+                                    : _textPrimary,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -202,12 +204,12 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Default Tax Rate',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
-                                color: AppColors.textPrimary,
+                                color: _textPrimary,
                               ),
                             ),
                             SizedBox(
@@ -221,10 +223,10 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                                     ),
                                 textAlign: TextAlign.center,
                                 onChanged: (_) => setState(() {}),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 14,
-                                  color: AppColors.textPrimary,
+                                  color: _textPrimary,
                                 ),
                                 decoration: InputDecoration(
                                   suffixText: '%',
@@ -295,14 +297,14 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                                     : FontWeight.w500,
                                 color: isSelected
                                     ? Colors.white
-                                    : AppColors.textPrimary,
+                                    : _textPrimary,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 side: BorderSide(
                                   color: isSelected
                                       ? AppColors.primary
-                                      : AppColors.border,
+                                      : (_isDark ? AppColors.darkBorder : AppColors.border),
                                 ),
                               ),
                               showCheckmark: false,
@@ -322,7 +324,7 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -331,7 +333,7 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
-                                  color: AppColors.textPrimary,
+                                  color: _textPrimary,
                                 ),
                               ),
                               SizedBox(height: 2),
@@ -372,12 +374,12 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Default Discount Rate',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
-                            color: AppColors.textPrimary,
+                            color: _textPrimary,
                           ),
                         ),
                         SizedBox(
@@ -390,10 +392,10 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                             ),
                             textAlign: TextAlign.center,
                             onChanged: (_) => setState(() {}),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
-                              color: AppColors.textPrimary,
+                              color: _textPrimary,
                             ),
                             decoration: InputDecoration(
                               suffixText: '%',
@@ -463,14 +465,14 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                                 : FontWeight.w500,
                             color: isSelected
                                 ? Colors.white
-                                : AppColors.textPrimary,
+                                : _textPrimary,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                             side: BorderSide(
                               color: isSelected
                                   ? AppColors.primary
-                                  : AppColors.border,
+                                  : (_isDark ? AppColors.darkBorder : AppColors.border),
                             ),
                           ),
                           showCheckmark: false,
@@ -512,9 +514,11 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: _isDark ? AppColors.darkBorder : AppColors.border,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -547,10 +551,10 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
               ),
               Text(
                 'Total: ${CurrencyFormatter.format(totalAmount)}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: _textPrimary,
                 ),
               ),
             ],
@@ -596,7 +600,7 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: valueColor ?? AppColors.textPrimary,
+            color: valueColor ?? _textPrimary,
           ),
         ),
       ],
@@ -606,7 +610,7 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
   Widget _buildDivider() {
     return Divider(
       height: 1,
-      color: AppColors.border.withValues(alpha: 0.5),
+      color: (_isDark ? AppColors.darkBorder : AppColors.border).withValues(alpha: 0.5),
       indent: 16,
       endIndent: 16,
     );

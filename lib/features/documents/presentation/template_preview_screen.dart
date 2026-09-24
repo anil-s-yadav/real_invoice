@@ -107,11 +107,18 @@ class TemplatePreviewScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
+        backgroundColor: AppColors.canvas,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0,
         title: Column(
           children: [
             Text(
               template.name,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: AppColors.textPrimary,
+              ),
             ),
             Text(
               '${documentType.displayName} Template Preview',
@@ -123,11 +130,8 @@ class TemplatePreviewScreen extends StatelessWidget {
           ],
         ),
         centerTitle: true,
-        backgroundColor: AppColors.canvas,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.close, color: AppColors.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
           tooltip: 'Close',
         ),
@@ -195,7 +199,10 @@ class TemplatePreviewScreen extends StatelessWidget {
                 ),
               ],
               border: const Border(
-                top: BorderSide(color: AppColors.border, width: 1),
+                top: BorderSide(
+                  color: AppColors.border,
+                  width: 1,
+                ),
               ),
             ),
             child: Row(
@@ -208,7 +215,9 @@ class TemplatePreviewScreen extends StatelessWidget {
                       onPressed: () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textPrimary,
-                        side: const BorderSide(color: AppColors.borderStrong),
+                        side: const BorderSide(
+                          color: AppColors.borderStrong,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_typography.dart';
@@ -16,7 +17,6 @@ import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
 import '../../subscription/presentation/subscription_screen.dart';
 import '../../settings/presentation/user_profile_screen.dart';
-import '../../reports/presentation/reports_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/domain/auth_user_model.dart';
@@ -41,7 +41,46 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _showPromoBanner = true;
+  bool _showPromoBanner = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPromoBanner();
+  }
+
+  Future<void> _checkPromoBanner() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastDismissedStr = prefs.getString('promo_banner_dismissed_date');
+    if (lastDismissedStr != null) {
+      final lastDismissed = DateTime.tryParse(lastDismissedStr);
+      if (lastDismissed != null) {
+        final now = DateTime.now();
+        final difference = now.difference(lastDismissed).inDays;
+        if (difference < 7) {
+          // Less than 7 days since dismissal
+          setState(() {
+            _showPromoBanner = false;
+          });
+          return;
+        }
+      }
+    }
+    setState(() {
+      _showPromoBanner = true;
+    });
+  }
+
+  Future<void> _dismissPromoBanner() async {
+    setState(() {
+      _showPromoBanner = false;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      'promo_banner_dismissed_date',
+      DateTime.now().toIso8601String(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,35 +91,34 @@ class _HomeScreenState extends State<HomeScreen> {
         final isProfileConfigured =
             businessName != null && businessName.trim().isNotEmpty;
         final isLoading = state is! HomeLoaded;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Scaffold(
           appBar: AppBar(
             title: Row(
               children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.receipt_long,
-                    color: Colors.white,
-                    size: 18,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    'assets/icons/applogo.png',
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'invoz',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.3,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                     ),
                     Text(
@@ -92,7 +130,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: AppTypography.bodySmall.copyWith(
                         fontSize: 11,
                         color: (isProfileConfigured || isLoading)
-                            ? AppColors.textSecondary
+                            ? (isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary)
                             : AppColors.primary,
                         fontWeight: (isProfileConfigured || isLoading)
                             ? FontWeight.normal
@@ -146,24 +186,38 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-              // 2. Reports Icon
+              // 2. Notifications Icon
               IconButton(
-                icon: const Icon(
-                  Icons.analytics_outlined,
-                  size: 26,
-                  color: AppColors.primary,
+                icon: const Badge(
+                  backgroundColor: Colors.redAccent,
+                  label: Text(
+                    '2',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.notifications_outlined,
+                    size: 30,
+                    color: AppColors.primary,
+                  ),
                 ),
-                tooltip: 'Reports',
+                tooltip: 'Notifications',
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ReportsScreen()),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('No new notifications')),
                   );
                 },
               ),
+              SizedBox(width: 8),
               // 3. User Profile Avatar
               BlocBuilder<AuthBloc, AuthState>(
                 builder: (context, authState) {
-                  final AuthUser? user = authState is Authenticated ? authState.user : null;
+                  final AuthUser? user = authState is Authenticated
+                      ? authState.user
+                      : null;
                   final photoUrl = user?.photoUrl;
                   return GestureDetector(
                     onTap: () {
@@ -177,7 +231,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: CircleAvatar(
                         radius: 16,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                        backgroundColor: AppColors.primary.withValues(
+                          alpha: 0.1,
+                        ),
                         child: photoUrl != null && photoUrl.isNotEmpty
                             ? ClipOval(
                                 child: CachedNetworkImage(
@@ -190,11 +246,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     size: 20,
                                     color: AppColors.primary,
                                   ),
-                                  errorWidget: (context, url, error) => const Icon(
-                                    Icons.person,
-                                    size: 20,
-                                    color: AppColors.primary,
-                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(
+                                        Icons.person,
+                                        size: 20,
+                                        color: AppColors.primary,
+                                      ),
                                 ),
                               )
                             : const Icon(
@@ -207,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-
+              SizedBox(width: 16),
             ],
           ),
           body: RefreshIndicator(
@@ -230,12 +287,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? AppColors.darkSurface : Colors.white,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(
+                            color: isDark ? AppColors.darkBorder : AppColors.border,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -269,11 +328,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Complete Profile',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w600,
-                                            color: AppColors.textPrimary,
+                                            color: isDark
+                                                ? AppColors.darkTextPrimary
+                                                : AppColors.textPrimary,
                                             fontSize: 15,
                                           ),
                                         ),
@@ -281,7 +342,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Text(
                                           'Add your business details and logo to start creating professional invoices.',
                                           style: TextStyle(
-                                            color: AppColors.textSecondary,
+                                            color: isDark
+                                                ? AppColors.darkTextSecondary
+                                                : AppColors.textSecondary,
                                             fontSize: 13,
                                             height: 1.3,
                                           ),
@@ -367,12 +430,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(bottom: AppDimensions.xl),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? AppColors.darkSurface : Colors.white,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(
+                            color: isDark ? AppColors.darkBorder : AppColors.border,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -397,7 +462,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFFEF2F2),
+                                      color: isDark
+                                          ? const Color(0xFF450A0A)
+                                          : const Color(0xFFFEF2F2),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     alignment: Alignment.center,
@@ -417,19 +484,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                       children: [
                                         Text(
                                           '${state.stats.overdueCount} Overdue Bill${state.stats.overdueCount > 1 ? 's' : ''}',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w700,
-                                            color: AppColors.textPrimary,
+                                            color: isDark
+                                                ? AppColors.darkTextPrimary
+                                                : AppColors.textPrimary,
                                             letterSpacing: -0.2,
                                           ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           '${state.stats.overdueCount > 1 ? 'Payments are' : 'Payment is'} past the due date',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12.5,
-                                            color: AppColors.textSecondary,
+                                            color: isDark
+                                                ? AppColors.darkTextSecondary
+                                                : AppColors.textSecondary,
                                           ),
                                         ),
                                       ],
@@ -723,6 +794,8 @@ class _HomeScreenState extends State<HomeScreen> {
     BoxFit fit = BoxFit.cover,
     double imagePadding = 0.0,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -740,11 +813,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 aspectRatio: 1,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? AppColors.darkSurface : Colors.white,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.border.withValues(alpha: 0.5),
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.12),
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.25 : 0.08,
+                        ),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -763,10 +843,12 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -883,11 +965,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: IconButton(
             icon: const Icon(Icons.close, color: Colors.white, size: 20),
             padding: const EdgeInsets.all(12),
-            onPressed: () {
-              setState(() {
-                _showPromoBanner = false;
-              });
-            },
+            onPressed: _dismissPromoBanner,
           ),
         ),
       ],

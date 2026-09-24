@@ -113,7 +113,10 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
             decoration: BoxDecoration(
               color: const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
+              border: Border.all(
+                color: const Color(0xFFE2E8F0),
+                width: 0.8,
+              ),
             ),
             child: TabBar(
               controller: _tabController,

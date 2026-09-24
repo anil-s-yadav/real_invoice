@@ -43,12 +43,20 @@ class ConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AlertDialog(
-      title: Text(title, style: AppTypography.titleLarge),
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+      title: Text(
+        title,
+        style: AppTypography.titleLarge.copyWith(
+          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+        ),
+      ),
       content: Text(
         message,
         style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textSecondary,
+          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
         ),
       ),
       actionsPadding: const EdgeInsets.fromLTRB(

@@ -290,10 +290,15 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     }
   }
 
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _textPrimary => _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+  Color get _textSecondary => _isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+  Color get _border => _isDark ? AppColors.darkBorder : AppColors.border;
+  Color get _surfaceVariant => _isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: Text(
           widget.initialDocument != null
@@ -302,10 +307,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: AppColors.canvas,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 0,
-        actions: [],
+        actions: const [],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -504,10 +506,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                         profile.businessName.isNotEmpty
                             ? profile.businessName
                             : 'Set up your company',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: _textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -540,7 +542,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               Text(
                 '${_docType.displayName} #',
                 style: TextStyle(
-                  color: AppColors.textSecondary,
+                  color: _textSecondary,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -551,10 +553,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   controller: _docNumberController,
                   textCapitalization: TextCapitalization.characters,
                   textAlign: TextAlign.left,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
-                    color: AppColors.textPrimary,
+                    color: _textPrimary,
                   ),
                   decoration: InputDecoration(
                     hintText: 'INV-2026-0001',
@@ -613,7 +615,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.canvas,
+          color: _isDark ? AppColors.darkSurfaceVariant : AppColors.canvas,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -624,7 +626,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.textMuted,
                       fontWeight: FontWeight.w500,
@@ -633,10 +635,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   const SizedBox(height: 2),
                   Text(
                     dateStr,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: _textPrimary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -731,10 +733,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                       children: [
                         Text(
                           customer.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
-                            color: AppColors.textPrimary,
+                            color: _textPrimary,
                           ),
                         ),
                         if (customer.gstin != null && customer.gstin!.isNotEmpty)
@@ -803,7 +805,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-              Text(value, style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+              Text(value, style: TextStyle(fontSize: 14, color: _textPrimary)),
             ],
           ),
         ),
@@ -887,10 +889,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 children: [
                   Text(
                     _selectedCustomer!.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: AppColors.textPrimary,
+                      color: _textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -900,8 +902,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                       _selectedCustomer!.phone!.isNotEmpty)
                     Text(
                       _selectedCustomer!.phone!,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: _textSecondary,
                         fontSize: 13,
                       ),
                     )
@@ -909,8 +911,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                       _selectedCustomer!.email!.isNotEmpty)
                     Text(
                       _selectedCustomer!.email!,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: _textSecondary,
                         fontSize: 13,
                       ),
                     ),
@@ -963,17 +965,17 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                             children: [
                               Text(
                                 item.title,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
-                                  color: AppColors.textPrimary,
+                                  color: _textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 '${item.quantity} x ${CurrencyFormatter.format(item.unitPrice)}',
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
+                                style: TextStyle(
+                                  color: _textSecondary,
                                   fontSize: 13,
                                 ),
                               ),
@@ -985,10 +987,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                           children: [
                             Text(
                               CurrencyFormatter.format(item.lineTotal),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w900,
                                 fontSize: 15,
-                                color: AppColors.textPrimary,
+                                color: _textPrimary,
                               ),
                             ),
                             if (item.taxPercent > 0) ...[
@@ -1239,7 +1241,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
         Text(
           value,
           style: TextStyle(
-            color: valueColor ?? AppColors.textPrimary,
+            color: valueColor ?? _textPrimary,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -1387,30 +1389,30 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.qr_code_2_rounded,
                         size: 22,
                         color: AppColors.primary,
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         'Select Payment Profile & QR',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: _textPrimary,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   if (!hasAny) ...[
-                    const Text(
+                    Text(
                       'No payment profiles available.',
                       style: TextStyle(
-                        color: AppColors.textSecondary,
+                        color: _textSecondary,
                         fontSize: 13,
                       ),
                     ),
@@ -1523,20 +1525,20 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Notes Header & Field
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.sticky_note_2_outlined,
                     size: 18,
                     color: AppColors.primary,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
                     'Notes to Customer',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: _textPrimary,
                     ),
                   ),
                 ],
@@ -1546,9 +1548,9 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 controller: _notesController,
                 maxLines: 2,
                 minLines: 1,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textPrimary,
+                  color: _textPrimary,
                 ),
                 decoration: InputDecoration(
                   hintText:
@@ -1559,18 +1561,18 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   ),
                   isDense: true,
                   filled: true,
-                  fillColor: AppColors.surfaceVariant.withValues(alpha: 0.35),
+                  fillColor: _surfaceVariant.withValues(alpha: 0.35),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 10,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: _border),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: _border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -1586,22 +1588,22 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               //   padding: EdgeInsets.symmetric(vertical: 14),
               //   child: Divider(height: 1, color: AppColors.border),
               // ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Terms & Conditions Header & Field
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.description_outlined,
                     size: 18,
                     color: AppColors.primary,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
                     'Terms & Conditions',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: _textPrimary,
                     ),
                   ),
                 ],
@@ -1611,9 +1613,9 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 controller: _termsController,
                 maxLines: 3,
                 minLines: 1,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textPrimary,
+                  color: _textPrimary,
                 ),
                 decoration: InputDecoration(
                   hintText:
@@ -1624,18 +1626,18 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   ),
                   isDense: true,
                   filled: true,
-                  fillColor: AppColors.surfaceVariant.withValues(alpha: 0.35),
+                  fillColor: _surfaceVariant.withValues(alpha: 0.35),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 10,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: _border),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: _border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -1656,10 +1658,16 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   Widget _buildBottomStickyBar() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _isDark ? AppColors.darkSurface : Colors.white,
+        border: Border(
+          top: BorderSide(
+            color: _border,
+            width: 1,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: _isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),

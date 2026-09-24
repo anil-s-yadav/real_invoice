@@ -121,6 +121,7 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         AppDimensions.lg,
@@ -204,18 +205,25 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                   child: ChoiceChip(
                     label: Text(unit),
                     selected: isSelected,
-                    selectedColor: AppColors.primaryLight,
-                    backgroundColor: AppColors.surface,
+                    selectedColor: isDark
+                        ? AppColors.primary.withValues(alpha: 0.25)
+                        : AppColors.primaryLight,
+                    backgroundColor:
+                        isDark ? AppColors.darkSurface : AppColors.surface,
                     labelStyle: TextStyle(
                       color: isSelected
                           ? AppColors.primary
-                          : AppColors.textSecondary,
+                          : (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary),
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.normal,
                     ),
                     side: BorderSide(
-                      color: isSelected ? AppColors.primary : AppColors.border,
+                      color: isSelected
+                          ? AppColors.primary
+                          : (isDark ? AppColors.darkBorder : AppColors.border),
                     ),
                     onSelected: (selected) {
                       if (selected) setState(() => _selectedUnit = unit);
@@ -240,16 +248,23 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                   rate == 0 ? 'Exempt (0%)' : '${rate.toStringAsFixed(0)}%',
                 ),
                 selected: isSelected,
-                selectedColor: AppColors.primaryLight,
-                backgroundColor: AppColors.surface,
+                selectedColor: isDark
+                    ? AppColors.primary.withValues(alpha: 0.25)
+                    : AppColors.primaryLight,
+                backgroundColor:
+                    isDark ? AppColors.darkSurface : AppColors.surface,
                 labelStyle: TextStyle(
                   color: isSelected
                       ? AppColors.primary
-                      : AppColors.textSecondary,
+                      : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary),
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
                 side: BorderSide(
-                  color: isSelected ? AppColors.primary : AppColors.border,
+                  color: isSelected
+                      ? AppColors.primary
+                      : (isDark ? AppColors.darkBorder : AppColors.border),
                 ),
                 onSelected: (selected) {
                   if (selected) setState(() => _selectedTaxPercent = rate);

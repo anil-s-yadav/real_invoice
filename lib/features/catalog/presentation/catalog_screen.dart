@@ -31,31 +31,30 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 ? productState.products.length
                 : 0;
 
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+
             return DefaultTabController(
               length: 2,
               initialIndex: widget.initialTabIndex,
               child: Scaffold(
-                backgroundColor: AppColors.canvas,
                 appBar: AppBar(
-                  // backgroundColor: AppColors.darkTextSecondary,
                   title: TabBar(
                     indicator: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? AppColors.darkSurface : Colors.white,
                       borderRadius: BorderRadius.circular(9),
                       border: Border.all(
-                        color: AppColors.border.withValues(alpha: 0.5),
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.border.withValues(alpha: 0.5),
                         width: 0.5,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.2 : 0.06,
+                          ),
                           blurRadius: 5,
                           offset: const Offset(0, 1.5),
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          blurRadius: 2,
-                          offset: const Offset(0, 0.5),
                         ),
                       ],
                     ),

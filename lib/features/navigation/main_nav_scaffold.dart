@@ -5,6 +5,7 @@ import '../catalog/presentation/catalog_screen.dart';
 import '../documents/domain/document_model.dart';
 import '../documents/presentation/document_list_screen.dart';
 import '../home/presentation/home_screen.dart';
+import '../reports/presentation/reports_screen.dart';
 import '../settings/presentation/settings_screen.dart';
 
 class MainNavScaffold extends StatefulWidget {
@@ -64,21 +65,26 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
       ),
       DocumentListScreen(key: _docListKey),
       const CatalogScreen(),
+      const ReportsScreen(),
       const SettingsScreen(),
     ];
 
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: screens),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          border: Border(top: BorderSide(color: AppColors.border, width: 1)),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.outline,
+              width: 1,
+            ),
+          ),
         ),
         child: NavigationBar(
           selectedIndex: _currentIndex,
           onDestinationSelected: _navigateToIndex,
-          backgroundColor: AppColors.surface,
-          indicatorColor: AppColors.primaryLight,
+          backgroundColor: Colors.transparent,
           elevation: 0,
           destinations: const [
             NavigationDestination(
@@ -95,6 +101,11 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
               icon: Icon(Icons.folder_outlined),
               selectedIcon: Icon(Icons.folder, color: AppColors.primary),
               label: 'Catalog',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.analytics_outlined),
+              selectedIcon: Icon(Icons.analytics, color: AppColors.primary),
+              label: 'Analytics',
             ),
             NavigationDestination(
               icon: Icon(Icons.tune_outlined),

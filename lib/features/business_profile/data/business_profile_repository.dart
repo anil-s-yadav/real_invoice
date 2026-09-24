@@ -66,6 +66,8 @@ class BusinessProfileRepository {
   }
 
   Future<BusinessProfile> saveProfile(BusinessProfile profile) async {
+    final existingProfiles = await getAllProfiles();
+    final isFirstProfile = existingProfiles.isEmpty;
     final profileToSaveId = profile.id.isEmpty ? const Uuid().v4() : profile.id;
     
     // Upload assets to Firebase Storage if they are local files
@@ -88,6 +90,10 @@ class BusinessProfileRepository {
       profileToSave.toMap(),
       SetOptions(merge: true),
     );
+
+    if (isFirstProfile) {
+      await setActiveProfileId(profileToSave.id);
+    }
 
     return profileToSave;
   }
@@ -115,10 +121,23 @@ class BusinessProfileRepository {
   Future<void> deleteProfile(String id) async {
     await _companiesRef.doc(id).delete();
 
-    // If we deleted the active profile, reset to default
+    // If we deleted the active profile, reset or auto-activate another one
     final activeId = await getActiveProfileId();
-    if (activeId == id) {
-      await setActiveProfileId('default_profile');
+    if (activeId == id || activeId == 'default_profile') {
+      final remainingProfiles = await getAllProfiles();
+      if (remainingProfiles.isNotEmpty) {
+        await setActiveProfileId(remainingProfiles.first.id);
+      } else {
+        await setActiveProfileId('default_profile');
+      }
+    } else {
+      // Also check if we deleted a profile and now there is only 1 left, maybe we should activate it?
+      // Actually, if we deleted a profile and activeId is NOT the deleted one, it means the active profile is still valid.
+      // But just to be sure, if there is only 1 profile remaining, it's safe to make it active (it might already be active).
+      final remainingProfiles = await getAllProfiles();
+      if (remainingProfiles.length == 1) {
+        await setActiveProfileId(remainingProfiles.first.id);
+      }
     }
   }
 }

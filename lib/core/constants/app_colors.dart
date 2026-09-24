@@ -75,4 +75,57 @@ class AppColors {
   static const Color premiumGold = Color(
     0xFFDAA520,
   ); // Darker, rich goldenrod for premium features
+
+  // Theme-aware helper functions
+  static Color canvasColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? darkCanvas : canvas;
+
+  static Color surfaceColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? darkSurface : surface;
+
+  static Color surfaceVariantColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? darkSurfaceVariant
+          : surfaceVariant;
+
+  static Color borderColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? darkBorder : border;
+
+  static Color borderSubtleColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? darkBorderSubtle
+          : borderSubtle;
+
+  static Color textPrimaryColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? darkTextPrimary
+          : textPrimary;
+
+  static Color textSecondaryColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? darkTextSecondary
+          : textSecondary;
+
+  static Color textMutedColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? darkTextMuted
+          : textMuted;
 }
+
+extension AppThemeX on BuildContext {
+  bool get isDark => Theme.of(this).brightness == Brightness.dark;
+  Color get canvasColor => isDark ? AppColors.darkCanvas : AppColors.canvas;
+  Color get surfaceColor => isDark ? AppColors.darkSurface : AppColors.surface;
+  Color get surfaceVariantColor =>
+      isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant;
+  Color get borderColor => isDark ? AppColors.darkBorder : AppColors.border;
+  Color get borderSubtleColor =>
+      isDark ? AppColors.darkBorderSubtle : AppColors.borderSubtle;
+  Color get textPrimaryColor =>
+      isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+  Color get textSecondaryColor =>
+      isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+  Color get textMutedColor =>
+      isDark ? AppColors.darkTextMuted : AppColors.textMuted;
+}
+

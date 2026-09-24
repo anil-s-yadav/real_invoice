@@ -181,7 +181,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       if (profile.businessName.isNotEmpty) {
         // Await the repository directly so it finishes before we navigate
         final repo = context.read<BusinessProfileRepository>();
-        final savedProfile = await repo.saveProfile(profile);
+        await repo.saveProfile(profile);
         
         if (mounted) {
           // Tell the bloc to load this specific profile
@@ -244,8 +244,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -281,7 +281,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             decoration: BoxDecoration(
                               color: index <= _currentPage
                                   ? AppColors.primary
-                                  : AppColors.border,
+                                  : (isDark ? AppColors.darkBorder : AppColors.border),
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -372,9 +372,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.arrow_back,
-                          color: AppColors.textPrimary,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                         ),
                       ),
                     ),
@@ -400,6 +402,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildStep1Localization() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -452,9 +455,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: isDark
+                  ? AppColors.darkSurfaceVariant
+                  : AppColors.surfaceVariant,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(
+                color: isDark ? AppColors.darkBorder : AppColors.border,
+              ),
             ),
             child: Row(
               children: [
@@ -472,9 +479,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 Text(
                   '$_selectedCurrencyCode ($_selectedCurrencySymbol)',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -491,6 +500,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required Function(String) onChanged,
     required IconData icon,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: () {
         _showSearchBottomSheet(
@@ -503,9 +513,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? AppColors.darkSurface : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(
+            color: isDark ? AppColors.darkBorder : AppColors.border,
+          ),
         ),
         child: Row(
           children: [
@@ -532,10 +544,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required List<String> items,
     required Function(String) onSelected,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -652,27 +665,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 48),
 
           Center(
-            child: GestureDetector(
-              onTap: () => _pickImage(step),
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    width: 2,
-                    style: BorderStyle.solid,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.05),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
+            child: Builder(
+              builder: (context) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                return GestureDetector(
+                  onTap: () => _pickImage(step),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        width: 2,
+                        style: BorderStyle.solid,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.05),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
                 child: imagePath != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(22),
@@ -699,8 +715,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ],
                       ),
               ),
-            ),
-          ),
+            );
+          },
+        ),
+      ),
           if (imagePath != null)
             Center(
               child: TextButton.icon(

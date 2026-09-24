@@ -22,12 +22,17 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final radius = borderRadius ?? AppDimensions.roundedLg;
-    final bg = backgroundColor ?? AppColors.surface;
+    final bg = backgroundColor ??
+        (isDark ? AppColors.darkSurface : AppColors.surface);
 
     final borderSide = border != null
         ? border!.top
-        : const BorderSide(color: AppColors.border, width: 1);
+        : BorderSide(
+            color: isDark ? AppColors.darkBorder : AppColors.border,
+            width: 1,
+          );
 
     return Material(
       color: bg,

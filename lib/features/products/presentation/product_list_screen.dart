@@ -32,7 +32,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       body: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
           if (state is ProductLoading) {
@@ -62,10 +61,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
               );
             }
 
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+
             return Column(
               children: [
                 Container(
-                  color: AppColors.canvas,
+                  color: isDark ? AppColors.darkCanvas : AppColors.canvas,
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                   child: SizedBox(
                     height: 44,
@@ -73,6 +74,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       controller: _searchController,
                       onChanged: (val) =>
                           setState(() => _searchQuery = val.trim()),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Search items, services, HSN...',
                         hintStyle: const TextStyle(color: AppColors.textMuted),
@@ -91,7 +98,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                               )
                             : null,
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: isDark
+                            ? AppColors.darkSurface
+                            : Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 0,
                           horizontal: 16,
@@ -99,7 +108,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            color: AppColors.border.withValues(alpha: 0.5),
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.border.withValues(alpha: 0.5),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
@@ -117,7 +128,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       ? Center(
                           child: Text(
                             'No items match "$_searchQuery"',
-                            style: AppTypography.bodyMedium,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
+                            ),
                           ),
                         )
                       : ListView.builder(
@@ -170,6 +185,7 @@ class _ProductItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isService =
         product.unit == 'hrs' ||
         product.unit == 'service' ||
@@ -188,7 +204,7 @@ class _ProductItemCard extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: (isService ? Colors.purple : Colors.blue).withValues(
-                  alpha: 0.1,
+                  alpha: isDark ? 0.2 : 0.1,
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -197,7 +213,9 @@ class _ProductItemCard extends StatelessWidget {
                 isService
                     ? Icons.design_services_outlined
                     : Icons.inventory_2_outlined,
-                color: isService ? Colors.purple : Colors.blue,
+                color: isService
+                    ? (isDark ? Colors.purpleAccent : Colors.purple)
+                    : (isDark ? Colors.lightBlueAccent : Colors.blue),
                 size: 24,
               ),
             ),
@@ -212,10 +230,12 @@ class _ProductItemCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           product.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
-                            color: AppColors.textPrimary,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -224,10 +244,12 @@ class _ProductItemCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         CurrencyFormatter.format(product.unitPrice),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
-                          color: AppColors.primary,
+                          color: isDark
+                              ? AppColors.primaryLight
+                              : AppColors.primary,
                         ),
                       ),
                     ],
@@ -237,8 +259,10 @@ class _ProductItemCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       product.description!,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                         fontSize: 13,
                       ),
                       maxLines: 2,
@@ -256,20 +280,26 @@ class _ProductItemCard extends StatelessWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant,
+                          color: isDark
+                              ? AppColors.darkSurfaceVariant
+                              : AppColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color: AppColors.border.withValues(alpha: 0.5),
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.border.withValues(alpha: 0.5),
                           ),
                         ),
                         child: Text(
                           isService
                               ? 'Service (${product.unit})'
                               : 'Product (${product.unit})',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
                           ),
                         ),
                       ),
@@ -281,18 +311,24 @@ class _ProductItemCard extends StatelessWidget {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
+                            color: isDark
+                                ? AppColors.darkSurfaceVariant
+                                : AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: AppColors.border.withValues(alpha: 0.5),
+                              color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.border.withValues(alpha: 0.5),
                             ),
                           ),
                           child: Text(
                             '${isService ? 'SAC' : 'HSN'}: ${product.hsnSacCode}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                             ),
                           ),
                         ),
@@ -303,18 +339,24 @@ class _ProductItemCard extends StatelessWidget {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
+                            color: isDark
+                                ? AppColors.darkSurfaceVariant
+                                : AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: AppColors.border.withValues(alpha: 0.5),
+                              color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.border.withValues(alpha: 0.5),
                             ),
                           ),
                           child: Text(
                             'GST ${product.defaultTaxPercent.toStringAsFixed(0)}%',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                             ),
                           ),
                         ),

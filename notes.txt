@@ -63,3 +63,9 @@ Step 10: Set up a Firebase Cloud Function with a Cron Job (Scheduled Task) that 
 Invoices where status == 'sent' and dueDate is within 3 days.
 User subscriptions where expiresAt is within 3 days.
 Step 11: The Cloud Function sends targeted Push Notifications (FCM) to the tokens stored in the user's devices subcollection.
+
+
+Now implement welcome offer. first time buyer got two offers can select one of them.
+50% extra discount on 1 year plan or 100% discount on 1 months plan. show it on package screen on top (after/below appbar/ on top body) also mansion discount auto applied when checkout and also show on checkout screen top. .
+also add a question/help/query option on top right where we explain each opint of plan.
+below choose plan button also show terms & conditions we will add a website link there.

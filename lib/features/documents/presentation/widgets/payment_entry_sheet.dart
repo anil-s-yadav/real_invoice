@@ -119,6 +119,7 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         AppDimensions.lg,
@@ -131,7 +132,8 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
         children: [
           // Invoice Summary Card
           AppCard(
-            backgroundColor: AppColors.surfaceVariant,
+            backgroundColor:
+                isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant,
             padding: const EdgeInsets.all(AppDimensions.md),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -158,7 +160,7 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
                     Text(
                       CurrencyFormatter.format(widget.document.balanceDue),
                       style: AppTypography.moneyMedium.copyWith(
-                        color: AppColors.primaryDark,
+                        color: isDark ? AppColors.primaryLight : AppColors.primaryDark,
                       ),
                     ),
                   ],
@@ -208,18 +210,25 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
                   child: ChoiceChip(
                     label: Text(method),
                     selected: isSelected,
-                    selectedColor: AppColors.primaryLight,
-                    backgroundColor: AppColors.surface,
+                    selectedColor: isDark
+                        ? AppColors.primary.withValues(alpha: 0.25)
+                        : AppColors.primaryLight,
+                    backgroundColor:
+                        isDark ? AppColors.darkSurface : AppColors.surface,
                     labelStyle: TextStyle(
                       color: isSelected
                           ? AppColors.primary
-                          : AppColors.textSecondary,
+                          : (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary),
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.normal,
                     ),
                     side: BorderSide(
-                      color: isSelected ? AppColors.primary : AppColors.border,
+                      color: isSelected
+                          ? AppColors.primary
+                          : (isDark ? AppColors.darkBorder : AppColors.border),
                     ),
                     onSelected: (selected) {
                       if (selected) setState(() => _selectedMethod = method);

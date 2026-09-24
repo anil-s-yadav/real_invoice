@@ -22,6 +22,15 @@ class EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceVariant =
+        isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant;
+    final border = isDark ? AppColors.darkBorder : AppColors.border;
+    final textPrimary =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final textSecondary =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppDimensions.xxl),
@@ -34,17 +43,18 @@ class EmptyStateView extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: surfaceVariant,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border, width: 1.5),
+                border: Border.all(color: border, width: 1.5),
               ),
-              child: Icon(icon, size: 32, color: AppColors.textSecondary),
+              child: Icon(icon, size: 32, color: textSecondary),
             ),
             const SizedBox(height: AppDimensions.xl),
             Text(
               title,
               style: AppTypography.titleLarge.copyWith(
                 fontWeight: FontWeight.w700,
+                color: textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -54,7 +64,7 @@ class EmptyStateView extends StatelessWidget {
               child: Text(
                 description,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),

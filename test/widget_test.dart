@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:invoz/core/theme/theme_cubit.dart';
 import 'package:invoz/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:invoz/features/auth/data/auth_repository.dart';
 import 'package:invoz/features/auth/domain/auth_user_model.dart';
@@ -34,12 +33,6 @@ class MockAuthRepository implements AuthRepository {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() {
-    try {
-      sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
-    } catch (_) {
-      // Native sqlite3 library might not be present in local test runner environment
-    }
     SharedPreferences.setMockInitialValues({});
   });
 

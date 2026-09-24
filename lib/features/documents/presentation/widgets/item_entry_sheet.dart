@@ -172,20 +172,24 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
     Navigator.of(context).pop(item);
   }
 
-  InputDecoration _dropdownDecoration(String label) {
+  InputDecoration _dropdownDecoration(String label, bool isDark) {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: isDark ? AppColors.darkSurface : Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.border),
+        borderSide: BorderSide(
+          color: isDark ? AppColors.darkBorder : AppColors.border,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.border),
+        borderSide: BorderSide(
+          color: isDark ? AppColors.darkBorder : AppColors.border,
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -196,6 +200,7 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         AppDimensions.lg,
@@ -270,7 +275,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   initialValue: _selectedUnit,
-                  decoration: _dropdownDecoration('Unit'),
+                  dropdownColor:
+                      isDark ? AppColors.darkSurface : Colors.white,
+                  decoration: _dropdownDecoration('Unit', isDark),
                   items: _commonUnits
                       .map((u) => DropdownMenuItem(value: u, child: Text(u)))
                       .toList(),
@@ -283,7 +290,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
               Expanded(
                 child: DropdownButtonFormField<double>(
                   initialValue: _taxPercent,
-                  decoration: _dropdownDecoration('GST Tax'),
+                  dropdownColor:
+                      isDark ? AppColors.darkSurface : Colors.white,
+                  decoration: _dropdownDecoration('GST Tax', isDark),
                   items: _taxRates
                       .map(
                         (r) => DropdownMenuItem(
@@ -342,7 +351,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
 
           // Live Calculation Card
           AppCard(
-            backgroundColor: AppColors.surfaceVariant,
+            backgroundColor: isDark
+                ? AppColors.darkSurfaceVariant
+                : AppColors.surfaceVariant,
             padding: const EdgeInsets.all(AppDimensions.md),
             child: Column(
               children: [

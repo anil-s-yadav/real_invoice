@@ -19,17 +19,19 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dividerColor = isDark
+        ? AppColors.darkBorder
+        : AppColors.border.withValues(alpha: 0.5);
+
     return Scaffold(
-      backgroundColor: AppColors.canvas,
       appBar: AppBar(
         title: const Text(
           'Settings',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: AppColors.canvas,
         elevation: 0,
-        foregroundColor: AppColors.textPrimary,
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(
@@ -58,7 +60,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 SettingsTile(
@@ -76,7 +78,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 SettingsTile(
@@ -94,7 +96,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 SettingsTile(
@@ -131,7 +133,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 SettingsTile(
@@ -149,7 +151,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 SettingsTile(
@@ -168,7 +170,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 BlocBuilder<ThemeCubit, ThemeMode>(
@@ -182,30 +184,49 @@ class SettingsScreen extends StatelessWidget {
                       trailing: DropdownButton<ThemeMode>(
                         value: themeMode,
                         underline: const SizedBox(),
-                        icon: const Icon(
+                        dropdownColor: Theme.of(context).colorScheme.surface,
+                        icon: Icon(
                           Icons.expand_more,
                           size: 20,
-                          color: AppColors.textMuted,
+                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                         ),
                         alignment: Alignment.centerRight,
-                        items: const [
+                        items: [
                           DropdownMenuItem(
                             value: ThemeMode.system,
                             child: Text(
                               'System',
-                              style: TextStyle(fontSize: 14),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
+                              ),
                             ),
                           ),
                           DropdownMenuItem(
                             value: ThemeMode.light,
                             child: Text(
                               'Light',
-                              style: TextStyle(fontSize: 14),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
+                              ),
                             ),
                           ),
                           DropdownMenuItem(
                             value: ThemeMode.dark,
-                            child: Text('Dark', style: TextStyle(fontSize: 14)),
+                            child: Text(
+                              'Dark',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
                           ),
                         ],
                         onChanged: (mode) {
@@ -253,7 +274,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 SettingsTile(
@@ -272,7 +293,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 SettingsTile(
@@ -284,7 +305,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: dividerColor,
                   indent: 56,
                 ),
                 SettingsTile(
@@ -312,17 +333,24 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-          color: AppColors.textSecondary,
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.8,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary,
+            ),
+          ),
+        );
+      },
     );
   }
 
