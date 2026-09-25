@@ -6,7 +6,8 @@ import '../../../core/theme/theme_cubit.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/settings_tile.dart';
 import '../../business_profile/presentation/manage_company_list_screen.dart';
-import '../../subscription/presentation/subscription_screen.dart';
+import '../../subscription/presentation/plan_info_screen.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
 import 'default_templates_screen.dart';
 import 'help_support_screen.dart';
 import 'invoice_numbering_screen.dart';
@@ -99,17 +100,30 @@ class SettingsScreen extends StatelessWidget {
                   color: dividerColor,
                   indent: 56,
                 ),
-                SettingsTile(
-                  title: 'Subscription',
-                  subtitle: 'Free Plan',
-                  icon: Icons.workspace_premium_outlined,
-                  color: AppColors.premiumGold,
-                  isLast: true,
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SubscriptionScreen(),
-                      ),
+                BlocBuilder<SubscriptionBloc, SubscriptionState>(
+                  builder: (context, subState) {
+                    final plan = subState.plan;
+                    final planName = plan?.planName ?? 'Free Plan';
+                    final isPremium = subState is PremiumTierState;
+                    final subtitle = isPremium
+                        ? '$planName (Active)'
+                        : 'Free Plan • Tap to view';
+
+                    return SettingsTile(
+                      title: 'Subscription',
+                      subtitle: subtitle,
+                      icon: isPremium
+                          ? Icons.workspace_premium_rounded
+                          : Icons.workspace_premium_outlined,
+                      color: AppColors.premiumGold,
+                      isLast: true,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PlanInfoScreen(),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),

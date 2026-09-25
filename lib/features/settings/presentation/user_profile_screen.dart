@@ -9,6 +9,9 @@ import '../../auth/domain/auth_user_model.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
+import '../../subscription/domain/subscription_plan_model.dart';
+import '../../subscription/presentation/plan_info_screen.dart';
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key});
@@ -75,7 +78,11 @@ class UserProfileScreen extends StatelessWidget {
                   email,
                   style: const TextStyle(color: AppColors.textSecondary),
                 ),
-                const SizedBox(height: AppDimensions.xxl),
+                const SizedBox(height: AppDimensions.lg),
+
+                // Plan Name Card (Tap to view Plan Details)
+                _buildPlanNameCard(context),
+                const SizedBox(height: AppDimensions.lg),
 
                 // Account Info Card
                 if (user != null)
@@ -405,6 +412,176 @@ class UserProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPlanNameCard(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return BlocBuilder<SubscriptionBloc, SubscriptionState>(
+      builder: (context, subState) {
+        final plan = subState.plan ?? SubscriptionPlanModel.defaultFree();
+        final isFree = plan.isFree;
+        final planTitle = '${plan.planName} Plan';
+        final statusBadge = isFree ? 'FREE' : 'ACTIVE';
+        final expiryText = plan.expiryDate != null
+            ? 'Valid until ${DateFormat('dd MMM yyyy').format(plan.expiryDate!)}'
+            : (isFree ? 'Lifetime Free Starter' : 'Active Subscription');
+
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const PlanInfoScreen(),
+                ),
+              );
+            },
+            child: Ink(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isFree
+                      ? (isDark
+                          ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                          : [Colors.white, const Color(0xFFF8FAFC)])
+                      : [
+                          const Color(0xFF4338CA),
+                          const Color(0xFF312E81),
+                        ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isFree
+                      ? (isDark ? AppColors.darkBorder : AppColors.border)
+                      : const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isFree
+                        ? Colors.black.withValues(alpha: 0.04)
+                        : const Color(0xFF312E81).withValues(alpha: 0.25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: isFree
+                          ? AppColors.primary.withValues(alpha: 0.12)
+                          : const Color(0xFFF59E0B).withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isFree
+                          ? Icons.workspace_premium_outlined
+                          : Icons.workspace_premium_rounded,
+                      color: isFree
+                          ? AppColors.primary
+                          : const Color(0xFFFBBF24),
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              planTitle,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: isFree
+                                    ? (isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary)
+                                    : Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isFree
+                                    ? (isDark
+                                        ? AppColors.darkSurfaceVariant
+                                        : AppColors.canvas)
+                                    : const Color(0xFFF59E0B),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                statusBadge,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: isFree
+                                      ? (isDark
+                                          ? AppColors.darkTextSecondary
+                                          : AppColors.textSecondary)
+                                      : Colors.black,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          expiryText,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: isFree
+                                ? (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary)
+                                : const Color(0xFFCBD5E1),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: isFree
+                          ? (isDark
+                              ? AppColors.darkSurfaceVariant
+                              : AppColors.canvas)
+                          : Colors.white.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 18,
+                      color: isFree
+                          ? (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary)
+                          : Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
