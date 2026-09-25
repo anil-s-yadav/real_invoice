@@ -156,6 +156,46 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline_rounded),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text(
+                    'Plan Details',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  content: const SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('• Company Profiles: Number of distinct businesses you can manage.', style: TextStyle(fontSize: 14)),
+                        SizedBox(height: 12),
+                        Text('• Clients: Number of unique customers you can invoice.', style: TextStyle(fontSize: 14)),
+                        SizedBox(height: 12),
+                        Text('• Documents: Total invoices, estimates, and receipts created.', style: TextStyle(fontSize: 14)),
+                        SizedBox(height: 12),
+                        Text('• Multi-device Sync: Access your data seamlessly across multiple devices.', style: TextStyle(fontSize: 14)),
+                        SizedBox(height: 12),
+                        Text('• Premium Templates: Access to advanced, customizable invoice designs.', style: TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Got it', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -185,6 +225,92 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             //   ],
             // ),
             // ),
+            const SizedBox(height: 20),
+            
+            // Welcome Offer Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: (isDark ? AppColors.darkSurface : Colors.white),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.primary,
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.local_offer_rounded, color: AppColors.primary, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Welcome Offer',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'First-time buyer',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '• 50% Extra Discount on 1 Year Plan',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '• 100% Free on 1 Month Plan',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Select a plan below. Your discount will be auto-calculated and applied at checkout.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
 
             // Plan Cards Carousel
@@ -443,6 +569,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               builder: (_) => CheckoutScreen(
                                 planName: selectedPlan['name'] as String,
                                 monthlyPrice: selectedPlan['price'] as double,
+                                hasWelcomeOffer: true,
                               ),
                             ),
                           );
@@ -476,6 +603,26 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       ],
                     ],
                   ),
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () async {
+                final url = Uri.parse('https://invoz.app/terms');
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url);
+                }
+              },
+              child: const Text(
+                'By choosing a plan, you agree to our Terms & Conditions',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.primary,
                 ),
               ),
             ),

@@ -65,10 +65,12 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<AuthUser?> signInWithGoogle() async {
     try {
       await _ensureGoogleSignInInitialized();
-      final googleUser = await _googleSignIn.authenticate();
+      final googleUser = await _googleSignIn.authenticate(
+        scopeHint: ['email', 'profile'],
+      );
       final googleAuth = googleUser.authentication;
       final authorization = await googleUser.authorizationClient
-          .authorizationForScopes([]);
+          .authorizationForScopes(['email', 'profile']);
       final credential = fb.GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
         accessToken: authorization?.accessToken,

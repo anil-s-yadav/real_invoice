@@ -291,10 +291,13 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   }
 
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
-  Color get _textPrimary => _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-  Color get _textSecondary => _isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+  Color get _textPrimary =>
+      _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+  Color get _textSecondary =>
+      _isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
   Color get _border => _isDark ? AppColors.darkBorder : AppColors.border;
-  Color get _surfaceVariant => _isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant;
+  Color get _surfaceVariant =>
+      _isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant;
 
   @override
   Widget build(BuildContext context) {
@@ -475,16 +478,20 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                             width: 32,
                             height: 32,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) =>
-                                const Icon(Icons.business, color: AppColors.primary),
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.business,
+                              color: AppColors.primary,
+                            ),
                           )
                         : Image.file(
                             File(profile.logoPath!),
                             width: 32,
                             height: 32,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) =>
-                                const Icon(Icons.business, color: AppColors.primary),
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.business,
+                              color: AppColors.primary,
+                            ),
                           ),
                   )
                 else
@@ -696,7 +703,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   void _showCustomerInfo() {
     if (_selectedCustomer == null) return;
     final customer = _selectedCustomer!;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -718,7 +725,9 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      customer.name.substring(0, customer.name.length.clamp(1, 2)).toUpperCase(),
+                      customer.name
+                          .substring(0, customer.name.length.clamp(1, 2))
+                          .toUpperCase(),
                       style: const TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -739,8 +748,15 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                             color: _textPrimary,
                           ),
                         ),
-                        if (customer.gstin != null && customer.gstin!.isNotEmpty)
-                          Text('Tax ID: ${customer.gstin}', style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                        if (customer.gstin != null &&
+                            customer.gstin!.isNotEmpty)
+                          Text(
+                            'Tax ID: ${customer.gstin}',
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -759,12 +775,22 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 _buildInfoRow(Icons.email_outlined, 'Email', customer.email!),
                 const SizedBox(height: 16),
               ],
-              if (customer.billingAddress != null && customer.billingAddress!.isNotEmpty) ...[
-                _buildInfoRow(Icons.location_on_outlined, 'Billing Address', customer.billingAddress!),
+              if (customer.billingAddress != null &&
+                  customer.billingAddress!.isNotEmpty) ...[
+                _buildInfoRow(
+                  Icons.location_on_outlined,
+                  'Billing Address',
+                  customer.billingAddress!,
+                ),
                 const SizedBox(height: 16),
               ],
-              if (customer.shippingAddress != null && customer.shippingAddress!.isNotEmpty) ...[
-                _buildInfoRow(Icons.local_shipping_outlined, 'Shipping Address', customer.shippingAddress!),
+              if (customer.shippingAddress != null &&
+                  customer.shippingAddress!.isNotEmpty) ...[
+                _buildInfoRow(
+                  Icons.local_shipping_outlined,
+                  'Shipping Address',
+                  customer.shippingAddress!,
+                ),
                 const SizedBox(height: 16),
               ],
               if (customer.notes != null && customer.notes!.isNotEmpty) ...[
@@ -804,7 +830,13 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textMuted,
+                ),
+              ),
               Text(value, style: TextStyle(fontSize: 14, color: _textPrimary)),
             ],
           ),
@@ -902,27 +934,18 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                       _selectedCustomer!.phone!.isNotEmpty)
                     Text(
                       _selectedCustomer!.phone!,
-                      style: TextStyle(
-                        color: _textSecondary,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: _textSecondary, fontSize: 13),
                     )
                   else if (_selectedCustomer!.email != null &&
                       _selectedCustomer!.email!.isNotEmpty)
                     Text(
                       _selectedCustomer!.email!,
-                      style: TextStyle(
-                        color: _textSecondary,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: _textSecondary, fontSize: 13),
                     ),
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.textMuted,
-            ),
+            const Icon(Icons.chevron_right, color: AppColors.textMuted),
           ],
         ),
       ),
@@ -1026,7 +1049,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                             ),
                             const SizedBox(width: 12),
                             GestureDetector(
-                              onTap: () => setState(() => _items.removeAt(index)),
+                              onTap: () =>
+                                  setState(() => _items.removeAt(index)),
                               child: const Icon(
                                 Icons.delete_outline,
                                 color: AppColors.statusOverdueText,
@@ -1411,10 +1435,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   if (!hasAny) ...[
                     Text(
                       'No payment profiles available.',
-                      style: TextStyle(
-                        color: _textSecondary,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: _textSecondary, fontSize: 13),
                     ),
                     const SizedBox(height: 8),
                     TextButton.icon(
@@ -1548,10 +1569,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 controller: _notesController,
                 maxLines: 2,
                 minLines: 1,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: _textPrimary,
-                ),
+                style: TextStyle(fontSize: 14, color: _textPrimary),
                 decoration: InputDecoration(
                   hintText:
                       'e.g. Thank you for your business! Please feel free to reach out with any questions.',
@@ -1613,10 +1631,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 controller: _termsController,
                 maxLines: 3,
                 minLines: 1,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: _textPrimary,
-                ),
+                style: TextStyle(fontSize: 14, color: _textPrimary),
                 decoration: InputDecoration(
                   hintText:
                       'e.g. Payment is due within 15 days of invoice date. Late payments incur a 1.5% monthly fee.',
@@ -1659,12 +1674,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     return Container(
       decoration: BoxDecoration(
         color: _isDark ? AppColors.darkSurface : Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: _border,
-            width: 1,
-          ),
-        ),
+        border: Border(top: BorderSide(color: _border, width: 1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: _isDark ? 0.3 : 0.05),

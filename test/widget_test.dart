@@ -45,11 +45,11 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    // Verify App renders successfully with invoz branding
+    // Verify App renders successfully with branding
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            (widget is Text && (widget.data?.contains('invoz') ?? false)) ||
+            (widget is Text && (widget.data?.contains('Create professional invoices') ?? false)) ||
             widget is CircularProgressIndicator,
       ),
       findsAtLeastNWidgets(1),
