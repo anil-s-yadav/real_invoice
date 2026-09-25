@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -332,7 +333,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: imagePath.startsWith('http')
-                            ? Image.network(
+                            ? CachedNetworkImage(imageUrl: 
                                 imagePath,
                                 fit: BoxFit.contain,
                               )
@@ -452,3 +453,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     );
   }
 }
+
+
+

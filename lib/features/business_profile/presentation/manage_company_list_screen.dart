@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../subscription/presentation/subscription_screen.dart';
@@ -75,7 +76,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Compact Buy Premium Tab (Visible only on Free plan)
-                        _buildCompactPremiumTab(context),
+                        _buildPremiumBanner(context),
 
                         // Header
                         Row(
@@ -209,7 +210,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                         backgroundImage:
                             profile.logoPath != null && profile.logoPath!.isNotEmpty
                                 ? (profile.logoPath!.startsWith('http')
-                                    ? NetworkImage(profile.logoPath!)
+                                    ? CachedNetworkImageProvider(profile.logoPath!)
                                         as ImageProvider
                                     : FileImage(File(profile.logoPath!)))
                                 : null,
@@ -371,149 +372,214 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
 );
   }
 
-  Widget _buildCompactPremiumTab(BuildContext context) {
+  Widget _buildPremiumBanner(BuildContext context) {
     return BlocBuilder<SubscriptionBloc, SubscriptionState>(
       builder: (context, subscriptionState) {
         final isFree = subscriptionState is! PremiumTierState;
         if (!isFree) return const SizedBox.shrink();
 
         return Padding(
-          padding: const EdgeInsets.only(bottom: 14.0),
+          padding: const EdgeInsets.only(bottom: 20.0),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(18),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
                 );
               },
-              child: Ink(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 9,
-                ),
+              child: Container(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                    colors: [
+                      Color(0xFF1E1B4B), // Deep Midnight Indigo
+                      Color(0xFF312E81), // Rich Indigo
+                      Color(0xFF0F172A), // Midnight Navy
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: AppColors.premiumGold.withValues(alpha: 0.3),
-                    width: 1,
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                    width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+                      color: const Color(0xFF312E81).withValues(alpha: 0.3),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
-                child: Row(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.premiumGold.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.workspace_premium_rounded,
-                        color: AppColors.premiumGold,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
+                    // Top Badge & Discount Chip
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: const Color(0xFFF59E0B).withValues(alpha: 0.5),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                'Buy Premium',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                              Icon(
+                                Icons.workspace_premium_rounded,
+                                size: 15,
+                                color: Color(0xFFFBBF24),
                               ),
-                              SizedBox(width: 6),
-                              DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: AppColors.premiumGold,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(4),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                    vertical: 1,
-                                  ),
-                                  child: Text(
-                                    'PRO',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
+                              SizedBox(width: 5),
+                              Text(
+                                'INVOZ PRO',
+                                style: TextStyle(
+                                  color: Color(0xFFFBBF24),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.8,
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 1),
-                          Text(
-                            'Add multiple companies, manage separate GSTINs & unlock all templates',
-                            style: TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 11,
-                              height: 1.2,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.green.withValues(alpha: 0.4),
+                              width: 1,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          ),
+                          child: const Text(
+                            'SPECIAL OFFER',
+                            style: TextStyle(
+                              color: Color(0xFF4ADE80),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Main Headline & Subtitle
+                    const Text(
+                      'Manage Multiple Companies with Ease',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Run multiple businesses from one app. Create separate invoice series, manage unique GSTINs, and customize branding for each enterprise.',
+                      style: TextStyle(
+                        color: Color(0xFFCBD5E1),
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Feature highlights list
+                    _buildFeatureItem(
+                      Icons.domain_add_rounded,
+                      'Add unlimited companies & switch profiles in 1 tap',
+                    ),
+                    const SizedBox(height: 8),
+                    _buildFeatureItem(
+                      Icons.auto_awesome_rounded,
+                      'Unlock all premium invoice & quotation templates',
+                    ),
+                    const SizedBox(height: 8),
+                    _buildFeatureItem(
+                      Icons.draw_rounded,
+                      'Custom signatures, stamps, & distinct business logos',
+                    ),
+                    const SizedBox(height: 8),
+                    _buildFeatureItem(
+                      Icons.cloud_sync_rounded,
+                      'Real-time cloud sync & multi-device backup',
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Upgrade Button
+                    Container(
+                      width: double.infinity,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFFF59E0B), // Amber 500
+                            Color(0xFFD97706), // Amber 600
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.bolt_rounded,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Upgrade to Pro — View Plans',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.black,
+                            size: 16,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.premiumGold.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.premiumGold.withValues(alpha: 0.35),
-                          width: 0.8,
+                    const SizedBox(height: 10),
+                    const Center(
+                      child: Text(
+                        'Instant activation • Cancel anytime • 100% money-back guarantee',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Upgrade',
-                            style: TextStyle(
-                              color: AppColors.premiumGold,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: 2),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            color: AppColors.premiumGold,
-                            size: 13,
-                          ),
-                        ],
                       ),
                     ),
                   ],
@@ -525,4 +591,37 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
       },
     );
   }
+
+  Widget _buildFeatureItem(IconData icon, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            size: 14,
+            color: const Color(0xFFFBBF24),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Color(0xFFF1F5F9),
+              fontSize: 12.5,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
+
+

@@ -7,7 +7,8 @@ class AppColors {
 
   // Primary Indigo Brand
   static const Color primary = Color(0xFF4F46E5);
-  static const Color primaryDark = Color(0xFF3730A3);
+  static const Color primaryDark = Color(0xFF818CF8); // Bright vibrant indigo: high-contrast and clearly visible in dark mode
+  static const Color primaryDeep = Color(0xFF3730A3);
   static const Color primaryLight = Color(0xFFEEF2FF);
   static const Color primaryHover = Color(0xFF4338CA);
 
@@ -110,6 +111,11 @@ class AppColors {
       Theme.of(context).brightness == Brightness.dark
           ? darkTextMuted
           : textMuted;
+
+  static Color primaryTextColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF818CF8)
+          : primary;
 }
 
 extension AppThemeX on BuildContext {
@@ -127,5 +133,7 @@ extension AppThemeX on BuildContext {
       isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
   Color get textMutedColor =>
       isDark ? AppColors.darkTextMuted : AppColors.textMuted;
+  Color get primaryTextColor =>
+      isDark ? const Color(0xFF818CF8) : AppColors.primary;
 }
 

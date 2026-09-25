@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
@@ -473,12 +474,12 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
                     child: profile.logoPath!.startsWith('http')
-                        ? Image.network(
+                        ? CachedNetworkImage(imageUrl: 
                             profile.logoPath!,
                             width: 32,
                             height: 32,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const Icon(
+                            errorWidget: (_, _, _) => const Icon(
                               Icons.business,
                               color: AppColors.primary,
                             ),
@@ -1723,3 +1724,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     );
   }
 }
+
+
+
+
+

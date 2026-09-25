@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../bloc/onboarding_cubit.dart';
@@ -182,10 +183,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         // Await the repository directly so it finishes before we navigate
         final repo = context.read<BusinessProfileRepository>();
         await repo.saveProfile(profile);
-        
+
         if (mounted) {
           // Tell the bloc to load this specific profile
-          context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
+          context.read<BusinessProfileBloc>().add(
+            const LoadBusinessProfileEvent(),
+          );
         }
       }
 
@@ -211,7 +214,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: image.path,
-        aspectRatio: isSignature 
+        aspectRatio: isSignature
             ? null // Free crop for signature
             : const CropAspectRatio(ratioX: 1, ratioY: 1),
         uiSettings: [
@@ -219,8 +222,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             toolbarTitle: title,
             toolbarColor: AppColors.primary,
             toolbarWidgetColor: Colors.white,
-            initAspectRatio: isSignature 
-                ? CropAspectRatioPreset.original 
+            initAspectRatio: isSignature
+                ? CropAspectRatioPreset.original
                 : CropAspectRatioPreset.square,
             lockAspectRatio: !isSignature,
           ),
@@ -265,13 +268,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+            final bool isKeyboardOpen =
+                MediaQuery.of(context).viewInsets.bottom > 0;
             return Column(
               children: [
                 // Progress Indicator
                 if (!isKeyboardOpen) ...[
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
                     child: Row(
                       children: List.generate(_totalPages, (index) {
                         return Expanded(
@@ -281,7 +288,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             decoration: BoxDecoration(
                               color: index <= _currentPage
                                   ? AppColors.primary
-                                  : (isDark ? AppColors.darkBorder : AppColors.border),
+                                  : (isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.border),
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -292,113 +301,114 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: 16),
                 ],
 
-            // Page Content
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                children: widget.isAddingNewCompany
-                    ? [
-                        _buildStepImageUpload(
-                          1,
-                          'Upload Company Logo',
-                          'A professional logo builds trust with your clients.',
-                          _logoPath,
-                        ),
-                        _buildStepImageUpload(
-                          2,
-                          'Upload Signature',
-                          'Digital signatures make your invoices authentic and legally compliant.',
-                          _signaturePath,
-                        ),
-                        _buildStepImageUpload(
-                          3,
-                          'Upload Company Stamp',
-                          'Optional. Add an official company stamp/seal.',
-                          _stampPath,
-                          isOptional: true,
-                        ),
-                        _buildStep5BusinessInfo(),
-                      ]
-                    : [
-                        _buildStep1Localization(),
-                        _buildStepImageUpload(
-                          1,
-                          'Upload Company Logo',
-                          'A professional logo builds trust with your clients.',
-                          _logoPath,
-                        ),
-                        _buildStepImageUpload(
-                          2,
-                          'Upload Signature',
-                          'Digital signatures make your invoices authentic and legally compliant.',
-                          _signaturePath,
-                        ),
-                        _buildStepImageUpload(
-                          3,
-                          'Upload Company Stamp',
-                          'Optional. Add an official company stamp/seal.',
-                          _stampPath,
-                          isOptional: true,
-                        ),
-                        _buildStep5BusinessInfo(),
-                      ],
-              ),
-            ),
+                // Page Content
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    children: widget.isAddingNewCompany
+                        ? [
+                            _buildStepImageUpload(
+                              1,
+                              'Upload Company Logo',
+                              'A professional logo builds trust with your clients.',
+                              _logoPath,
+                            ),
+                            _buildStepImageUpload(
+                              2,
+                              'Upload Signature',
+                              'Digital signatures make your invoices authentic and legally compliant.',
+                              _signaturePath,
+                            ),
+                            _buildStepImageUpload(
+                              3,
+                              'Upload Company Stamp',
+                              'Optional. Add an official company stamp/seal.',
+                              _stampPath,
+                              isOptional: true,
+                            ),
+                            _buildStep5BusinessInfo(),
+                          ]
+                        : [
+                            _buildStep1Localization(),
+                            _buildStepImageUpload(
+                              1,
+                              'Upload Company Logo',
+                              'A professional logo builds trust with your clients.',
+                              _logoPath,
+                            ),
+                            _buildStepImageUpload(
+                              2,
+                              'Upload Signature',
+                              'Digital signatures make your invoices authentic and legally compliant.',
+                              _signaturePath,
+                            ),
+                            _buildStepImageUpload(
+                              3,
+                              'Upload Company Stamp',
+                              'Optional. Add an official company stamp/seal.',
+                              _stampPath,
+                              isOptional: true,
+                            ),
+                            _buildStep5BusinessInfo(),
+                          ],
+                  ),
+                ),
 
-            // Bottom Controls
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-              child: Row(
-                children: [
-                  Visibility(
-                    visible: _currentPage > 0,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: OutlinedButton(
-                        onPressed: _previousPage,
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 14,
-                            horizontal: 20,
+                // Bottom Controls
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+                  child: Row(
+                    children: [
+                      Visibility(
+                        visible: _currentPage > 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: OutlinedButton(
+                            onPressed: _previousPage,
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 20,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.textPrimary,
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.textPrimary,
                         ),
                       ),
-                    ),
+                      Expanded(
+                        child: AppButton(
+                          key: const ValueKey('continue_button'),
+                          label: _currentPage == _totalPages - 1
+                              ? 'Complete Setup'
+                              : 'Continue',
+                          isLoading: _isSaving,
+                          onPressed: _isSaving ? null : _nextPage,
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: AppButton(
-                      key: const ValueKey('continue_button'),
-                      label: _currentPage == _totalPages - 1
-                          ? 'Complete Setup'
-                          : 'Continue',
-                      isLoading: _isSaving,
-                      onPressed: _isSaving ? null : _nextPage,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      }),
-    ),
-  );
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 
   Widget _buildStep1Localization() {
@@ -689,36 +699,42 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ],
                     ),
-                child: imagePath != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(22),
-                        child: imagePath.startsWith('http')
-                            ? Image.network(imagePath, fit: BoxFit.contain)
-                            : Image.file(File(imagePath), fit: BoxFit.contain),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add_a_photo_outlined,
-                            size: 48,
-                            color: AppColors.primary.withValues(alpha: 0.5),
+                    child: imagePath != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(22),
+                            child: imagePath.startsWith('http')
+                                ? CachedNetworkImage(
+                                    imageUrl: imagePath,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Image.file(
+                                    File(imagePath),
+                                    fit: BoxFit.contain,
+                                  ),
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add_a_photo_outlined,
+                                size: 48,
+                                color: AppColors.primary.withValues(alpha: 0.5),
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'Tap to Upload',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Tap to Upload',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-              ),
-            );
-          },
-        ),
-      ),
+                  ),
+                );
+              },
+            ),
+          ),
           if (imagePath != null)
             Center(
               child: TextButton.icon(
