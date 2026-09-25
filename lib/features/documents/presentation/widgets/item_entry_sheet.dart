@@ -401,7 +401,7 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                     Text(
                       CurrencyFormatter.format(_lineTotal),
                       style: AppTypography.moneyMedium.copyWith(
-                        color: AppColors.primaryDark,
+                        color: isDark ? AppColors.primaryDark : AppColors.primary,
                       ),
                     ),
                   ],

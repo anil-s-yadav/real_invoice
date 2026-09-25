@@ -193,21 +193,27 @@ class DocumentListScreenState extends State<DocumentListScreen> {
   }
 
   Future<void> _showDateRangePicker() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
+      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) {
+      builder: (sheetContext) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Text(
                   'Select Date Range',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  ),
                 ),
               ),
               ...DateFilterRange.values.map((range) {
@@ -219,27 +225,38 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                       fontWeight: isSelected
                           ? FontWeight.w700
                           : FontWeight.w500,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                     ),
                   ),
                   trailing: isSelected
-                      ? const Icon(Icons.check, color: AppColors.primary)
+                      ? Icon(
+                          Icons.check,
+                          color: isDark ? AppColors.primaryDark : AppColors.primary,
+                        )
                       : null,
                   onTap: () async {
                     if (range == DateFilterRange.custom) {
-                      Navigator.pop(context);
+                      Navigator.pop(sheetContext);
                       final picked = await showDateRangePicker(
                         context: context,
                         firstDate: DateTime(2000),
                         lastDate: DateTime.now(),
-                        builder: (context, child) {
+                        builder: (pickerContext, child) {
                           return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: const ColorScheme.light(
-                                primary: AppColors.primary,
-                                onPrimary: Colors.white,
-                                surface: Colors.white,
-                                onSurface: Colors.black,
-                              ),
+                            data: Theme.of(pickerContext).copyWith(
+                              colorScheme: isDark
+                                  ? const ColorScheme.dark(
+                                      primary: AppColors.primary,
+                                      onPrimary: Colors.white,
+                                      surface: AppColors.darkSurface,
+                                      onSurface: AppColors.darkTextPrimary,
+                                    )
+                                  : const ColorScheme.light(
+                                      primary: AppColors.primary,
+                                      onPrimary: Colors.white,
+                                      surface: Colors.white,
+                                      onSurface: AppColors.textPrimary,
+                                    ),
                             ),
                             child: child!,
                           );
@@ -254,7 +271,7 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                       }
                     } else {
                       _applyFilter(dateRangeType: range);
-                      Navigator.pop(context);
+                      Navigator.pop(sheetContext);
                     }
                   },
                 );
@@ -267,47 +284,71 @@ class DocumentListScreenState extends State<DocumentListScreen> {
   }
 
   void _showStatusPicker() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
+      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) {
+      builder: (sheetContext) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Text(
                   'Select Status',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  ),
                 ),
               ),
               ListTile(
-                title: const Text(
+                title: Text(
                   'All Statuses',
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  ),
                 ),
                 trailing: _selectedStatus == null
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(
+                        Icons.check,
+                        color: isDark ? AppColors.primaryDark : AppColors.primary,
+                      )
                     : null,
                 onTap: () {
                   _applyFilter(clearStatus: true);
-                  Navigator.pop(context);
+                  Navigator.pop(sheetContext);
                 },
               ),
-              const Divider(height: 1),
+              Divider(
+                height: 1,
+                color: isDark ? AppColors.darkBorder : AppColors.border,
+              ),
               ...DocumentStatus.values.map((status) {
                 final isSelected = _selectedStatus == status;
                 return ListTile(
-                  title: Text(status.name.toUpperCase()),
+                  title: Text(
+                    status.name.toUpperCase(),
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    ),
+                  ),
                   trailing: isSelected
-                      ? const Icon(Icons.check, color: AppColors.primary)
+                      ? Icon(
+                          Icons.check,
+                          color: isDark ? AppColors.primaryDark : AppColors.primary,
+                        )
                       : null,
                   onTap: () {
                     _applyFilter(status: status);
-                    Navigator.pop(context);
+                    Navigator.pop(sheetContext);
                   },
                 );
               }),
@@ -452,14 +493,20 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                   _selectedDateRangeType !=
                                       DateFilterRange.allTime
                                   ? AppColors.primary
-                                  : Colors.white,
+                                  : (isDark
+                                      ? AppColors.darkSurface
+                                      : Colors.white),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color:
                                     _selectedDateRangeType !=
                                         DateFilterRange.allTime
                                     ? AppColors.primary
-                                    : AppColors.border.withValues(alpha: 0.5),
+                                    : (isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.border.withValues(
+                                            alpha: 0.5,
+                                          )),
                               ),
                             ),
                             alignment: Alignment.center,
@@ -470,7 +517,9 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                   _selectedDateRangeType !=
                                       DateFilterRange.allTime
                                   ? Colors.white
-                                  : AppColors.textMuted,
+                                  : (isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textMuted),
                             ),
                           ),
                         ),
@@ -485,12 +534,18 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                             decoration: BoxDecoration(
                               color: _selectedStatus != null
                                   ? AppColors.primary
-                                  : Colors.white,
+                                  : (isDark
+                                      ? AppColors.darkSurface
+                                      : Colors.white),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: _selectedStatus != null
                                     ? AppColors.primary
-                                    : AppColors.border.withValues(alpha: 0.5),
+                                    : (isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.border.withValues(
+                                            alpha: 0.5,
+                                          )),
                               ),
                             ),
                             alignment: Alignment.center,
@@ -499,7 +554,9 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                               size: 22,
                               color: _selectedStatus != null
                                   ? Colors.white
-                                  : AppColors.textMuted,
+                                  : (isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textMuted),
                             ),
                           ),
                         ),
@@ -543,16 +600,22 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: _selectedStatus == DocumentStatus.overdue
-                                    ? AppColors.statusOverdueBg
-                                    : AppColors.primaryLight,
+                                    ? (isDark
+                                        ? AppColors.statusOverdueText.withValues(alpha: 0.2)
+                                        : AppColors.statusOverdueBg)
+                                    : (isDark
+                                        ? AppColors.primary.withValues(alpha: 0.2)
+                                        : AppColors.primaryLight),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color:
                                       _selectedStatus == DocumentStatus.overdue
                                       ? AppColors.statusOverdueBorder
-                                      : AppColors.primary.withValues(
-                                          alpha: 0.3,
-                                        ),
+                                      : (isDark
+                                          ? AppColors.primary.withValues(alpha: 0.4)
+                                          : AppColors.primary.withValues(
+                                              alpha: 0.3,
+                                            )),
                                   width: 1,
                                 ),
                               ),
@@ -578,8 +641,12 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                         color:
                                             _selectedStatus ==
                                                 DocumentStatus.overdue
-                                            ? AppColors.statusOverdueText
-                                            : AppColors.primary,
+                                            ? (isDark
+                                                ? const Color(0xFFFCA5A5)
+                                                : AppColors.statusOverdueText)
+                                            : (isDark
+                                                ? AppColors.primaryDark
+                                                : AppColors.primary),
                                       ),
                                     ),
                                   ),
@@ -594,8 +661,12 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                       color:
                                           _selectedStatus ==
                                               DocumentStatus.overdue
-                                          ? AppColors.statusOverdueText
-                                          : AppColors.primary,
+                                          ? (isDark
+                                              ? const Color(0xFFFCA5A5)
+                                              : AppColors.statusOverdueText)
+                                          : (isDark
+                                              ? AppColors.primaryDark
+                                              : AppColors.primary),
                                     ),
                                   ),
                                 ],
@@ -608,32 +679,40 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
+                                color: isDark
+                                    ? AppColors.primary.withValues(alpha: 0.2)
+                                    : AppColors.primaryLight,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.3,
-                                  ),
+                                  color: isDark
+                                      ? AppColors.primary.withValues(alpha: 0.4)
+                                      : AppColors.primary.withValues(
+                                          alpha: 0.3,
+                                        ),
                                   width: 1,
                                 ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.calendar_month_outlined,
                                     size: 14,
-                                    color: AppColors.primary,
+                                    color: isDark
+                                        ? AppColors.primaryDark
+                                        : AppColors.primary,
                                   ),
                                   const SizedBox(width: 4),
                                   InkWell(
                                     onTap: _showDateRangePicker,
                                     child: Text(
                                       'Date: ${_getDateRangeChipText()}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700,
-                                        color: AppColors.primary,
+                                        color: isDark
+                                            ? AppColors.primaryDark
+                                            : AppColors.primary,
                                       ),
                                     ),
                                   ),
@@ -643,10 +722,12 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                       dateRangeType: DateFilterRange.allTime,
                                     ),
                                     borderRadius: BorderRadius.circular(10),
-                                    child: const Icon(
+                                    child: Icon(
                                       Icons.close,
                                       size: 15,
-                                      color: AppColors.primary,
+                                      color: isDark
+                                          ? AppColors.primaryDark
+                                          : AppColors.primary,
                                     ),
                                   ),
                                 ],
@@ -939,10 +1020,10 @@ class _DocumentListItemCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   CurrencyFormatter.format(document.totalAmount),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 16,
-                    color: AppColors.primaryDark,
+                    color: isDark ? AppColors.primaryDark : AppColors.primary,
                   ),
                 ),
               ],

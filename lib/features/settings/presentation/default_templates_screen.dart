@@ -87,21 +87,23 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Default Templates',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             letterSpacing: -0.3,
           ),
         ),
         centerTitle: true,
-        backgroundColor: AppColors.canvas,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
+        foregroundColor: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
         bottom: PreferredSize(
@@ -111,25 +113,27 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
             margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: isDark ? AppColors.darkSurface : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFFE2E8F0),
+                color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
                 width: 0.8,
               ),
             ),
             child: TabBar(
               controller: _tabController,
               indicator: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? AppColors.darkSurfaceVariant : Colors.white,
                 borderRadius: BorderRadius.circular(9),
                 border: Border.all(
-                  color: AppColors.border.withValues(alpha: 0.4),
+                  color: isDark
+                      ? AppColors.darkBorder
+                      : AppColors.border.withValues(alpha: 0.4),
                   width: 0.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
                     blurRadius: 4,
                     offset: const Offset(0, 1.5),
                   ),
@@ -139,8 +143,9 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
               dividerColor: Colors.transparent,
               splashFactory: NoSplash.splashFactory,
               overlayColor: WidgetStateProperty.all(Colors.transparent),
-              labelColor: AppColors.primary,
-              unselectedLabelColor: AppColors.textSecondary,
+              labelColor: isDark ? AppColors.primaryDark : AppColors.primary,
+              unselectedLabelColor:
+                  isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
               labelStyle: const TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
@@ -197,10 +202,12 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? AppColors.darkSurface : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.grey.withValues(alpha: 0.15),
+                          color: isDark
+                              ? AppColors.darkBorder
+                              : Colors.grey.withValues(alpha: 0.15),
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -225,9 +232,11 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                             child: Text.rich(
                               TextSpan(
                                 text: 'Active Default: ',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
-                                  color: AppColors.textSecondary,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary,
                                 ),
                                 children: [
                                   TextSpan(
@@ -238,12 +247,14 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                                       color: color,
                                     ),
                                   ),
-                                  const TextSpan(
+                                  TextSpan(
                                     text:
                                         ' • Tap any design to preview & set default',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      color: isDark
+                                          ? AppColors.darkTextMuted
+                                          : AppColors.textSecondary,
                                     ),
                                   ),
                                 ],

@@ -102,36 +102,40 @@ class TemplatePreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final sampleDoc = _createSampleDocument();
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: AppColors.canvas,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
+        foregroundColor: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
         elevation: 0,
         title: Column(
           children: [
             Text(
               template.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
             Text(
               '${documentType.displayName} Template Preview',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
               ),
             ),
           ],
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.textPrimary),
+          icon: Icon(
+            Icons.close,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.of(context).pop(),
           tooltip: 'Close',
         ),
@@ -152,7 +156,7 @@ class TemplatePreviewScreen extends StatelessWidget {
                   return const Center(child: Text('Failed to load preview'));
                 }
                 return Container(
-                  color: AppColors.canvas,
+                  color: isDark ? AppColors.darkCanvas : AppColors.canvas,
                   child: InteractiveViewer(
                     minScale: 1.0,
                     maxScale: 4.0,
@@ -190,17 +194,17 @@ class TemplatePreviewScreen extends StatelessWidget {
                   : 16,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? AppColors.darkSurface : Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -3),
                 ),
               ],
-              border: const Border(
+              border: Border(
                 top: BorderSide(
-                  color: AppColors.border,
+                  color: isDark ? AppColors.darkBorder : AppColors.border,
                   width: 1,
                 ),
               ),
@@ -214,9 +218,13 @@ class TemplatePreviewScreen extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textPrimary,
-                        side: const BorderSide(
-                          color: AppColors.borderStrong,
+                        foregroundColor: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                        side: BorderSide(
+                          color: isDark
+                              ? AppColors.darkBorder
+                              : AppColors.borderStrong,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

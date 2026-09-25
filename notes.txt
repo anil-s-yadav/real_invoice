@@ -65,3 +65,13 @@ User subscriptions where expiresAt is within 3 days.
 Step 11: The Cloud Function sends targeted Push Notifications (FCM) to the tokens stored in the user's devices subcollection.
 
 
+Make Default Templates Screen also Theme responsive means light and dark bsed on settings and  left only tempalates. 
+You missed Documents Tabs top left filters they dont follow themesfix them.
+also apply theme on document view or generated screen just left generated template/pdf in light.
+also apply theme on Select Template bottomsheet just left templates / pdfs  light left al background too should follow theme.
+
+At many places out that blue color (  color: AppColors.primaryDark,) doesnt visible on blacks also fix that.
+
+at company info screen on top app bar also give option to delete company and it is for everyone even for freeplan also. clicking it company got deleted and 
+also allow to edit all info.
+

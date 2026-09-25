@@ -101,20 +101,24 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
                         (c.phone?.toLowerCase().contains(q) ?? false);
                   }).toList();
 
-                  if (filtered.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppDimensions.xl),
-                        child: Text(
-                          _searchQuery.isEmpty
-                              ? 'No customers added yet. Tap "Add New Customer" above to create one.'
-                              : 'No customer matches "$_searchQuery"',
-                          textAlign: TextAlign.center,
-                          style: AppTypography.bodyMedium,
+                    if (filtered.isEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppDimensions.xl),
+                          child: Text(
+                            _searchQuery.isEmpty
+                                ? 'No customers added yet. Tap "Add New Customer" above to create one.'
+                                : 'No customer matches "$_searchQuery"',
+                            textAlign: TextAlign.center,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: Theme.of(context).brightness == Brightness.dark 
+                                  ? AppColors.darkTextSecondary 
+                                  : AppColors.textSecondary,
+                            ),
+                          ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
 
                   return ListView.separated(
                     padding: const EdgeInsets.all(AppDimensions.lg),
@@ -125,15 +129,16 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
                       final customer = filtered[index];
                       final isSelected =
                           widget.selectedCustomer?.id == customer.id;
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
 
                       return AppCard(
                         backgroundColor: isSelected
-                            ? AppColors.primaryLight
-                            : AppColors.surface,
+                            ? (isDark ? AppColors.primary.withValues(alpha: 0.15) : AppColors.primaryLight)
+                            : null,
                         border: Border.all(
                           color: isSelected
                               ? AppColors.primary
-                              : AppColors.border,
+                              : (isDark ? AppColors.darkBorder : AppColors.border),
                           width: isSelected ? 1.5 : 1.0,
                         ),
                         padding: const EdgeInsets.symmetric(
@@ -153,6 +158,7 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
                                       fontWeight: isSelected
                                           ? FontWeight.w700
                                           : FontWeight.w600,
+                                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                     ),
                                   ),
                                   if (customer.phone != null &&
@@ -160,7 +166,9 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
                                     const SizedBox(height: 2),
                                     Text(
                                       customer.phone!,
-                                      style: AppTypography.bodySmall,
+                                      style: AppTypography.bodySmall.copyWith(
+                                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                      ),
                                     ),
                                   ],
                                 ],

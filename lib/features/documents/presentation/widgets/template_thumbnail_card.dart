@@ -19,6 +19,8 @@ class TemplateThumbnailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -32,7 +34,7 @@ class TemplateThumbnailCard extends StatelessWidget {
                 border: Border.all(
                   color: isSelected
                       ? template.accentColor
-                      : AppColors.borderStrong,
+                      : (isDark ? AppColors.darkBorder : AppColors.borderStrong),
                   width: isSelected ? 3 : 1,
                 ),
                 boxShadow: [
@@ -82,7 +84,9 @@ class TemplateThumbnailCard extends StatelessWidget {
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
               color: isSelected
                   ? template.accentColor
-                  : AppColors.textPrimary,
+                  : (isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

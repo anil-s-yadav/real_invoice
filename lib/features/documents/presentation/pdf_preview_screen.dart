@@ -113,13 +113,14 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   }
 
   void _showTemplateSelector() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       isDismissible: false,
       enableDrag: false,
       useSafeArea: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -129,7 +130,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
         return Container(
           height: screenHeight * 0.9,
-          color: Colors.white,
+          color: isDark ? AppColors.darkSurface : Colors.white,
           padding: const EdgeInsets.only(top: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,18 +140,18 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Select Template',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: AppColors.textPrimary,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close,
-                        color: AppColors.textPrimary,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -194,7 +195,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                           template: t,
                           isSelected: isSelected,
                           documentType: _document.docType,
-
                           onTap: () {},
                         ),
                       ),
@@ -211,8 +211,10 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   }
 
   void _showDocumentSettings() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
+      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -220,19 +222,34 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
         return StatefulBuilder(
           builder: (context, setStateSheet) {
             return Container(
+              color: isDark ? AppColors.darkSurface : Colors.white,
               padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Document Settings',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   SwitchListTile(
-                    title: const Text('Show Payment Details & QR Code'),
-                    subtitle: const Text('Include bank and UPI info on PDF'),
+                    title: Text(
+                      'Show Payment Details & QR Code',
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Include bank and UPI info on PDF',
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                      ),
+                    ),
                     value: _document.includePaymentDetails,
                     activeThumbColor: AppColors.primary,
                     onChanged: (val) {
@@ -258,6 +275,8 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
       builder: (context, profileState) {
         final profile = profileState is BusinessProfileLoaded
@@ -265,16 +284,27 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
             : const BusinessProfile();
 
         return Scaffold(
+          backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
           appBar: AppBar(
+            backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
+            foregroundColor: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            elevation: 0,
             title: Text(
               '${_document.docType.displayName} ${_document.docNumber}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+              ),
             ),
             actions: [
               GestureDetector(
                 onTap: _showDocumentSettings,
-                child: Icon(Icons.settings_outlined),
+                child: Icon(
+                  Icons.settings_outlined,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               GestureDetector(
                 onTap: () async {
                   await Navigator.of(context).push(
@@ -291,11 +321,20 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     }
                   }
                 },
-                child: Icon(Icons.edit_outlined),
+                child: Icon(
+                  Icons.edit_outlined,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                ),
               ),
 
               TextButton(
-                child: const Text("Done"),
+                child: Text(
+                  "Done",
+                  style: TextStyle(
+                    color: isDark ? AppColors.primaryDark : AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -313,16 +352,16 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppDimensions.lg,
                     ),
-                    color: AppColors.primaryLight,
+                    color: isDark ? AppColors.darkSurface : AppColors.primaryLight,
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'Accepted?',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.primaryDark,
+                              color: isDark ? AppColors.primaryDark : AppColors.primary,
                             ),
                           ),
                         ),
@@ -408,30 +447,33 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppDimensions.lg,
                     ),
-                    color: AppColors.primaryLight,
+                    color: isDark ? AppColors.darkSurface : AppColors.primaryLight,
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.transform,
-                          color: AppColors.primaryDark,
+                          color: isDark ? AppColors.primaryDark : AppColors.primary,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'Finalize Document',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.primaryDark,
+                              color: isDark ? AppColors.primaryDark : AppColors.primary,
                             ),
                           ),
                         ),
                         TextButton(
                           onPressed: _handleConvertProformaToInvoice,
-                          child: const Text(
+                          child: Text(
                             'Convert to Invoice',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? AppColors.primaryDark : AppColors.primary,
+                            ),
                           ),
                         ),
                       ],
@@ -485,17 +527,11 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Row(
-                      //   children: [
-                      //     const Text(
-                      //       'Template: ',
-                      //       style: AppTypography.bodySmall,
-                      //     ),
-                      //   ],
-                      // ),
-                      const Text(
+                      Text(
                         'Double Tap Document to Zoom',
-                        style: AppTypography.bodySmall,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: isDark ? AppColors.darkTextMuted : AppColors.textSecondary,
+                        ),
                       ),
                       InkWell(
                         onTap: _showTemplateSelector,
@@ -504,7 +540,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                             Text(
                               'Change Style \u25BE  : ',
                               style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.primary,
+                                color: isDark ? AppColors.primaryDark : AppColors.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -512,7 +548,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                               TemplateRegistry.getById(_currentTemplateId).name,
                               style: AppTypography.titleSmall.copyWith(
                                 fontSize: 12,
-                                color: AppColors.primary,
+                                color: isDark ? AppColors.primaryDark : AppColors.primary,
                               ),
                             ),
                           ],
@@ -530,7 +566,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       profile: profile,
                       templateId: _currentTemplateId,
                     ),
-                    previewPageMargin: EdgeInsets.symmetric(
+                    previewPageMargin: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 10,
                     ),
@@ -538,14 +574,14 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     canChangeOrientation: false,
                     canChangePageFormat: true,
                     canDebug: false,
-                    scrollViewDecoration: const BoxDecoration(
-                      color: Color(0xFFF1F5F9),
+                    scrollViewDecoration: BoxDecoration(
+                      color: isDark ? AppColors.darkCanvas : const Color(0xFFF1F5F9),
                     ),
                     pdfPreviewPageDecoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withAlpha(30),
+                          color: Colors.black.withAlpha(isDark ? 60 : 30),
                           blurRadius: 10,
                           spreadRadius: 5,
                           offset: const Offset(0, 4),
@@ -553,9 +589,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       ],
                     ),
                     pdfFileName: '${_document.docNumber}.pdf',
-                    loadingWidget: const Center(
+                    loadingWidget: Center(
                       child: CircularProgressIndicator(
-                        color: AppColors.primary,
+                        color: isDark ? AppColors.primaryDark : AppColors.primary,
                       ),
                     ),
                   ),

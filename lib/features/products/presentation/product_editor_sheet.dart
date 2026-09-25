@@ -192,7 +192,10 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
           const SizedBox(height: AppDimensions.md),
           Text(
             'Unit of Measure',
-            style: AppTypography.titleSmall.copyWith(fontSize: 13),
+            style: AppTypography.titleSmall.copyWith(
+              fontSize: 13,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 6),
           SingleChildScrollView(
@@ -210,6 +213,7 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                         : AppColors.primaryLight,
                     backgroundColor:
                         isDark ? AppColors.darkSurface : AppColors.surface,
+                    checkmarkColor: AppColors.primary,
                     labelStyle: TextStyle(
                       color: isSelected
                           ? AppColors.primary
@@ -236,7 +240,10 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
           const SizedBox(height: AppDimensions.md),
           Text(
             'Default Tax Rate (GST %)',
-            style: AppTypography.titleSmall.copyWith(fontSize: 13),
+            style: AppTypography.titleSmall.copyWith(
+              fontSize: 13,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 6),
           Wrap(
@@ -253,6 +260,7 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                     : AppColors.primaryLight,
                 backgroundColor:
                     isDark ? AppColors.darkSurface : AppColors.surface,
+                checkmarkColor: AppColors.primary,
                 labelStyle: TextStyle(
                   color: isSelected
                       ? AppColors.primary

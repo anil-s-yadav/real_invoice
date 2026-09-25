@@ -628,8 +628,8 @@ class _HomeScreenState extends State<HomeScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryDark,
-            AppColors.primaryDark.withValues(alpha: 0.8),
+            AppColors.primary,
+            AppColors.primaryDeep,
           ],
         ),
         borderRadius: BorderRadius.circular(16),

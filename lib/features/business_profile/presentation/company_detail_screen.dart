@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../bloc/business_profile_bloc.dart';
 import '../bloc/business_profile_event.dart';
@@ -30,10 +31,77 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   late BusinessProfile _profile;
   bool _hasChanges = false;
 
+  late TextEditingController _nameController;
+  late TextEditingController _gstinController;
+  late TextEditingController _panController;
+  late TextEditingController _phoneController;
+  late TextEditingController _emailController;
+  late TextEditingController _addressController;
+  late TextEditingController _websiteController;
+  late TextEditingController _bankNameController;
+  late TextEditingController _accountNumberController;
+  late TextEditingController _ifscCodeController;
+  late TextEditingController _upiIdController;
+  late TextEditingController _termsController;
+  late TextEditingController _notesController;
+
   @override
   void initState() {
     super.initState();
     _profile = widget.profile;
+
+    _nameController = TextEditingController(text: _profile.businessName);
+    _gstinController = TextEditingController(text: _profile.gstin ?? '');
+    _panController = TextEditingController(text: _profile.pan ?? '');
+    _phoneController = TextEditingController(text: _profile.phone ?? '');
+    _emailController = TextEditingController(text: _profile.email ?? '');
+    _addressController = TextEditingController(text: _profile.address ?? '');
+    _websiteController = TextEditingController(text: _profile.website ?? '');
+    _bankNameController = TextEditingController(text: _profile.bankName ?? '');
+    _accountNumberController =
+        TextEditingController(text: _profile.accountNumber ?? '');
+    _ifscCodeController = TextEditingController(text: _profile.ifscCode ?? '');
+    _upiIdController = TextEditingController(text: _profile.upiId ?? '');
+    _termsController = TextEditingController(text: _profile.defaultTerms);
+    _notesController = TextEditingController(text: _profile.defaultNotes);
+
+    void markChanged() {
+      if (!_hasChanges && mounted) {
+        setState(() => _hasChanges = true);
+      }
+    }
+
+    _nameController.addListener(markChanged);
+    _gstinController.addListener(markChanged);
+    _panController.addListener(markChanged);
+    _phoneController.addListener(markChanged);
+    _emailController.addListener(markChanged);
+    _addressController.addListener(markChanged);
+    _websiteController.addListener(markChanged);
+    _bankNameController.addListener(markChanged);
+    _accountNumberController.addListener(markChanged);
+    _ifscCodeController.addListener(markChanged);
+    _upiIdController.addListener(markChanged);
+    _termsController.addListener(markChanged);
+    _notesController.addListener(markChanged);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _gstinController.dispose();
+    _panController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _addressController.dispose();
+    _websiteController.dispose();
+    _bankNameController.dispose();
+    _accountNumberController.dispose();
+    _ifscCodeController.dispose();
+    _upiIdController.dispose();
+    _termsController.dispose();
+    _notesController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickImage(String field) async {
@@ -45,16 +113,16 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
 
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: image.path,
-        aspectRatio: isSignature 
-            ? null 
+        aspectRatio: isSignature
+            ? null
             : const CropAspectRatio(ratioX: 1, ratioY: 1),
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: title,
             toolbarColor: AppColors.primary,
             toolbarWidgetColor: Colors.white,
-            initAspectRatio: isSignature 
-                ? CropAspectRatioPreset.original 
+            initAspectRatio: isSignature
+                ? CropAspectRatioPreset.original
                 : CropAspectRatioPreset.square,
             lockAspectRatio: !isSignature,
           ),
@@ -82,8 +150,55 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   }
 
   Future<void> _handleUpdate() async {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Business Name cannot be empty'),
+          backgroundColor: AppColors.statusOverdueText,
+        ),
+      );
+      return;
+    }
+
+    final updated = _profile.copyWith(
+      businessName: name,
+      gstin: _gstinController.text.trim().isEmpty
+          ? null
+          : _gstinController.text.trim(),
+      pan: _panController.text.trim().isEmpty
+          ? null
+          : _panController.text.trim(),
+      phone: _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
+      email: _emailController.text.trim().isEmpty
+          ? null
+          : _emailController.text.trim(),
+      address: _addressController.text.trim().isEmpty
+          ? null
+          : _addressController.text.trim(),
+      website: _websiteController.text.trim().isEmpty
+          ? null
+          : _websiteController.text.trim(),
+      bankName: _bankNameController.text.trim().isEmpty
+          ? null
+          : _bankNameController.text.trim(),
+      accountNumber: _accountNumberController.text.trim().isEmpty
+          ? null
+          : _accountNumberController.text.trim(),
+      ifscCode: _ifscCodeController.text.trim().isEmpty
+          ? null
+          : _ifscCodeController.text.trim(),
+      upiId: _upiIdController.text.trim().isEmpty
+          ? null
+          : _upiIdController.text.trim(),
+      defaultTerms: _termsController.text.trim(),
+      defaultNotes: _notesController.text.trim(),
+    );
+
     final repo = context.read<BusinessProfileRepository>();
-    await repo.saveProfile(_profile);
+    await repo.saveProfile(updated);
     if (mounted) {
       context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
       ScaffoldMessenger.of(context).showSnackBar(
@@ -101,7 +216,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
       context,
       title: 'Delete Company',
       message:
-          'Are you sure you want to delete "${_profile.businessName}"? This action cannot be undone.',
+          'Are you sure you want to delete "${_nameController.text.isNotEmpty ? _nameController.text : _profile.businessName}"? This action cannot be undone.',
       confirmLabel: 'Delete',
       isDestructive: true,
     );
@@ -130,21 +245,39 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: _isDark ? AppColors.darkCanvas : AppColors.canvas,
       appBar: AppBar(
-        title: Text(
-          _profile.businessName.isEmpty
-              ? 'Company Details'
-              : _profile.businessName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        backgroundColor: _isDark ? AppColors.darkCanvas : AppColors.canvas,
+        foregroundColor: _textPrimary,
         elevation: 0,
+        title: Text(
+          _nameController.text.isEmpty
+              ? (_profile.businessName.isEmpty
+                  ? 'Company Details'
+                  : _profile.businessName)
+              : _nameController.text,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: _textPrimary,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.delete_outline,
+              color: AppColors.statusOverdueText,
+            ),
+            tooltip: 'Delete Company',
+            onPressed: _handleDelete,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Editable Images Section
+            // Company Assets (Logo, Signature, Stamp)
             _buildSectionTitle('Company Assets', Icons.image_outlined),
             const SizedBox(height: 12),
             Row(
@@ -176,57 +309,124 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Read-only Business Info
+            // Business Information
             _buildSectionTitle('Business Information', Icons.business_outlined),
             const SizedBox(height: 12),
-            _buildReadOnlyField('Business Name', _profile.businessName),
-            if (_profile.gstin != null && _profile.gstin!.isNotEmpty)
-              _buildReadOnlyField('Tax ID / GSTIN', _profile.gstin!),
-            if (_profile.pan != null && _profile.pan!.isNotEmpty)
-              _buildReadOnlyField('Company ID / PAN', _profile.pan!),
+            AppTextField(
+              controller: _nameController,
+              label: 'Business Name *',
+              hint: 'e.g. Acme Innovations Pvt Ltd',
+              textCapitalization: TextCapitalization.words,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _gstinController,
+              label: 'Tax ID / GSTIN',
+              hint: 'e.g. 29ABCDE1234F1Z5',
+              textCapitalization: TextCapitalization.characters,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _panController,
+              label: 'Company ID / PAN',
+              hint: 'e.g. ABCDE1234F',
+              textCapitalization: TextCapitalization.characters,
+            ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            // Contact Info
+            // Contact Details
             _buildSectionTitle('Contact Details', Icons.contact_mail_outlined),
             const SizedBox(height: 12),
-            if (_profile.phone != null && _profile.phone!.isNotEmpty)
-              _buildReadOnlyField('Phone', _profile.phone!),
-            if (_profile.email != null && _profile.email!.isNotEmpty)
-              _buildReadOnlyField('Email', _profile.email!),
-            if (_profile.address != null && _profile.address!.isNotEmpty)
-              _buildReadOnlyField('Address', _profile.address!),
-            if (_profile.website != null && _profile.website!.isNotEmpty)
-              _buildReadOnlyField('Website', _profile.website!),
+            AppTextField(
+              controller: _phoneController,
+              label: 'Phone Number',
+              hint: '+91 98765 43210',
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _emailController,
+              label: 'Email Address',
+              hint: 'billing@company.com',
+              keyboardType: TextInputType.emailAddress,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _addressController,
+              label: 'Full Address',
+              hint: 'Street, City, State, PIN',
+              maxLines: 2,
+              textCapitalization: TextCapitalization.sentences,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _websiteController,
+              label: 'Website',
+              hint: 'https://example.com',
+              keyboardType: TextInputType.url,
+            ),
 
-            // Show empty state if no contact info
-            if ((_profile.phone == null || _profile.phone!.isEmpty) &&
-                (_profile.email == null || _profile.email!.isEmpty) &&
-                (_profile.address == null || _profile.address!.isEmpty))
-              _buildEmptyField('No contact details added'),
+            const SizedBox(height: 24),
 
-            const SizedBox(height: 20),
+            // Bank & Payment Details
+            _buildSectionTitle(
+              'Bank & Payment Details',
+              Icons.account_balance_outlined,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _bankNameController,
+              label: 'Bank Name',
+              hint: 'e.g. HDFC Bank',
+              textCapitalization: TextCapitalization.words,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _accountNumberController,
+              label: 'Account Number',
+              hint: 'e.g. 50100234567890',
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _ifscCodeController,
+              label: 'IFSC Code',
+              hint: 'e.g. HDFC0001234',
+              textCapitalization: TextCapitalization.characters,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _upiIdController,
+              label: 'UPI ID / VPA',
+              hint: 'e.g. company@okhdfcbank',
+            ),
 
-            // Payment Details
-            if (_profile.paymentDetails.isNotEmpty) ...[
-              _buildSectionTitle(
-                'Payment Details',
-                Icons.account_balance_outlined,
-              ),
-              const SizedBox(height: 12),
-              ..._profile.paymentDetails.map(
-                (pd) => _buildReadOnlyField(
-                  pd.title.isEmpty ? pd.type : pd.title,
-                  pd.details +
-                      (pd.extra != null && pd.extra!.isNotEmpty
-                          ? '\nIFSC: ${pd.extra}'
-                          : ''),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+            const SizedBox(height: 24),
 
-            // Status
+            // Invoice Defaults
+            _buildSectionTitle(
+              'Default Notes & Terms',
+              Icons.description_outlined,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _termsController,
+              label: 'Terms & Conditions',
+              hint: '1. Payment due within 15 days...',
+              maxLines: 3,
+            ),
+            const SizedBox(height: 12),
+            AppTextField(
+              controller: _notesController,
+              label: 'Customer Notes',
+              hint: 'Thank you for your business!',
+              maxLines: 2,
+            ),
+
+            const SizedBox(height: 24),
+
+            // Active Company Badge
             if (widget.isActive)
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -264,20 +464,19 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
 
             // Update Button
             AppButton(
-              label: 'Update',
+              label: 'Update Company',
               onPressed: _hasChanges ? _handleUpdate : null,
               icon: Icons.save_outlined,
             ),
             const SizedBox(height: 12),
 
-            // Delete Button
-            if (!widget.isActive)
-              AppButton(
-                label: 'Delete Company',
-                onPressed: _handleDelete,
-                variant: AppButtonVariant.danger,
-                icon: Icons.delete_outline,
-              ),
+            // Delete Button (Available for all companies & plans)
+            AppButton(
+              label: 'Delete Company',
+              onPressed: _handleDelete,
+              variant: AppButtonVariant.danger,
+              icon: Icons.delete_outline,
+            ),
 
             const SizedBox(height: 40),
           ],
@@ -333,8 +532,8 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: imagePath.startsWith('http')
-                            ? CachedNetworkImage(imageUrl: 
-                                imagePath,
+                            ? CachedNetworkImage(
+                                imageUrl: imagePath,
                                 fit: BoxFit.contain,
                               )
                             : Image.file(
@@ -384,75 +583,4 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
       ),
     );
   }
-
-  Widget _buildReadOnlyField(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: _isDark ? AppColors.darkSurface : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: _isDark
-                ? AppColors.darkBorder
-                : AppColors.border.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textMuted,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: _textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyField(String message) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-        decoration: BoxDecoration(
-          color: _isDark ? AppColors.darkSurface : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: _isDark
-                ? AppColors.darkBorder
-                : AppColors.border.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Text(
-          message,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textMuted,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ),
-    );
-  }
 }
-
-
-

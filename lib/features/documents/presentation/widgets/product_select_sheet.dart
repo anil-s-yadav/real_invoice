@@ -110,7 +110,11 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                           _searchQuery.isEmpty
                               ? 'No items found in catalog.'
                               : 'No items match your search.',
-                          style: const TextStyle(color: AppColors.textMuted),
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: Theme.of(context).brightness == Brightness.dark 
+                                ? AppColors.darkTextSecondary 
+                                : AppColors.textSecondary,
+                          ),
                         ),
                       ),
                     );
@@ -124,16 +128,17 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                       final product = filtered[index];
                       final isSelected =
                           widget.selectedProduct?.id == product.id;
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
 
                       return AppCard(
                         padding: EdgeInsets.zero,
                         backgroundColor: isSelected
-                            ? AppColors.primary.withValues(alpha: 0.05)
-                            : AppColors.surface,
+                            ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.05)
+                            : null,
                         border: Border.all(
                           color: isSelected
                               ? AppColors.primary
-                              : AppColors.border,
+                              : (isDark ? AppColors.darkBorder : AppColors.border),
                         ),
                         child: InkWell(
                           onTap: () => Navigator.of(context).pop(product),
@@ -150,14 +155,14 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                                         ? AppColors.primary.withValues(
                                             alpha: 0.1,
                                           )
-                                        : AppColors.surfaceVariant,
+                                        : (isDark ? AppColors.darkSurface : AppColors.surfaceVariant),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
                                     Icons.inventory_2_outlined,
                                     color: isSelected
                                         ? AppColors.primary
-                                        : AppColors.textMuted,
+                                        : (isDark ? AppColors.darkTextSecondary : AppColors.textMuted),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -172,14 +177,14 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                                             .copyWith(
                                               color: isSelected
                                                   ? AppColors.primary
-                                                  : AppColors.textPrimary,
+                                                  : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
                                             ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         '${CurrencyFormatter.format(product.unitPrice)} / ${product.unit}',
-                                        style: const TextStyle(
-                                          color: AppColors.textSecondary,
+                                        style: TextStyle(
+                                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),
