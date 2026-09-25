@@ -57,7 +57,8 @@ class SignInScreen extends StatelessWidget {
                 ),
               ),
               SafeArea(
-                child: Column(
+                child: SingleChildScrollView(
+                  child: Column(
                   children: [
                     const SizedBox(height: 20),
                     // Logo and Title
@@ -114,12 +115,12 @@ class SignInScreen extends StatelessWidget {
                       ),
                     ),
                     
-                    const Spacer(),
+                    const SizedBox(height: 24),
                     
                     // Center Illustration
                     const _CenterIllustration(),
 
-                    const Spacer(),
+                    const SizedBox(height: 24),
                     
                     // Buttons
                     if (isLoading)
@@ -167,6 +168,7 @@ class SignInScreen extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
             ],
           );
         },

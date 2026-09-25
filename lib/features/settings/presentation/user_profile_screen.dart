@@ -46,9 +46,9 @@ class UserProfileScreen extends StatelessWidget {
                             fit: BoxFit.cover,
                             placeholder: (context, url) =>
                                 const CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.primary,
-                            ),
+                                  strokeWidth: 2,
+                                  color: AppColors.primary,
+                                ),
                             errorWidget: (context, url, error) => const Icon(
                               Icons.person,
                               size: 50,
@@ -93,7 +93,10 @@ class UserProfileScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: AppDimensions.lg),
                         _buildInfoRow(
-                            Icons.person_outline, 'Name', displayName),
+                          Icons.person_outline,
+                          'Name',
+                          displayName,
+                        ),
                         const Divider(height: 24),
                         _buildInfoRow(Icons.email_outlined, 'Email', email),
                         const Divider(height: 24),
@@ -127,7 +130,10 @@ class UserProfileScreen extends StatelessWidget {
                         const SizedBox(height: AppDimensions.sm),
                         const Text(
                           'Manage the devices logged into your account.',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
                         ),
                         const SizedBox(height: AppDimensions.md),
                         StreamBuilder<QuerySnapshot>(
@@ -137,17 +143,30 @@ class UserProfileScreen extends StatelessWidget {
                               .collection('devices')
                               .snapshots(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 20),
-                                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
                               );
                             }
-                            
-                            if (snapshot.hasError || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
+
+                            if (snapshot.hasError ||
+                                !snapshot.hasData ||
+                                snapshot.data!.docs.isEmpty) {
                               return const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10),
-                                child: Text('No devices found.', style: TextStyle(color: AppColors.textSecondary, fontStyle: FontStyle.italic)),
+                                child: Text(
+                                  'No devices found.',
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
                               );
                             }
 
@@ -157,15 +176,22 @@ class UserProfileScreen extends StatelessWidget {
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: devices.length,
-                              separatorBuilder: (_, __) => const Divider(height: 1),
+                              separatorBuilder: (_, _) =>
+                                  const Divider(height: 1),
                               itemBuilder: (context, index) {
-                                final data = devices[index].data() as Map<String, dynamic>;
-                                
+                                final data =
+                                    devices[index].data()
+                                        as Map<String, dynamic>;
+
                                 // Format device model name nicely
-                                String modelName = data['deviceModel'] as String? ?? 'Unknown Device';
-                                
-                                final platform = data['platform'] as String? ?? '';
-                                final platformIcon = platform.toLowerCase() == 'ios' 
+                                String modelName =
+                                    data['deviceModel'] as String? ??
+                                    'Unknown Device';
+
+                                final platform =
+                                    data['platform'] as String? ?? '';
+                                final platformIcon =
+                                    platform.toLowerCase() == 'ios'
                                     ? Icons.phone_iphone
                                     : Icons.android;
 
@@ -173,13 +199,17 @@ class UserProfileScreen extends StatelessWidget {
                                 String lastActiveStr = 'Unknown';
                                 if (data['lastActive'] != null) {
                                   try {
-                                    final dt = (data['lastActive'] as Timestamp).toDate();
-                                    lastActiveStr = DateFormat('MMM d, yyyy - h:mm a').format(dt);
+                                    final dt = (data['lastActive'] as Timestamp)
+                                        .toDate();
+                                    lastActiveStr = DateFormat(
+                                      'MMM d, yyyy - h:mm a',
+                                    ).format(dt);
                                   } catch (_) {}
                                 }
 
                                 final isDark =
-                                    Theme.of(context).brightness == Brightness.dark;
+                                    Theme.of(context).brightness ==
+                                    Brightness.dark;
 
                                 return ListTile(
                                   contentPadding: EdgeInsets.zero,
@@ -197,11 +227,17 @@ class UserProfileScreen extends StatelessWidget {
                                   ),
                                   title: Text(
                                     modelName,
-                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   subtitle: Text(
                                     'Last active: $lastActiveStr',
-                                    style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textMuted,
+                                    ),
                                   ),
                                 );
                               },
@@ -212,9 +248,16 @@ class UserProfileScreen extends StatelessWidget {
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton.icon(
-                            onPressed: () => _showLogOutAllDevicesConfirmation(context),
-                            icon: const Icon(Icons.logout, color: Colors.orange),
-                            label: const Text('Log Out All Devices', style: TextStyle(color: Colors.orange)),
+                            onPressed: () =>
+                                _showLogOutAllDevicesConfirmation(context),
+                            icon: const Icon(
+                              Icons.logout,
+                              color: Colors.orange,
+                            ),
+                            label: const Text(
+                              'Log Out All Devices',
+                              style: TextStyle(color: Colors.orange),
+                            ),
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.orange),
                             ),
@@ -259,8 +302,9 @@ class UserProfileScreen extends StatelessWidget {
                               _showLogoutConfirmation(context);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Colors.red.withValues(alpha: 0.1),
+                              backgroundColor: Colors.red.withValues(
+                                alpha: 0.1,
+                              ),
                               foregroundColor: Colors.red,
                               elevation: 0,
                             ),
@@ -341,7 +385,8 @@ class UserProfileScreen extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         title: const Text('Log Out All Devices'),
         content: const Text(
-            'This will sign you out from all devices currently logged into your account. Are you sure you want to proceed?'),
+          'This will sign you out from all devices currently logged into your account. Are you sure you want to proceed?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -350,7 +395,9 @@ class UserProfileScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<AuthBloc>().add(const LogOutAllDevicesRequestedEvent());
+              context.read<AuthBloc>().add(
+                const LogOutAllDevicesRequestedEvent(),
+              );
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.orange),

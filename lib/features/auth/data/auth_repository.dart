@@ -26,12 +26,20 @@ abstract class AuthRepository {
 class FirebaseAuthRepository implements AuthRepository {
   final fb.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
+  bool _isGoogleSignInInitialized = false;
 
   FirebaseAuthRepository({
     fb.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
-  })  : _firebaseAuth = firebaseAuth ?? fb.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn();
+  }) : _firebaseAuth = firebaseAuth ?? fb.FirebaseAuth.instance,
+       _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
+
+  Future<void> _ensureGoogleSignInInitialized() async {
+    if (!_isGoogleSignInInitialized) {
+      await _googleSignIn.initialize();
+      _isGoogleSignInInitialized = true;
+    }
+  }
 
   AuthUser? _mapFirebaseUser(fb.User? fbUser) {
     if (fbUser == null) return null;
@@ -55,19 +63,28 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<AuthUser?> signInWithGoogle() async {
-    final googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) {
-      return null;
+    try {
+      await _ensureGoogleSignInInitialized();
+      final googleUser = await _googleSignIn.authenticate();
+      final googleAuth = googleUser.authentication;
+      final authorization = await googleUser.authorizationClient
+          .authorizationForScopes([]);
+      final credential = fb.GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+        accessToken: authorization?.accessToken,
+      );
+      final userCredential = await _firebaseAuth.signInWithCredential(
+        credential,
+      );
+      final user = _mapFirebaseUser(userCredential.user);
+      if (user == null) throw Exception('Sign-in failed.');
+      return user;
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return null;
+      }
+      rethrow;
     }
-    final googleAuth = await googleUser.authentication;
-    final credential = fb.GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-    final userCredential = await _firebaseAuth.signInWithCredential(credential);
-    final user = _mapFirebaseUser(userCredential.user);
-    if (user == null) throw Exception('Sign-in failed.');
-    return user;
   }
 
   @override
@@ -83,13 +100,13 @@ class FirebaseAuthRepository implements AuthRepository {
       nonce: nonce,
     );
 
-    final oauthCredential = fb.OAuthProvider('apple.com').credential(
-      idToken: appleCredential.identityToken,
-      rawNonce: rawNonce,
-    );
+    final oauthCredential = fb.OAuthProvider(
+      'apple.com',
+    ).credential(idToken: appleCredential.identityToken, rawNonce: rawNonce);
 
-    final userCredential =
-        await _firebaseAuth.signInWithCredential(oauthCredential);
+    final userCredential = await _firebaseAuth.signInWithCredential(
+      oauthCredential,
+    );
 
     // Apple only returns name on first sign-in; update profile if available
     final fbUser = userCredential.user;
@@ -112,10 +129,8 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {
-    await Future.wait([
-      _firebaseAuth.signOut(),
-      _googleSignIn.signOut(),
-    ]);
+    await _ensureGoogleSignInInitialized();
+    await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
   }
 
   String _generateNonce([int length = 32]) {
@@ -141,7 +156,9 @@ class FirebaseAuthRepository implements AuthRepository {
 
     try {
       // 1. Ensure the parent user document exists
-      final userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userDocRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
       final userDoc = await userDocRef.get();
       if (!userDoc.exists) {
         await userDocRef.set({
@@ -155,12 +172,12 @@ class FirebaseAuthRepository implements AuthRepository {
       // 2. Register the device
       final messaging = FirebaseMessaging.instance;
       String? token;
-      
+
       // Request permission for iOS (ignored on Android)
       if (!kIsWeb && Platform.isIOS) {
         await messaging.requestPermission();
       }
-      
+
       token = await messaging.getToken();
 
       final deviceInfo = DeviceInfoPlugin();
@@ -184,7 +201,9 @@ class FirebaseAuthRepository implements AuthRepository {
       // Generate a stable device ID or just use token as doc ID (but token changes)
       // Better to use a hash of the device name + platform or let Firestore generate it
       // Let's use a combination of platform and model as a simple stable ID for this example
-      final deviceId = _sha256ofString(deviceModel + platformStr).substring(0, 16);
+      final deviceId = _sha256ofString(
+        deviceModel + platformStr,
+      ).substring(0, 16);
 
       final device = DeviceModel(
         deviceId: deviceId,
@@ -224,7 +243,7 @@ class FirebaseAuthRepository implements AuthRepository {
       }
 
       await batch.commit();
-      
+
       // Finally, sign out locally
       await signOut();
     } catch (e) {
