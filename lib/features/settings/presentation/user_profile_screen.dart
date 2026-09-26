@@ -9,17 +9,90 @@ import '../../auth/domain/auth_user_model.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import '../../documents/data/document_repository.dart';
+import '../../customers/data/customer_repository.dart';
+import '../../products/data/product_repository.dart';
+import '../../business_profile/data/business_profile_repository.dart';
+import '../../documents/bloc/document_bloc.dart';
+import '../../documents/bloc/document_event.dart';
+import '../../customers/bloc/customer_bloc.dart';
+import '../../customers/bloc/customer_event.dart';
+import '../../products/bloc/product_bloc.dart';
+import '../../products/bloc/product_event.dart';
+import '../../business_profile/bloc/business_profile_bloc.dart';
+import '../../business_profile/bloc/business_profile_event.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../../subscription/domain/subscription_plan_model.dart';
 import '../../subscription/presentation/plan_info_screen.dart';
 
-class UserProfileScreen extends StatelessWidget {
-  const UserProfileScreen({super.key});
+class UserProfileScreen extends StatefulWidget {
+  
+
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  bool _isSyncing = false;
+
+  Future<void> _handleSync() async {
+    setState(() => _isSyncing = true);
+    try {
+      final docRepo = context.read<DocumentRepository>();
+      await docRepo.getAllDocuments(forceSync: true);
+      
+      final custRepo = context.read<CustomerRepository>();
+      await custRepo.getAllCustomers(forceSync: true);
+
+      final prodRepo = context.read<ProductRepository>();
+      await prodRepo.getAllProducts(forceSync: true);
+
+      final bizRepo = context.read<BusinessProfileRepository>();
+      await bizRepo.getAllProfiles(forceSync: true);
+
+      if (mounted) {
+        context.read<DocumentBloc>().add(const LoadDocumentsEvent());
+        context.read<CustomerBloc>().add(const LoadCustomersEvent());
+        context.read<ProductBloc>().add(const LoadProductsEvent());
+        context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cloud sync complete!'), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sync failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSyncing = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('User Profile')),
+      appBar: AppBar(
+        title: const Text('User Profile'),
+        actions: [
+          _isSyncing
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.sync),
+                  tooltip: 'Sync Cloud Data',
+                  onPressed: _handleSync,
+                ),
+        ],
+      ),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           AuthUser? user;

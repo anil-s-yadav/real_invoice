@@ -53,9 +53,17 @@ class BusinessProfileRepository {
     }
   }
 
-  Future<List<BusinessProfile>> getAllProfiles() async {
+  Future<List<BusinessProfile>> getAllProfiles({bool forceSync = false}) async {
     try {
-      final querySnapshot = await _companiesRef.get();
+      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      try {
+        querySnapshot = await _companiesRef.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        if (querySnapshot.docs.isEmpty && !forceSync) {
+          querySnapshot = await _companiesRef.get(const GetOptions(source: Source.server));
+        }
+      } catch (_) {
+        querySnapshot = await _companiesRef.get(const GetOptions(source: Source.server));
+      }
       return querySnapshot.docs
           .map((doc) => BusinessProfile.fromMap(doc.data()))
           .toList();

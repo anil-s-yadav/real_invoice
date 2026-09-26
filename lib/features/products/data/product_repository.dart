@@ -28,10 +28,21 @@ class ProductRepository {
         .collection('products');
   }
 
-  Future<List<ProductItem>> getAllProducts() async {
+  Future<List<ProductItem>> getAllProducts({bool forceSync = false}) async {
     try {
       final ref = await _getProductsRef();
-      final querySnapshot = await ref.orderBy('title').get();
+      final query = ref.orderBy('title');
+      
+      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      try {
+        querySnapshot = await query.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        if (querySnapshot.docs.isEmpty && !forceSync) {
+          querySnapshot = await query.get(const GetOptions(source: Source.server));
+        }
+      } catch (_) {
+        querySnapshot = await query.get(const GetOptions(source: Source.server));
+      }
+      
       return querySnapshot.docs.map((doc) => ProductItem.fromMap(doc.data())).toList();
     } catch (e) {
       print('Error getting products: $e');

@@ -131,8 +131,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 11,
                         color: (isProfileConfigured || isLoading)
                             ? (isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary)
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary)
                             : AppColors.primary,
                         fontWeight: (isProfileConfigured || isLoading)
                             ? FontWeight.normal
@@ -222,9 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const UserProfileScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => UserProfileScreen()),
                       );
                     },
                     child: Padding(
@@ -290,11 +288,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: isDark ? AppColors.darkSurface : Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: isDark ? AppColors.darkBorder : AppColors.border,
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.border,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                              color: Colors.black.withValues(
+                                alpha: isDark ? 0.2 : 0.03,
+                              ),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -433,11 +435,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: isDark ? AppColors.darkSurface : Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: isDark ? AppColors.darkBorder : AppColors.border,
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.border,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                              color: Colors.black.withValues(
+                                alpha: isDark ? 0.2 : 0.03,
+                              ),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -627,10 +633,7 @@ class _HomeScreenState extends State<HomeScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary,
-            AppColors.primaryDeep,
-          ],
+          colors: [AppColors.primary, AppColors.primaryDeep],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.2)),

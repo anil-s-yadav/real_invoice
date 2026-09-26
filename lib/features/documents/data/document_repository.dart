@@ -58,6 +58,7 @@ class DocumentRepository {
     int? limit,
     DateTime? startDate,
     DateTime? endDate,
+    bool forceSync = false,
   }) async {
     try {
       final ref = await _getDocumentsRef();
@@ -82,7 +83,15 @@ class DocumentRepository {
         query = query.limit(limit);
       }
 
-      final snapshot = await query.get();
+      QuerySnapshot<Map<String, dynamic>> snapshot;
+      try {
+        snapshot = await query.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        if (snapshot.docs.isEmpty && !forceSync) {
+          snapshot = await query.get(const GetOptions(source: Source.server));
+        }
+      } catch (_) {
+        snapshot = await query.get(const GetOptions(source: Source.server));
+      }
       var docs = snapshot.docs.map((doc) => DocumentModel.fromMap(doc.data())).toList();
 
       if (searchQuery != null && searchQuery.trim().isNotEmpty) {

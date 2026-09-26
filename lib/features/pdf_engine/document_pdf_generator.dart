@@ -14,28 +14,60 @@ import 'template_registry.dart';
 class DocumentPdfGenerator {
   DocumentPdfGenerator._();
 
+  // In-memory caches to prevent redundant disk/network reads on theme change
+  static pw.Font? _cachedFont;
+  static pw.Font? _cachedBoldFont;
+  static pw.Font? _cachedFallback;
+  static final Map<String, Uint8List> _imageCache = {};
+
+  static Future<Uint8List?> _fetchImageBytes(String path) async {
+    if (path.isEmpty) return null;
+    if (_imageCache.containsKey(path)) return _imageCache[path];
+
+    try {
+      if (path.startsWith('http')) {
+        final response = await http.get(Uri.parse(path));
+        if (response.statusCode == 200) {
+          _imageCache[path] = response.bodyBytes;
+          return response.bodyBytes;
+        }
+      } else {
+        final file = File(path);
+        if (await file.exists()) {
+          final bytes = await file.readAsBytes();
+          _imageCache[path] = bytes;
+          return bytes;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  static Future<void> _initFonts() async {
+    if (_cachedFont != null && _cachedBoldFont != null && _cachedFallback != null) return;
+    
+    try {
+      final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
+      final boldData = await rootBundle.load('assets/fonts/Roboto-Medium.ttf');
+      final fallbackData = await rootBundle.load('assets/fonts/NotoSansDevanagari-Regular.ttf');
+      _cachedFont = pw.Font.ttf(fontData);
+      _cachedBoldFont = pw.Font.ttf(boldData);
+      _cachedFallback = pw.Font.ttf(fallbackData);
+    } catch (_) {
+      // Fallback to network fonts if local assets are missing
+      _cachedFont = await PdfGoogleFonts.robotoRegular();
+      _cachedBoldFont = await PdfGoogleFonts.robotoMedium();
+      _cachedFallback = await PdfGoogleFonts.notoSansDevanagariRegular();
+    }
+  }
+
   static Future<Uint8List> generate({
     required DocumentModel document,
     required BusinessProfile profile,
     String? templateId,
   }) async {
-    // Load fonts: prefer local assets (works offline/debug), fallback to network
-    pw.Font font;
-    pw.Font boldFont;
-    pw.Font fallback;
-    try {
-      final fontData = await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
-      final boldData = await rootBundle.load('assets/fonts/Roboto-Medium.ttf');
-      final fallbackData = await rootBundle.load('assets/fonts/NotoSansDevanagari-Regular.ttf');
-      font = pw.Font.ttf(fontData);
-      boldFont = pw.Font.ttf(boldData);
-      fallback = pw.Font.ttf(fallbackData);
-    } catch (_) {
-      // Fallback to network fonts if local assets are missing
-      font = await PdfGoogleFonts.robotoRegular();
-      boldFont = await PdfGoogleFonts.robotoMedium();
-      fallback = await PdfGoogleFonts.notoSansDevanagariRegular();
-    }
+    // Ensure fonts are loaded (cached after first run)
+    await _initFonts();
 
     final pdf = pw.Document(
       title: '${document.docType.displayName} ${document.docNumber}',
@@ -43,39 +75,22 @@ class DocumentPdfGenerator {
           ? profile.businessName
           : 'invoz',
       theme: pw.ThemeData.withFont(
-        base: font,
-        bold: boldFont,
-        fontFallback: [fallback],
+        base: _cachedFont,
+        bold: _cachedBoldFont,
+        fontFallback: [_cachedFallback!],
       ),
     );
 
     final selectedTemplate = templateId ?? document.templateId;
 
-    Uint8List? logoBytes;
-    if (profile.logoPath != null && profile.logoPath!.isNotEmpty) {
-      try {
-        if (profile.logoPath!.startsWith('http')) {
-          final response = await http.get(Uri.parse(profile.logoPath!));
-          if (response.statusCode == 200) logoBytes = response.bodyBytes;
-        } else {
-          final file = File(profile.logoPath!);
-          if (await file.exists()) logoBytes = await file.readAsBytes();
-        }
-      } catch (_) {}
-    }
-
-    Uint8List? signatureBytes;
-    if (profile.signaturePath != null && profile.signaturePath!.isNotEmpty) {
-      try {
-        if (profile.signaturePath!.startsWith('http')) {
-          final response = await http.get(Uri.parse(profile.signaturePath!));
-          if (response.statusCode == 200) signatureBytes = response.bodyBytes;
-        } else {
-          final file = File(profile.signaturePath!);
-          if (await file.exists()) signatureBytes = await file.readAsBytes();
-        }
-      } catch (_) {}
-    }
+    // Fetch images using cache
+    final Uint8List? logoBytes = profile.logoPath != null 
+        ? await _fetchImageBytes(profile.logoPath!) 
+        : null;
+        
+    final Uint8List? signatureBytes = profile.signaturePath != null 
+        ? await _fetchImageBytes(profile.signaturePath!) 
+        : null;
 
     pdf.addPage(
       pw.MultiPage(

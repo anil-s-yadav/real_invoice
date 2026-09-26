@@ -28,10 +28,22 @@ class CustomerRepository {
         .collection('customers');
   }
 
-  Future<List<Customer>> getAllCustomers() async {
+  Future<List<Customer>> getAllCustomers({bool forceSync = false}) async {
     try {
       final ref = await _getCustomersRef();
-      final querySnapshot = await ref.orderBy('name').get();
+      final query = ref.orderBy('name');
+      
+      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      try {
+        querySnapshot = await query.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        if (querySnapshot.docs.isEmpty && !forceSync) {
+          // Fallback to server if cache is empty (first load)
+          querySnapshot = await query.get(const GetOptions(source: Source.server));
+        }
+      } catch (_) {
+        querySnapshot = await query.get(const GetOptions(source: Source.server));
+      }
+      
       return querySnapshot.docs.map((doc) => Customer.fromMap(doc.data())).toList();
     } catch (e) {
       print('Error getting customers: $e');
