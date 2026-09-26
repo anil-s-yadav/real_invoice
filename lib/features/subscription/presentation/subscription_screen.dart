@@ -58,14 +58,23 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       'badgeTextColor': const Color(0xFF475569),
       'features': [
         {'text': '1 Company Profile', 'highlight': true},
-        {'text': 'Manage up to 3 Clients', 'highlight': false},
+        {'text': 'Manage up to 3 clients & Items', 'highlight': false},
         {'text': 'Create up to 5 documents / day', 'highlight': false},
         {'text': 'Single device access', 'highlight': false},
-        {'text': 'Standard invoice templates', 'highlight': false},
-        {'text': 'Cloud backup & cross-device sync', 'highlight': false},
-        {'text': 'Standard email support', 'highlight': false},
         {
-          'text': 'Supported by unobtrusive ads',
+          'text': 'Cloud backup but No device sync',
+          'highlight': false,
+          'isLimitation': true,
+        },
+        {
+          'text': 'No premium templates',
+          'highlight': false,
+          'isLimitation': true,
+        },
+
+        {'text': 'No support', 'highlight': false, 'isLimitation': true},
+        {
+          'text': 'No ads free experience',
           'highlight': false,
           'isLimitation': true,
         },
@@ -81,12 +90,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       'badgeTextColor': const Color(0xFF1D4ED8),
       'features': [
         {'text': '1 Company Profile', 'highlight': true},
-        {'text': 'Manage up to 10 Clients', 'highlight': false},
+        {'text': 'Manage up to 10 clients & Items', 'highlight': false},
         {'text': 'Unlimited document creation', 'highlight': true},
         {'text': 'Dual device synchronization', 'highlight': false},
         {'text': 'Full access to Premium templates', 'highlight': true},
         {'text': 'Cloud backup & cross-device sync', 'highlight': false},
-        {'text': 'Standard email support', 'highlight': false},
+        {
+          'text': 'Standard email support',
+          'highlight': false,
+          'isLimitation': true,
+        },
         {
           'text': 'Minimal ads (small banners only)',
           'highlight': false,
@@ -105,7 +118,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       'features': [
         {'text': '100% Ad-free experience', 'highlight': true},
         {'text': 'Up to 3 Company Profiles', 'highlight': true},
-        {'text': 'Unlimited clients & contacts', 'highlight': true},
+        {'text': 'Manage Unlimited clients & Items', 'highlight': true},
         {'text': 'Multi-device sync (up to 3 devices)', 'highlight': false},
         {'text': 'Unlimited document creation', 'highlight': true},
         {'text': 'All Premium templates & customizations', 'highlight': false},
@@ -125,7 +138,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       'features': [
         {'text': '100% Ad-free experience', 'highlight': true},
         {'text': 'Up to 10 Company Profiles', 'highlight': true},
-        {'text': 'Unlimited clients & contacts', 'highlight': true},
+        {'text': 'Manage Unlimited clients & Items', 'highlight': true},
         {'text': 'Unlimited multi-device synchronization', 'highlight': true},
         {'text': 'Unlimited document creation', 'highlight': true},
         {'text': 'All Premium templates & customizations', 'highlight': false},
@@ -148,10 +161,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       appBar: AppBar(
         title: const Text(
           'Choose Your Plan',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -172,23 +182,44 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('• Company Profiles: Number of distinct businesses you can manage.', style: TextStyle(fontSize: 14)),
+                        Text(
+                          '• Company Profiles: Number of distinct businesses you can manage.',
+                          style: TextStyle(fontSize: 14),
+                        ),
                         SizedBox(height: 12),
-                        Text('• Clients: Number of unique customers you can invoice.', style: TextStyle(fontSize: 14)),
+                        Text(
+                          '• Clients: Number of unique customers you can invoice.',
+                          style: TextStyle(fontSize: 14),
+                        ),
                         SizedBox(height: 12),
-                        Text('• Documents: Total invoices, estimates, and receipts created.', style: TextStyle(fontSize: 14)),
+                        Text(
+                          '• Documents: Total invoices, estimates, and receipts created.',
+                          style: TextStyle(fontSize: 14),
+                        ),
                         SizedBox(height: 12),
-                        Text('• Multi-device Sync: Access your data seamlessly across multiple devices.', style: TextStyle(fontSize: 14)),
+                        Text(
+                          '• Multi-device Sync: Access your data seamlessly across multiple devices.',
+                          style: TextStyle(fontSize: 14),
+                        ),
                         SizedBox(height: 12),
-                        Text('• Premium Templates: Access to advanced, customizable invoice designs.', style: TextStyle(fontSize: 14)),
+                        Text(
+                          '• Premium Templates: Access to advanced, customizable invoice designs.',
+                          style: TextStyle(fontSize: 14),
+                        ),
                       ],
                     ),
                   ),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder( 
+                    
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Got it', style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        'Got it',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),
@@ -207,7 +238,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
                 letterSpacing: -0.5,
               ),
             ),
@@ -225,8 +258,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             //   ],
             // ),
             // ),
-            const SizedBox(height: 20),
-            
+            const SizedBox(height: 10),
+
             // Welcome Offer Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -235,10 +268,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 decoration: BoxDecoration(
                   color: (isDark ? AppColors.darkSurface : Colors.white),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.primary,
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: AppColors.primary, width: 1.5),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.primary.withValues(alpha: 0.1),
@@ -252,19 +282,28 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.local_offer_rounded, color: AppColors.primary, size: 20),
+                        const Icon(
+                          Icons.local_offer_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Welcome Offer',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
                           ),
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -280,38 +319,44 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 4),
                     Text(
                       '• 50% Extra Discount on 1 Year Plan',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Text(
                       '• 100% Free on 1 Month Plan',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 4),
                     Text(
-                      'Select a plan below. Your discount will be auto-calculated and applied at checkout.',
+                      'Your discount will be auto-applied at checkout.',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             // Plan Cards Carousel
             SizedBox(
@@ -349,14 +394,18 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       border: Border.all(
                         color: isSelected
                             ? planAccent
-                            : (isDark ? AppColors.darkBorder : AppColors.border),
+                            : (isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.border),
                         width: isSelected ? 2 : 1,
                       ),
                       boxShadow: [
                         BoxShadow(
                           color: isSelected
                               ? planAccent.withValues(alpha: 0.18)
-                              : Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                              : Colors.black.withValues(
+                                  alpha: isDark ? 0.2 : 0.04,
+                                ),
                           blurRadius: isSelected ? 22 : 10,
                           offset: const Offset(0, 8),
                         ),
@@ -412,7 +461,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             plan['tagline'] as String,
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -430,7 +481,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 style: TextStyle(
                                   fontSize: 36,
                                   fontWeight: FontWeight.w900,
-                                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                  color: isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary,
                                   letterSpacing: -1,
                                 ),
                               ),
@@ -440,7 +493,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary,
                                   ),
                                 ),
                             ],
@@ -448,7 +503,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           const SizedBox(height: 14),
                           Divider(
                             height: 1,
-                            color: isDark ? AppColors.darkBorder : AppColors.border,
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.border,
                           ),
                           const SizedBox(height: 14),
 
@@ -475,7 +532,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                       height: 20,
                                       decoration: BoxDecoration(
                                         color: isLimitation
-                                            ? (isDark ? AppColors.darkSurfaceVariant : Colors.grey.shade100)
+                                            ? (isDark
+                                                  ? AppColors.darkSurfaceVariant
+                                                  : Colors.grey.shade100)
                                             : planAccent.withValues(
                                                 alpha: 0.12,
                                               ),
@@ -487,7 +546,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                             : Icons.check,
                                         size: 13,
                                         color: isLimitation
-                                            ? (isDark ? AppColors.darkTextMuted : Colors.grey.shade600)
+                                            ? (isDark
+                                                  ? AppColors.darkTextMuted
+                                                  : Colors.grey.shade600)
                                             : planAccent,
                                       ),
                                     ),
@@ -501,8 +562,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                               ? FontWeight.w600
                                               : FontWeight.w500,
                                           color: isLimitation
-                                              ? (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)
-                                              : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                                              ? (isDark
+                                                    ? AppColors
+                                                          .darkTextSecondary
+                                                    : AppColors.textSecondary)
+                                              : (isDark
+                                                    ? AppColors.darkTextPrimary
+                                                    : AppColors.textPrimary),
                                           height: 1.25,
                                         ),
                                       ),
@@ -606,28 +672,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),
               ),
             ),
-            
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () async {
-                final url = Uri.parse('https://invoz.app/terms');
-                if (await canLaunchUrl(url)) {
-                  await launchUrl(url);
-                }
-              },
-              child: const Text(
-                'By choosing a plan, you agree to our Terms & Conditions',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppColors.primary,
-                ),
-              ),
-            ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
             // Support & Assistance Card
             Padding(
@@ -637,10 +683,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkSurface : Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+                  border: Border.all(
+                    color: isDark ? AppColors.darkBorder : AppColors.border,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.2 : 0.03,
+                      ),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -660,7 +710,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         Text(
                           'Questions about our plans? We\'re here to help.',
                           style: TextStyle(
-                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
@@ -683,13 +735,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                              side: BorderSide(
+                                color: isDark
+                                    ? AppColors.darkBorder
+                                    : AppColors.border,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -711,13 +769,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                              side: BorderSide(
+                                color: isDark
+                                    ? AppColors.darkBorder
+                                    : AppColors.border,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
