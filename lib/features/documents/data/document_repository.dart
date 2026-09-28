@@ -90,6 +90,7 @@ class DocumentRepository {
           snapshot = await query.get(const GetOptions(source: Source.server));
         }
       } catch (_) {
+        if (forceSync) rethrow;
         snapshot = await query.get(const GetOptions(source: Source.server));
       }
       var docs = snapshot.docs.map((doc) => DocumentModel.fromMap(doc.data())).toList();
@@ -106,6 +107,7 @@ class DocumentRepository {
       return docs;
     } catch (e) {
       print('Error getting documents: $e');
+      if (forceSync) rethrow;
       return [];
     }
   }
@@ -374,7 +376,17 @@ class DocumentRepository {
 
     try {
       final ref = await _getDocumentsRef();
-      final snapshot = await ref.where('docType', isEqualTo: DocumentType.invoice.name).get();
+      final query = ref.where('docType', isEqualTo: DocumentType.invoice.name);
+      
+      QuerySnapshot<Map<String, dynamic>> snapshot;
+      try {
+        snapshot = await query.get(const GetOptions(source: Source.cache));
+        if (snapshot.docs.isEmpty) {
+          snapshot = await query.get(const GetOptions(source: Source.server));
+        }
+      } catch (_) {
+        snapshot = await query.get(const GetOptions(source: Source.server));
+      }
       
       double unpaidTotal = 0;
       int unpaidCount = 0;

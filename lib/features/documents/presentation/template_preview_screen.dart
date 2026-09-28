@@ -284,9 +284,19 @@ class TemplatePreviewScreen extends StatelessWidget {
 
   Future<Uint8List?> _generatePdfImage(DocumentModel sampleDoc) async {
     try {
+      final hasBank = profile.bankName != null && profile.bankName!.trim().isNotEmpty;
+      final hasUpi = profile.upiId != null && profile.upiId!.trim().isNotEmpty;
+
+      final previewProfile = profile.copyWith(
+        bankName: hasBank ? profile.bankName : 'Example Bank Ltd',
+        accountNumber: hasBank ? profile.accountNumber : '0987654321234',
+        ifscCode: hasBank ? profile.ifscCode : 'EXMB0001234',
+        upiId: hasUpi ? profile.upiId : 'yourbusiness@upi',
+      );
+
       final bytes = await DocumentPdfGenerator.generate(
         document: sampleDoc,
-        profile: profile,
+        profile: previewProfile,
         templateId: template.id,
       );
 

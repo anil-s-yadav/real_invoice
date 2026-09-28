@@ -86,7 +86,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthLoading());
       final user = await authRepository.getCurrentUser();
       if (user != null) {
-        await authRepository.registerDevice();
+        authRepository.registerDevice();
         emit(Authenticated(user: user));
       } else {
         emit(const Unauthenticated());

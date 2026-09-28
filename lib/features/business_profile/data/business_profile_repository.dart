@@ -42,7 +42,16 @@ class BusinessProfileRepository {
     final targetId = id ?? await getActiveProfileId();
     
     try {
-      final doc = await _companiesRef.doc(targetId).get();
+      DocumentSnapshot<Map<String, dynamic>> doc;
+      try {
+        doc = await _companiesRef.doc(targetId).get(const GetOptions(source: Source.cache));
+        if (!doc.exists) {
+          doc = await _companiesRef.doc(targetId).get(const GetOptions(source: Source.server));
+        }
+      } catch (_) {
+        doc = await _companiesRef.doc(targetId).get(const GetOptions(source: Source.server));
+      }
+
       if (!doc.exists) {
         return BusinessProfile(id: targetId);
       }
@@ -62,6 +71,7 @@ class BusinessProfileRepository {
           querySnapshot = await _companiesRef.get(const GetOptions(source: Source.server));
         }
       } catch (_) {
+        if (forceSync) rethrow;
         querySnapshot = await _companiesRef.get(const GetOptions(source: Source.server));
       }
       return querySnapshot.docs
@@ -69,6 +79,7 @@ class BusinessProfileRepository {
           .toList();
     } catch (e) {
       print('Error fetching all profiles: $e');
+      if (forceSync) rethrow;
       return [];
     }
   }

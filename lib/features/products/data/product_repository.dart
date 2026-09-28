@@ -40,12 +40,14 @@ class ProductRepository {
           querySnapshot = await query.get(const GetOptions(source: Source.server));
         }
       } catch (_) {
+        if (forceSync) rethrow;
         querySnapshot = await query.get(const GetOptions(source: Source.server));
       }
       
       return querySnapshot.docs.map((doc) => ProductItem.fromMap(doc.data())).toList();
     } catch (e) {
       print('Error getting products: $e');
+      if (forceSync) rethrow;
       return [];
     }
   }

@@ -26,7 +26,7 @@ import '../../subscription/domain/subscription_plan_model.dart';
 import '../../subscription/presentation/plan_info_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
-  
+  const UserProfileScreen({super.key});
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
@@ -40,7 +40,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     try {
       final docRepo = context.read<DocumentRepository>();
       await docRepo.getAllDocuments(forceSync: true);
-      
+
       final custRepo = context.read<CustomerRepository>();
       await custRepo.getAllCustomers(forceSync: true);
 
@@ -54,16 +54,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         context.read<DocumentBloc>().add(const LoadDocumentsEvent());
         context.read<CustomerBloc>().add(const LoadCustomersEvent());
         context.read<ProductBloc>().add(const LoadProductsEvent());
-        context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
-        
+        context.read<BusinessProfileBloc>().add(
+          const LoadBusinessProfileEvent(),
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cloud sync complete!'), backgroundColor: Colors.green),
+          const SnackBar(
+            content: Text('Cloud sync complete!'),
+            backgroundColor: Colors.green,
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sync failed: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Sync failed: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -76,22 +84,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Profile'),
-        actions: [
-          _isSyncing
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
-                  ),
-                )
-              : IconButton(
-                  icon: const Icon(Icons.sync),
-                  tooltip: 'Sync Cloud Data',
-                  onPressed: _handleSync,
-                ),
-        ],
       ),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
@@ -104,6 +96,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           final String email =
               user?.email ?? 'Sign in to sync your data across devices.';
           final String? photoUrl = user?.photoUrl;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppDimensions.lg),
@@ -152,6 +145,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   style: const TextStyle(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: AppDimensions.lg),
+
+                // Beautiful Cloud Sync Card
+                if (user != null) _buildSyncCard(context, isDark),
+                if (user != null) const SizedBox(height: AppDimensions.lg),
 
                 // Plan Name Card (Tap to view Plan Details)
                 _buildPlanNameCard(context),
@@ -488,6 +485,77 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
+  Widget _buildSyncCard(BuildContext context, bool isDark) {
+    return AppCard(
+      padding: const EdgeInsets.all(AppDimensions.lg),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.cloud_sync_rounded,
+              color: AppColors.primary,
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Cloud Sync',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Sync data securely across your devices.',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          ElevatedButton(
+            onPressed: _isSyncing ? null : _handleSync,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: _isSyncing
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Text(
+                    'Sync Now',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPlanNameCard(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -506,11 +574,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const PlanInfoScreen(),
-                ),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const PlanInfoScreen()));
             },
             child: Ink(
               padding: const EdgeInsets.all(16),
@@ -520,12 +586,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   end: Alignment.bottomRight,
                   colors: isFree
                       ? (isDark
-                          ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
-                          : [Colors.white, const Color(0xFFF8FAFC)])
-                      : [
-                          const Color(0xFF4338CA),
-                          const Color(0xFF312E81),
-                        ],
+                            ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                            : [Colors.white, const Color(0xFFF8FAFC)])
+                      : [const Color(0xFF4338CA), const Color(0xFF312E81)],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
@@ -579,8 +642,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 fontWeight: FontWeight.bold,
                                 color: isFree
                                     ? (isDark
-                                        ? AppColors.darkTextPrimary
-                                        : AppColors.textPrimary)
+                                          ? AppColors.darkTextPrimary
+                                          : AppColors.textPrimary)
                                     : Colors.white,
                               ),
                             ),
@@ -593,8 +656,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               decoration: BoxDecoration(
                                 color: isFree
                                     ? (isDark
-                                        ? AppColors.darkSurfaceVariant
-                                        : AppColors.canvas)
+                                          ? AppColors.darkSurfaceVariant
+                                          : AppColors.canvas)
                                     : const Color(0xFFF59E0B),
                                 borderRadius: BorderRadius.circular(6),
                               ),
@@ -605,8 +668,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   fontWeight: FontWeight.w900,
                                   color: isFree
                                       ? (isDark
-                                          ? AppColors.darkTextSecondary
-                                          : AppColors.textSecondary)
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textSecondary)
                                       : Colors.black,
                                   letterSpacing: 0.5,
                                 ),
@@ -621,8 +684,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             fontSize: 12.5,
                             color: isFree
                                 ? (isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary)
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary)
                                 : const Color(0xFFCBD5E1),
                           ),
                         ),
@@ -634,8 +697,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     decoration: BoxDecoration(
                       color: isFree
                           ? (isDark
-                              ? AppColors.darkSurfaceVariant
-                              : AppColors.canvas)
+                                ? AppColors.darkSurfaceVariant
+                                : AppColors.canvas)
                           : Colors.white.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
@@ -644,8 +707,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       size: 18,
                       color: isFree
                           ? (isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.textSecondary)
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary)
                           : Colors.white,
                     ),
                   ),
