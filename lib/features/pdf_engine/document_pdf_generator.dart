@@ -584,11 +584,32 @@ class DocumentPdfGenerator {
     BusinessProfile profile, {
     PdfColor? primaryColor,
   }) {
-    final hasBank = profile.bankName != null &&
-        profile.bankName!.trim().isNotEmpty &&
-        profile.accountNumber != null &&
-        profile.accountNumber!.trim().isNotEmpty;
-    final hasUpi = profile.upiId != null && profile.upiId!.trim().isNotEmpty;
+    if (!doc.includePaymentDetails) return pw.SizedBox();
+
+    PaymentDetail? bankDetail;
+    if (doc.selectedBankDetailId != null && doc.selectedBankDetailId != 'none') {
+      try {
+        bankDetail = profile.paymentDetails.firstWhere((p) => p.id == doc.selectedBankDetailId);
+      } catch (_) {}
+    }
+    // If not found (e.g. 'legacy' ID) or none selected but fallback available, use legacy fields
+    if (bankDetail == null && doc.selectedBankDetailId != 'none' && profile.bankName != null && profile.bankName!.trim().isNotEmpty && profile.accountNumber != null && profile.accountNumber!.trim().isNotEmpty) {
+      bankDetail = PaymentDetail(id: 'legacy', type: 'Bank', title: profile.bankName!, details: profile.accountNumber!, extra: profile.ifscCode);
+    }
+
+    PaymentDetail? upiDetail;
+    if (doc.selectedUpiDetailId != null && doc.selectedUpiDetailId != 'none') {
+      try {
+        upiDetail = profile.paymentDetails.firstWhere((p) => p.id == doc.selectedUpiDetailId);
+      } catch (_) {}
+    }
+    // If not found or legacy, use legacy fields
+    if (upiDetail == null && doc.selectedUpiDetailId != 'none' && profile.upiId != null && profile.upiId!.trim().isNotEmpty) {
+      upiDetail = PaymentDetail(id: 'legacy_upi', type: 'UPI', title: 'UPI', details: profile.upiId!);
+    }
+
+    final hasBank = bankDetail != null;
+    final hasUpi = upiDetail != null;
 
     if (!hasBank && !hasUpi) return pw.SizedBox();
 
@@ -599,7 +620,7 @@ class DocumentPdfGenerator {
           if (hasUpi)
             pw.BarcodeWidget(
               barcode: pw.Barcode.qrCode(),
-              data: 'upi://pay?pa=${profile.upiId}&pn=${Uri.encodeComponent(profile.businessName)}',
+              data: 'upi://pay?pa=${upiDetail!.details}&pn=${Uri.encodeComponent(profile.businessName)}',
               width: 55,
               height: 55,
             ),
@@ -618,13 +639,13 @@ class DocumentPdfGenerator {
                 ),
                 pw.SizedBox(height: 4),
                 if (hasBank) ...[
-                  pw.Text('Bank: ${profile.bankName}', style: const pw.TextStyle(fontSize: 10)),
-                  pw.Text('A/C No: ${profile.accountNumber}', style: const pw.TextStyle(fontSize: 10)),
-                  if (profile.ifscCode != null && profile.ifscCode!.trim().isNotEmpty)
-                    pw.Text('IFSC: ${profile.ifscCode}', style: const pw.TextStyle(fontSize: 10)),
+                  pw.Text('Bank: ${bankDetail!.title}', style: const pw.TextStyle(fontSize: 10)),
+                  pw.Text('A/C No: ${bankDetail.details}', style: const pw.TextStyle(fontSize: 10)),
+                  if (bankDetail.extra != null && bankDetail.extra!.trim().isNotEmpty)
+                    pw.Text('IFSC: ${bankDetail.extra}', style: const pw.TextStyle(fontSize: 10)),
                 ],
                 if (hasUpi)
-                  pw.Text('UPI: ${profile.upiId}', style: const pw.TextStyle(fontSize: 10)),
+                  pw.Text('UPI: ${upiDetail!.details}', style: const pw.TextStyle(fontSize: 10)),
               ],
             ),
           ),
