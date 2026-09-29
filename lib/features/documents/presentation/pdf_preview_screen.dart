@@ -497,7 +497,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                         TextButton(
                           onPressed: _handleConvertProformaToInvoice,
                           child: Text(
-                            'Convert to Invoice',
+                            'Convert to Final Invoice',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: isDark
@@ -551,7 +551,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 // Template pill chip indicator
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
+                    horizontal: 15,
                     vertical: 4,
                   ),
                   child: Row(

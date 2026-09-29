@@ -1,11 +1,79 @@
-import re
-
-with open('d:/real_invoice/lib/features/pdf_engine/document_pdf_generator.dart', 'r') as f:
+with open('d:/real_invoice/lib/features/pdf_engine/document_pdf_generator.dart', 'r', encoding='utf-8') as f:
     content = f.read()
 
-target_pattern = r'    return pw\.Container\(.*?    \);[\s]*\}[\s]*static List<pw\.Widget> _buildElegantCenter'
+start_marker = '  static pw.Widget _buildPaymentDetails('
+end_marker = '  static pw.Widget _buildTable('
 
-replacement = '''    return pw.Container(
+start_pos = content.find(start_marker)
+end_pos = content.find(end_marker)
+
+new_method = """  static pw.Widget _buildPaymentDetails(
+    DocumentModel doc,
+    BusinessProfile profile, {
+    PdfColor? primaryColor,
+  }) {
+    PaymentDetail? bankDetail;
+    if (doc.selectedBankDetailId != null && doc.selectedBankDetailId != 'none') {
+      try {
+        bankDetail = profile.paymentDetails.firstWhere(
+          (p) => p.id == doc.selectedBankDetailId,
+        );
+      } catch (_) {}
+    }
+    if (bankDetail == null &&
+        doc.selectedBankDetailId != 'none' &&
+        profile.bankName != null &&
+        profile.bankName!.trim().isNotEmpty &&
+        profile.accountNumber != null &&
+        profile.accountNumber!.trim().isNotEmpty) {
+      bankDetail = PaymentDetail(
+        id: 'legacy',
+        type: 'Bank',
+        title: profile.bankName!,
+        details: profile.accountNumber!,
+        extra: profile.ifscCode,
+      );
+    }
+    if (bankDetail == null && doc.selectedBankDetailId != 'none') {
+      final banks = profile.paymentDetails
+          .where((p) => p.type == 'Bank')
+          .toList();
+      if (banks.isNotEmpty) bankDetail = banks.first;
+    }
+
+    PaymentDetail? upiDetail;
+    if (doc.selectedUpiDetailId != null && doc.selectedUpiDetailId != 'none') {
+      try {
+        upiDetail = profile.paymentDetails.firstWhere(
+          (p) => p.id == doc.selectedUpiDetailId,
+        );
+      } catch (_) {}
+    }
+    if (upiDetail == null &&
+        doc.selectedUpiDetailId != 'none' &&
+        profile.upiId != null &&
+        profile.upiId!.trim().isNotEmpty) {
+      upiDetail = PaymentDetail(
+        id: 'legacy_upi',
+        type: 'UPI',
+        title: 'UPI',
+        details: profile.upiId!,
+      );
+    }
+    if (upiDetail == null && doc.selectedUpiDetailId != 'none') {
+      final upis = profile.paymentDetails
+          .where((p) => p.type == 'UPI')
+          .toList();
+      if (upis.isNotEmpty) upiDetail = upis.first;
+    }
+
+    final hasBank = bankDetail != null;
+    final hasUpi = upiDetail != null;
+
+    if (!doc.includePaymentDetails || doc.docType == DocumentType.receipt) return pw.SizedBox();
+    if (!hasBank && !hasUpi) return pw.SizedBox();
+
+    return pw.Container(
       child: pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
@@ -80,7 +148,7 @@ replacement = '''    return pw.Container(
                     'A/C: ${bankDetail.details}',
                     style: const pw.TextStyle(fontSize: 10),
                   ),
-                  if (bankDetail.extra != null && bankDetail.extra!.isNotEmpty)
+                  if (bankDetail.extra != null && bankDetail.extra!.trim().isNotEmpty)
                     pw.Text(
                       'IFSC: ${bankDetail.extra}',
                       style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
@@ -94,16 +162,11 @@ replacement = '''    return pw.Container(
     );
   }
 
-  static List<pw.Widget> _buildElegantCenter'''
+"""
 
-# Python re.sub uses \ as an escape char. So we must escape any backslashes in replacement string.
-replacement = replacement.replace('\\', '\\\\')
+content = content[:start_pos] + new_method + content[end_pos:]
 
-new_content = re.sub(target_pattern, replacement, content, flags=re.DOTALL)
-if new_content == content:
-    print("WARNING: Substitution failed!")
-else:
-    print("SUCCESS: Substituted!")
+with open('d:/real_invoice/lib/features/pdf_engine/document_pdf_generator.dart', 'w', encoding='utf-8') as f:
+    f.write(content)
 
-with open('d:/real_invoice/lib/features/pdf_engine/document_pdf_generator.dart', 'w') as f:
-    f.write(new_content)
+print("Restored interpolations!")

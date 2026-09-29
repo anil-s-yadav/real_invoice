@@ -17,13 +17,21 @@ Widget buildElegantCenterDummy(DocumentType documentType) {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ClipOval(
-              child: Container(
-                width: 32,
-                height: 32,
-                color: primary.withAlpha(20),
-                padding: const EdgeInsets.all(4),
-                child: Image.asset('assets/icons/applogo.png', fit: BoxFit.contain, color: primary),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: primary.withAlpha(50), width: 1),
+              ),
+              child: ClipOval(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.asset(
+                    'assets/icons/applogo.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 16),

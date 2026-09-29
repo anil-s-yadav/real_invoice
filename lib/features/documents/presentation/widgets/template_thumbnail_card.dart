@@ -34,7 +34,7 @@ class TemplateThumbnailCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: isSelected
-                      ? template.accentColor
+                      ? AppColors.primary
                       : (isDark
                             ? AppColors.darkBorder
                             : AppColors.borderStrong),
@@ -73,7 +73,7 @@ class TemplateThumbnailCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: template.accentColor,
+                          color: AppColors.primary,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -125,7 +125,7 @@ class TemplateThumbnailCard extends StatelessWidget {
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected
-                  ? template.accentColor
+                  ? AppColors.primary
                   : (isDark
                         ? AppColors.darkTextPrimary
                         : AppColors.textPrimary),

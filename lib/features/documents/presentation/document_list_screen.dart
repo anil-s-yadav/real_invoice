@@ -212,7 +212,9 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -225,13 +227,17 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                       fontWeight: isSelected
                           ? FontWeight.w700
                           : FontWeight.w500,
-                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                     ),
                   ),
                   trailing: isSelected
                       ? Icon(
                           Icons.check,
-                          color: isDark ? AppColors.primaryDark : AppColors.primary,
+                          color: isDark
+                              ? AppColors.primaryDark
+                              : AppColors.primary,
                         )
                       : null,
                   onTap: () async {
@@ -303,7 +309,9 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -312,13 +320,17 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                   'All Statuses',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
                 trailing: _selectedStatus == null
                     ? Icon(
                         Icons.check,
-                        color: isDark ? AppColors.primaryDark : AppColors.primary,
+                        color: isDark
+                            ? AppColors.primaryDark
+                            : AppColors.primary,
                       )
                     : null,
                 onTap: () {
@@ -336,14 +348,20 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                   title: Text(
                     status.name.toUpperCase(),
                     style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                     ),
                   ),
                   trailing: isSelected
                       ? Icon(
                           Icons.check,
-                          color: isDark ? AppColors.primaryDark : AppColors.primary,
+                          color: isDark
+                              ? AppColors.primaryDark
+                              : AppColors.primary,
                         )
                       : null,
                   onTap: () {
@@ -396,7 +414,8 @@ class DocumentListScreenState extends State<DocumentListScreen> {
               // Filter Header
               Builder(
                 builder: (context) {
-                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                  final isDark =
+                      Theme.of(context).brightness == Brightness.dark;
                   return Container(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
                     decoration: BoxDecoration(
@@ -429,8 +448,7 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                         : AppColors.textPrimary,
                                   ),
                                   decoration: InputDecoration(
-                                    hintText:
-                                        'Search doc number or client...',
+                                    hintText: 'Search doc number or client...',
                                     hintStyle: const TextStyle(
                                       color: AppColors.textMuted,
                                     ),
@@ -455,11 +473,10 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                     fillColor: isDark
                                         ? AppColors.darkSurface
                                         : Colors.white,
-                                    contentPadding:
-                                        const EdgeInsets.symmetric(
-                                          vertical: 0,
-                                          horizontal: 16,
-                                        ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 0,
+                                      horizontal: 16,
+                                    ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: BorderSide(
@@ -480,267 +497,284 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                                 ),
                               ),
                             ),
-                          const SizedBox(width: 8),
-                        // Month Filter Button
-                        InkWell(
-                          onTap: _showDateRangePicker,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            height: 44,
-                            width: 44,
-                            decoration: BoxDecoration(
-                              color:
-                                  _selectedDateRangeType !=
-                                      DateFilterRange.allTime
-                                  ? AppColors.primary
-                                  : (isDark
-                                      ? AppColors.darkSurface
-                                      : Colors.white),
+                            const SizedBox(width: 8),
+                            // Month Filter Button
+                            InkWell(
+                              onTap: _showDateRangePicker,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color:
-                                    _selectedDateRangeType !=
-                                        DateFilterRange.allTime
-                                    ? AppColors.primary
-                                    : (isDark
-                                        ? AppColors.darkBorder
-                                        : AppColors.border.withValues(
-                                            alpha: 0.5,
-                                          )),
-                              ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.calendar_month_outlined,
-                              size: 22,
-                              color:
-                                  _selectedDateRangeType !=
-                                      DateFilterRange.allTime
-                                  ? Colors.white
-                                  : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textMuted),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        // Status Filter Button
-                        InkWell(
-                          onTap: _showStatusPicker,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            height: 44,
-                            width: 44,
-                            decoration: BoxDecoration(
-                              color: _selectedStatus != null
-                                  ? AppColors.primary
-                                  : (isDark
-                                      ? AppColors.darkSurface
-                                      : Colors.white),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _selectedStatus != null
-                                    ? AppColors.primary
-                                    : (isDark
-                                        ? AppColors.darkBorder
-                                        : AppColors.border.withValues(
-                                            alpha: 0.5,
-                                          )),
-                              ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.filter_list_outlined,
-                              size: 22,
-                              color: _selectedStatus != null
-                                  ? Colors.white
-                                  : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textMuted),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 32,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          _buildCompactChip(
-                            'All',
-                            isSelected: _selectedType == null,
-                            onSelected: () => _applyFilter(clearType: true),
-                          ),
-                          ...DocumentType.values.map(
-                            (type) => _buildCompactChip(
-                              type.displayName,
-                              isSelected: _selectedType == type,
-                              onSelected: () => _applyFilter(type: type),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (_selectedStatus != null ||
-                        _selectedDateRangeType != DateFilterRange.allTime) ...[
-                      const SizedBox(height: 10),
-                      Wrap(
-                        runAlignment: WrapAlignment.start,
-                        alignment: WrapAlignment.start,
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          if (_selectedStatus != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _selectedStatus == DocumentStatus.overdue
-                                    ? (isDark
-                                        ? AppColors.statusOverdueText.withValues(alpha: 0.2)
-                                        : AppColors.statusOverdueBg)
-                                    : (isDark
-                                        ? AppColors.primary.withValues(alpha: 0.2)
-                                        : AppColors.primaryLight),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
+                              child: Container(
+                                height: 44,
+                                width: 44,
+                                decoration: BoxDecoration(
                                   color:
-                                      _selectedStatus == DocumentStatus.overdue
-                                      ? AppColors.statusOverdueBorder
+                                      _selectedDateRangeType !=
+                                          DateFilterRange.allTime
+                                      ? AppColors.primary
                                       : (isDark
-                                          ? AppColors.primary.withValues(alpha: 0.4)
-                                          : AppColors.primary.withValues(
-                                              alpha: 0.3,
-                                            )),
-                                  width: 1,
+                                            ? AppColors.darkSurface
+                                            : Colors.white),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color:
+                                        _selectedDateRangeType !=
+                                            DateFilterRange.allTime
+                                        ? AppColors.primary
+                                        : (isDark
+                                              ? AppColors.darkBorder
+                                              : AppColors.border.withValues(
+                                                  alpha: 0.5,
+                                                )),
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Icons.calendar_month_outlined,
+                                  size: 22,
+                                  color:
+                                      _selectedDateRangeType !=
+                                          DateFilterRange.allTime
+                                      ? Colors.white
+                                      : (isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textMuted),
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (_selectedStatus ==
-                                      DocumentStatus.overdue) ...[
-                                    const Icon(
-                                      Icons.warning_amber_rounded,
-                                      size: 14,
-                                      color: AppColors.statusOverdueText,
-                                    ),
-                                    const SizedBox(width: 4),
-                                  ],
-                                  InkWell(
-                                    onTap: _showStatusPicker,
-                                    child: Text(
-                                      'Status: ${_selectedStatus!.displayName}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color:
-                                            _selectedStatus ==
-                                                DocumentStatus.overdue
-                                            ? (isDark
-                                                ? const Color(0xFFFCA5A5)
-                                                : AppColors.statusOverdueText)
-                                            : (isDark
-                                                ? AppColors.primaryDark
-                                                : AppColors.primary),
-                                      ),
-                                    ),
+                            ),
+                            const SizedBox(width: 8),
+                            // Status Filter Button
+                            InkWell(
+                              onTap: _showStatusPicker,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                height: 44,
+                                width: 44,
+                                decoration: BoxDecoration(
+                                  color: _selectedStatus != null
+                                      ? AppColors.primary
+                                      : (isDark
+                                            ? AppColors.darkSurface
+                                            : Colors.white),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: _selectedStatus != null
+                                        ? AppColors.primary
+                                        : (isDark
+                                              ? AppColors.darkBorder
+                                              : AppColors.border.withValues(
+                                                  alpha: 0.5,
+                                                )),
                                   ),
-                                  const SizedBox(width: 6),
-                                  InkWell(
-                                    onTap: () =>
-                                        _applyFilter(clearStatus: true),
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Icon(
-                                      Icons.close,
-                                      size: 15,
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Icons.filter_list_outlined,
+                                  size: 22,
+                                  color: _selectedStatus != null
+                                      ? Colors.white
+                                      : (isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textMuted),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 32,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              _buildCompactChip(
+                                'All',
+                                isSelected: _selectedType == null,
+                                onSelected: () => _applyFilter(clearType: true),
+                              ),
+                              ...DocumentType.values.map(
+                                (type) => _buildCompactChip(
+                                  type.displayName,
+                                  isSelected: _selectedType == type,
+                                  onSelected: () => _applyFilter(type: type),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (_selectedStatus != null ||
+                            _selectedDateRangeType !=
+                                DateFilterRange.allTime) ...[
+                          const SizedBox(height: 10),
+                          Wrap(
+                            runAlignment: WrapAlignment.start,
+                            alignment: WrapAlignment.start,
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              if (_selectedStatus != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedStatus ==
+                                            DocumentStatus.overdue
+                                        ? (isDark
+                                              ? AppColors.statusOverdueText
+                                                    .withValues(alpha: 0.2)
+                                              : AppColors.statusOverdueBg)
+                                        : (isDark
+                                              ? AppColors.primary.withValues(
+                                                  alpha: 0.2,
+                                                )
+                                              : AppColors.primaryLight),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
                                       color:
                                           _selectedStatus ==
                                               DocumentStatus.overdue
-                                          ? (isDark
-                                              ? const Color(0xFFFCA5A5)
-                                              : AppColors.statusOverdueText)
+                                          ? AppColors.statusOverdueBorder
                                           : (isDark
-                                              ? AppColors.primaryDark
-                                              : AppColors.primary),
+                                                ? AppColors.primary.withValues(
+                                                    alpha: 0.4,
+                                                  )
+                                                : AppColors.primary.withValues(
+                                                    alpha: 0.3,
+                                                  )),
+                                      width: 1,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          if (_selectedDateRangeType != DateFilterRange.allTime)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? AppColors.primary.withValues(alpha: 0.2)
-                                    : AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isDark
-                                      ? AppColors.primary.withValues(alpha: 0.4)
-                                      : AppColors.primary.withValues(
-                                          alpha: 0.3,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (_selectedStatus ==
+                                          DocumentStatus.overdue) ...[
+                                        const Icon(
+                                          Icons.warning_amber_rounded,
+                                          size: 14,
+                                          color: AppColors.statusOverdueText,
                                         ),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.calendar_month_outlined,
-                                    size: 14,
-                                    color: isDark
-                                        ? AppColors.primaryDark
-                                        : AppColors.primary,
+                                        const SizedBox(width: 4),
+                                      ],
+                                      InkWell(
+                                        onTap: _showStatusPicker,
+                                        child: Text(
+                                          'Status: ${_selectedStatus!.displayName}',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color:
+                                                _selectedStatus ==
+                                                    DocumentStatus.overdue
+                                                ? (isDark
+                                                      ? const Color(0xFFFCA5A5)
+                                                      : AppColors
+                                                            .statusOverdueText)
+                                                : (isDark
+                                                      ? AppColors.primaryDark
+                                                      : AppColors.primary),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      InkWell(
+                                        onTap: () =>
+                                            _applyFilter(clearStatus: true),
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 15,
+                                          color:
+                                              _selectedStatus ==
+                                                  DocumentStatus.overdue
+                                              ? (isDark
+                                                    ? const Color(0xFFFCA5A5)
+                                                    : AppColors
+                                                          .statusOverdueText)
+                                              : (isDark
+                                                    ? AppColors.primaryDark
+                                                    : AppColors.primary),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 4),
-                                  InkWell(
-                                    onTap: _showDateRangePicker,
-                                    child: Text(
-                                      'Date: ${_getDateRangeChipText()}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
+                                ),
+                              if (_selectedDateRangeType !=
+                                  DateFilterRange.allTime)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.primary.withValues(
+                                            alpha: 0.2,
+                                          )
+                                        : AppColors.primaryLight,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? AppColors.primary.withValues(
+                                              alpha: 0.4,
+                                            )
+                                          : AppColors.primary.withValues(
+                                              alpha: 0.3,
+                                            ),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_month_outlined,
+                                        size: 14,
                                         color: isDark
                                             ? AppColors.primaryDark
                                             : AppColors.primary,
                                       ),
-                                    ),
+                                      const SizedBox(width: 4),
+                                      InkWell(
+                                        onTap: _showDateRangePicker,
+                                        child: Text(
+                                          'Date: ${_getDateRangeChipText()}',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: isDark
+                                                ? AppColors.primaryDark
+                                                : AppColors.primary,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      InkWell(
+                                        onTap: () => _applyFilter(
+                                          dateRangeType:
+                                              DateFilterRange.allTime,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 15,
+                                          color: isDark
+                                              ? AppColors.primaryDark
+                                              : AppColors.primary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 6),
-                                  InkWell(
-                                    onTap: () => _applyFilter(
-                                      dateRangeType: DateFilterRange.allTime,
-                                    ),
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Icon(
-                                      Icons.close,
-                                      size: 15,
-                                      color: isDark
-                                          ? AppColors.primaryDark
-                                          : AppColors.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                ),
+                            ],
+                          ),
                         ],
-                      ),
-                    ],
-                  ],
-                ),
-              );
-            },
-          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
 
               // Documents List
               Expanded(
@@ -844,8 +878,8 @@ class DocumentListScreenState extends State<DocumentListScreen> {
             color: isSelected
                 ? AppColors.primary
                 : (isDark
-                    ? AppColors.darkBorder
-                    : AppColors.border.withValues(alpha: 0.5)),
+                      ? AppColors.darkBorder
+                      : AppColors.border.withValues(alpha: 0.5)),
           ),
         ),
         child: Text(
@@ -1214,7 +1248,7 @@ class _DocumentListItemCard extends StatelessWidget {
                   ),
                   SizedBox(width: 12),
                   Text(
-                    'Convert to Invoice',
+                    'Convert to Final Invoice',
                     style: TextStyle(color: AppColors.primary),
                   ),
                 ],
