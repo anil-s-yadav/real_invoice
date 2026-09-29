@@ -14,7 +14,6 @@ import 'template_registry.dart';
 class DocumentPdfGenerator {
   DocumentPdfGenerator._();
 
-
   static final Map<String, Uint8List> _imageCache = {};
 
   static Future<Uint8List?> _fetchImageBytes(String path) async {
@@ -24,15 +23,22 @@ class DocumentPdfGenerator {
     try {
       // 1. Resolve local path via ImageCacheService if it's a remote URL
       // For caching key, we use a hash of the URL to ensure uniqueness
-      String cacheKey = path.startsWith('http') ? 'pdf_img_${path.hashCode}' : '';
-      String? resolvedPath = path.startsWith('http') 
-          ? await ImageCacheService.cacheImage(pathOrUrl: path, cacheKey: cacheKey)
+      String cacheKey = path.startsWith('http')
+          ? 'pdf_img_${path.hashCode}'
+          : '';
+      String? resolvedPath = path.startsWith('http')
+          ? await ImageCacheService.cacheImage(
+              pathOrUrl: path,
+              cacheKey: cacheKey,
+            )
           : path;
-      
+
       if (resolvedPath != null) {
         if (resolvedPath.startsWith('http')) {
           // Fallback to direct HTTP if caching failed but it's still a URL
-          final response = await http.get(Uri.parse(resolvedPath)).timeout(const Duration(seconds: 5));
+          final response = await http
+              .get(Uri.parse(resolvedPath))
+              .timeout(const Duration(seconds: 5));
           if (response.statusCode == 200) {
             _imageCache[path] = response.bodyBytes;
             return response.bodyBytes;
@@ -50,8 +56,6 @@ class DocumentPdfGenerator {
     } catch (_) {}
     return null;
   }
-
-
 
   static Future<Uint8List> generate({
     required DocumentModel document,
@@ -330,9 +334,7 @@ class DocumentPdfGenerator {
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         crossAxisAlignment: pw.CrossAxisAlignment.end,
         children: [
-          pw.Expanded(
-            child: _buildPaymentDetails(doc, profile),
-          ),
+          pw.Expanded(child: _buildPaymentDetails(doc, profile)),
           if (signatureBytes != null)
             pw.Column(
               children: [
@@ -575,7 +577,11 @@ class DocumentPdfGenerator {
         crossAxisAlignment: pw.CrossAxisAlignment.end,
         children: [
           pw.Expanded(
-            child: _buildPaymentDetails(doc, profile, primaryColor: primaryColor),
+            child: _buildPaymentDetails(
+              doc,
+              profile,
+              primaryColor: primaryColor,
+            ),
           ),
           if (signatureBytes != null)
             pw.Column(
@@ -605,37 +611,66 @@ class DocumentPdfGenerator {
     BusinessProfile profile, {
     PdfColor? primaryColor,
   }) {
-    if (!doc.includePaymentDetails || doc.docType == DocumentType.receipt) return pw.SizedBox();
+    if (!doc.includePaymentDetails || doc.docType == DocumentType.receipt)
+      return pw.SizedBox();
 
     PaymentDetail? bankDetail;
-    if (doc.selectedBankDetailId != null && doc.selectedBankDetailId != 'none') {
+    if (doc.selectedBankDetailId != null &&
+        doc.selectedBankDetailId != 'none') {
       try {
-        bankDetail = profile.paymentDetails.firstWhere((p) => p.id == doc.selectedBankDetailId);
+        bankDetail = profile.paymentDetails.firstWhere(
+          (p) => p.id == doc.selectedBankDetailId,
+        );
       } catch (_) {}
     }
     // If not found (e.g. 'legacy' ID) or none selected but fallback available, use legacy fields
-    if (bankDetail == null && doc.selectedBankDetailId != 'none' && profile.bankName != null && profile.bankName!.trim().isNotEmpty && profile.accountNumber != null && profile.accountNumber!.trim().isNotEmpty) {
-      bankDetail = PaymentDetail(id: 'legacy', type: 'Bank', title: profile.bankName!, details: profile.accountNumber!, extra: profile.ifscCode);
+    if (bankDetail == null &&
+        doc.selectedBankDetailId != 'none' &&
+        profile.bankName != null &&
+        profile.bankName!.trim().isNotEmpty &&
+        profile.accountNumber != null &&
+        profile.accountNumber!.trim().isNotEmpty) {
+      bankDetail = PaymentDetail(
+        id: 'legacy',
+        type: 'Bank',
+        title: profile.bankName!,
+        details: profile.accountNumber!,
+        extra: profile.ifscCode,
+      );
     }
     // Auto-pick first available bank from profile if still not resolved
     if (bankDetail == null && doc.selectedBankDetailId != 'none') {
-      final banks = profile.paymentDetails.where((p) => p.type == 'Bank').toList();
+      final banks = profile.paymentDetails
+          .where((p) => p.type == 'Bank')
+          .toList();
       if (banks.isNotEmpty) bankDetail = banks.first;
     }
 
     PaymentDetail? upiDetail;
     if (doc.selectedUpiDetailId != null && doc.selectedUpiDetailId != 'none') {
       try {
-        upiDetail = profile.paymentDetails.firstWhere((p) => p.id == doc.selectedUpiDetailId);
+        upiDetail = profile.paymentDetails.firstWhere(
+          (p) => p.id == doc.selectedUpiDetailId,
+        );
       } catch (_) {}
     }
     // If not found or legacy, use legacy fields
-    if (upiDetail == null && doc.selectedUpiDetailId != 'none' && profile.upiId != null && profile.upiId!.trim().isNotEmpty) {
-      upiDetail = PaymentDetail(id: 'legacy_upi', type: 'UPI', title: 'UPI', details: profile.upiId!);
+    if (upiDetail == null &&
+        doc.selectedUpiDetailId != 'none' &&
+        profile.upiId != null &&
+        profile.upiId!.trim().isNotEmpty) {
+      upiDetail = PaymentDetail(
+        id: 'legacy_upi',
+        type: 'UPI',
+        title: 'UPI',
+        details: profile.upiId!,
+      );
     }
     // Auto-pick first available UPI from profile if still not resolved
     if (upiDetail == null && doc.selectedUpiDetailId != 'none') {
-      final upis = profile.paymentDetails.where((p) => p.type == 'UPI').toList();
+      final upis = profile.paymentDetails
+          .where((p) => p.type == 'UPI')
+          .toList();
       if (upis.isNotEmpty) upiDetail = upis.first;
     }
 
@@ -651,7 +686,8 @@ class DocumentPdfGenerator {
           if (hasUpi)
             pw.BarcodeWidget(
               barcode: pw.Barcode.qrCode(),
-              data: 'upi://pay?pa=${upiDetail!.details}&pn=${Uri.encodeComponent(profile.businessName)}',
+              data:
+                  'upi://pay?pa=${upiDetail!.details}&pn=${Uri.encodeComponent(profile.businessName)}',
               width: 55,
               height: 55,
             ),
@@ -670,13 +706,26 @@ class DocumentPdfGenerator {
                 ),
                 pw.SizedBox(height: 4),
                 if (hasBank) ...[
-                  pw.Text('Bank: ${bankDetail!.title}', style: const pw.TextStyle(fontSize: 10)),
-                  pw.Text('A/C No: ${bankDetail.details}', style: const pw.TextStyle(fontSize: 10)),
-                  if (bankDetail.extra != null && bankDetail.extra!.trim().isNotEmpty)
-                    pw.Text('IFSC: ${bankDetail.extra}', style: const pw.TextStyle(fontSize: 10)),
+                  pw.Text(
+                    'Bank: ${bankDetail!.title}',
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
+                  pw.Text(
+                    'A/C No: ${bankDetail.details}',
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
+                  if (bankDetail.extra != null &&
+                      bankDetail.extra!.trim().isNotEmpty)
+                    pw.Text(
+                      'IFSC: ${bankDetail.extra}',
+                      style: const pw.TextStyle(fontSize: 10),
+                    ),
                 ],
                 if (hasUpi)
-                  pw.Text('UPI: ${upiDetail!.details}', style: const pw.TextStyle(fontSize: 10)),
+                  pw.Text(
+                    'UPI: ${upiDetail!.details}',
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
               ],
             ),
           ),
@@ -807,17 +856,17 @@ class DocumentPdfGenerator {
               child: pw.Container(
                 width: 32,
                 height: 32,
-                child: pw.Image(pw.MemoryImage(logoBytes), fit: pw.BoxFit.cover),
+                child: pw.Image(
+                  pw.MemoryImage(logoBytes),
+                  fit: pw.BoxFit.cover,
+                ),
               ),
             ),
             pw.SizedBox(width: 16),
           ],
           pw.Text(
             profile.businessName,
-            style: pw.TextStyle(
-              fontSize: 32,
-              color: primaryColor,
-            ),
+            style: pw.TextStyle(fontSize: 32, color: primaryColor),
           ),
         ],
       ),
@@ -826,15 +875,36 @@ class DocumentPdfGenerator {
         mainAxisAlignment: pw.MainAxisAlignment.center,
         children: [
           if (profile.address != null && profile.address!.isNotEmpty)
-            pw.Text(profile.address!, style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600)),
-          if (profile.address != null && profile.phone != null && profile.address!.isNotEmpty && profile.phone!.isNotEmpty)
-            pw.Text('   |   ', style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600)),
+            pw.Text(
+              profile.address!,
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+            ),
+          if (profile.address != null &&
+              profile.phone != null &&
+              profile.address!.isNotEmpty &&
+              profile.phone!.isNotEmpty)
+            pw.Text(
+              '   |   ',
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+            ),
           if (profile.phone != null && profile.phone!.isNotEmpty)
-            pw.Text(profile.phone!, style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600)),
-          if (profile.phone != null && profile.email != null && profile.phone!.isNotEmpty && profile.email!.isNotEmpty)
-            pw.Text('   |   ', style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600)),
+            pw.Text(
+              profile.phone!,
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+            ),
+          if (profile.phone != null &&
+              profile.email != null &&
+              profile.phone!.isNotEmpty &&
+              profile.email!.isNotEmpty)
+            pw.Text(
+              '   |   ',
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+            ),
           if (profile.email != null && profile.email!.isNotEmpty)
-            pw.Text(profile.email!, style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600)),
+            pw.Text(
+              profile.email!,
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+            ),
         ],
       ),
       pw.SizedBox(height: 12),
@@ -847,7 +917,14 @@ class DocumentPdfGenerator {
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('Paid By', style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold, fontSize: 11)),
+              pw.Text(
+                'Paid By',
+                style: pw.TextStyle(
+                  color: primaryColor,
+                  fontWeight: pw.FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
               pw.SizedBox(height: 6),
               pw.Text(cName, style: const pw.TextStyle(fontSize: 11)),
               pw.SizedBox(height: 6),
@@ -855,7 +932,14 @@ class DocumentPdfGenerator {
                 pw.Text(cEmail, style: const pw.TextStyle(fontSize: 11)),
             ],
           ),
-          pw.Text(title, style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold, fontSize: 28)),
+          pw.Text(
+            title,
+            style: pw.TextStyle(
+              color: primaryColor,
+              fontWeight: pw.FontWeight.bold,
+              fontSize: 28,
+            ),
+          ),
         ],
       ),
       pw.SizedBox(height: 32),
@@ -867,20 +951,91 @@ class DocumentPdfGenerator {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text('Booking Details', style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold, fontSize: 11)),
+                pw.Text(
+                  'Booking Details',
+                  style: pw.TextStyle(
+                    color: primaryColor,
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 11,
+                  ),
+                ),
                 pw.SizedBox(height: 8),
-                pw.Row(children: [ pw.SizedBox(width: 100, child: pw.Text('Issue Date', style: const pw.TextStyle(fontSize: 11))), pw.Text(DateFormatter.format(doc.issueDate), style: const pw.TextStyle(fontSize: 11)) ]),
+                pw.Row(
+                  children: [
+                    pw.SizedBox(
+                      width: 100,
+                      child: pw.Text(
+                        'Issue Date',
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    ),
+                    pw.Text(
+                      DateFormatter.format(doc.issueDate),
+                      style: const pw.TextStyle(fontSize: 11),
+                    ),
+                  ],
+                ),
                 pw.SizedBox(height: 6),
-                pw.Row(children: [ pw.SizedBox(width: 100, child: pw.Text('Due Date', style: const pw.TextStyle(fontSize: 11))), pw.Text(DateFormatter.format(doc.dueDate), style: const pw.TextStyle(fontSize: 11)) ]),
+                pw.Row(
+                  children: [
+                    pw.SizedBox(
+                      width: 100,
+                      child: pw.Text(
+                        'Due Date',
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    ),
+                    pw.Text(
+                      DateFormatter.format(doc.dueDate),
+                      style: const pw.TextStyle(fontSize: 11),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              pw.Row(children: [ pw.SizedBox(width: 80, child: pw.Text('Receipt #', style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold, fontSize: 11))), pw.Text(doc.docNumber, style: const pw.TextStyle(fontSize: 11)) ]),
+              pw.Row(
+                children: [
+                  pw.SizedBox(
+                    width: 80,
+                    child: pw.Text(
+                      'Receipt #',
+                      style: pw.TextStyle(
+                        color: primaryColor,
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                  pw.Text(
+                    doc.docNumber,
+                    style: const pw.TextStyle(fontSize: 11),
+                  ),
+                ],
+              ),
               pw.SizedBox(height: 6),
-              pw.Row(children: [ pw.SizedBox(width: 80, child: pw.Text('Receipt Date', style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold, fontSize: 11))), pw.Text(DateFormatter.format(doc.issueDate), style: const pw.TextStyle(fontSize: 11)) ]),
+              pw.Row(
+                children: [
+                  pw.SizedBox(
+                    width: 80,
+                    child: pw.Text(
+                      'Receipt Date',
+                      style: pw.TextStyle(
+                        color: primaryColor,
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                  pw.Text(
+                    DateFormatter.format(doc.issueDate),
+                    style: const pw.TextStyle(fontSize: 11),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -894,72 +1049,253 @@ class DocumentPdfGenerator {
           children: [
             pw.Container(
               color: primaryColor,
-              padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 12,
+              ),
               child: pw.Row(
                 children: [
-                  pw.Expanded(flex: 1, child: pw.Text('Quantity', style: pw.TextStyle(color: PdfColors.white, fontWeight: pw.FontWeight.bold, fontSize: 10))),
-                  pw.Expanded(flex: 3, child: pw.Text('Description', style: pw.TextStyle(color: PdfColors.white, fontWeight: pw.FontWeight.bold, fontSize: 10))),
-                  pw.Expanded(flex: 2, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text('Unit Price', style: pw.TextStyle(color: PdfColors.white, fontWeight: pw.FontWeight.bold, fontSize: 10)))),
-                  pw.Expanded(flex: 2, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text('Amount', style: pw.TextStyle(color: PdfColors.white, fontWeight: pw.FontWeight.bold, fontSize: 10)))),
+                  pw.Expanded(
+                    flex: 1,
+                    child: pw.Text(
+                      'Quantity',
+                      style: pw.TextStyle(
+                        color: PdfColors.white,
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                  pw.Expanded(
+                    flex: 3,
+                    child: pw.Text(
+                      'Description',
+                      style: pw.TextStyle(
+                        color: PdfColors.white,
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                  pw.Expanded(
+                    flex: 2,
+                    child: pw.Align(
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(
+                        'Unit Price',
+                        style: pw.TextStyle(
+                          color: PdfColors.white,
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ),
+                  pw.Expanded(
+                    flex: 2,
+                    child: pw.Align(
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(
+                        'Amount',
+                        style: pw.TextStyle(
+                          color: PdfColors.white,
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
             ...doc.items.map((item) {
               return pw.Padding(
-                padding: const pw.EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 12,
+                ),
                 child: pw.Row(
                   children: [
-                    pw.Expanded(flex: 1, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text(item.quantity.toString(), style: const pw.TextStyle(fontSize: 11)))),
+                    pw.Expanded(
+                      flex: 1,
+                      child: pw.Align(
+                        alignment: pw.Alignment.centerRight,
+                        child: pw.Text(
+                          item.quantity.toString(),
+                          style: const pw.TextStyle(fontSize: 11),
+                        ),
+                      ),
+                    ),
                     pw.SizedBox(width: 20),
-                    pw.Expanded(flex: 3, child: pw.Text(item.title, style: const pw.TextStyle(fontSize: 11))),
-                    pw.Expanded(flex: 2, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text(CurrencyFormatter.format(item.unitPrice, symbol: 'Rs.'), style: const pw.TextStyle(fontSize: 11)))),
-                    pw.Expanded(flex: 2, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text(CurrencyFormatter.format(item.lineTotal, symbol: 'Rs.'), style: const pw.TextStyle(fontSize: 11)))),
+                    pw.Expanded(
+                      flex: 3,
+                      child: pw.Text(
+                        item.title,
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    ),
+                    pw.Expanded(
+                      flex: 2,
+                      child: pw.Align(
+                        alignment: pw.Alignment.centerRight,
+                        child: pw.Text(
+                          CurrencyFormatter.format(
+                            item.unitPrice,
+                            symbol: 'Rs.',
+                          ),
+                          style: const pw.TextStyle(fontSize: 11),
+                        ),
+                      ),
+                    ),
+                    pw.Expanded(
+                      flex: 2,
+                      child: pw.Align(
+                        alignment: pw.Alignment.centerRight,
+                        child: pw.Text(
+                          CurrencyFormatter.format(
+                            item.lineTotal,
+                            symbol: 'Rs.',
+                          ),
+                          style: const pw.TextStyle(fontSize: 11),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               );
             }),
             pw.Container(height: 1, color: primaryColor),
             pw.Padding(
-              padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 12,
+              ),
               child: pw.Row(
                 children: [
                   pw.Expanded(flex: 4, child: pw.SizedBox()),
-                  pw.Expanded(flex: 2, child: pw.Text('Subtotal', style: const pw.TextStyle(fontSize: 11))),
-                  pw.Expanded(flex: 2, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text(CurrencyFormatter.format(doc.subtotal, symbol: 'Rs.'), style: const pw.TextStyle(fontSize: 11)))),
+                  pw.Expanded(
+                    flex: 2,
+                    child: pw.Text(
+                      'Subtotal',
+                      style: const pw.TextStyle(fontSize: 11),
+                    ),
+                  ),
+                  pw.Expanded(
+                    flex: 2,
+                    child: pw.Align(
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(
+                        CurrencyFormatter.format(doc.subtotal, symbol: 'Rs.'),
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
             if (doc.totalTaxAmount > 0)
               pw.Padding(
-                padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12,
+                ),
                 child: pw.Row(
                   children: [
                     pw.Expanded(flex: 4, child: pw.SizedBox()),
-                    pw.Expanded(flex: 2, child: pw.Text('Tax', style: const pw.TextStyle(fontSize: 11))),
-                    pw.Expanded(flex: 2, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text(CurrencyFormatter.format(doc.totalTaxAmount, symbol: 'Rs.'), style: const pw.TextStyle(fontSize: 11)))),
+                    pw.Expanded(
+                      flex: 2,
+                      child: pw.Text(
+                        'Tax',
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    ),
+                    pw.Expanded(
+                      flex: 2,
+                      child: pw.Align(
+                        alignment: pw.Alignment.centerRight,
+                        child: pw.Text(
+                          CurrencyFormatter.format(
+                            doc.totalTaxAmount,
+                            symbol: 'Rs.',
+                          ),
+                          style: const pw.TextStyle(fontSize: 11),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             if (doc.overallDiscountAmount > 0)
               pw.Padding(
-                padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12,
+                ),
                 child: pw.Row(
                   children: [
                     pw.Expanded(flex: 4, child: pw.SizedBox()),
-                    pw.Expanded(flex: 2, child: pw.Text('Discount', style: const pw.TextStyle(fontSize: 11))),
-                    pw.Expanded(flex: 2, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text('-' + CurrencyFormatter.format(doc.overallDiscountAmount, symbol: 'Rs.'), style: const pw.TextStyle(fontSize: 11)))),
+                    pw.Expanded(
+                      flex: 2,
+                      child: pw.Text(
+                        'Discount',
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    ),
+                    pw.Expanded(
+                      flex: 2,
+                      child: pw.Align(
+                        alignment: pw.Alignment.centerRight,
+                        child: pw.Text(
+                          '-' +
+                              CurrencyFormatter.format(
+                                doc.overallDiscountAmount,
+                                symbol: 'Rs.',
+                              ),
+                          style: const pw.TextStyle(fontSize: 11),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             pw.Container(height: 1, color: primaryColor),
             pw.Container(
               color: lightBlue,
-              padding: const pw.EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 12,
+                horizontal: 12,
+              ),
               child: pw.Row(
                 children: [
                   pw.Expanded(flex: 4, child: pw.SizedBox()),
-                  pw.Expanded(flex: 2, child: pw.Text('Total', style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold, fontSize: 12))),
-                  pw.Expanded(flex: 2, child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text(CurrencyFormatter.format(doc.totalAmount, symbol: 'Rs.'), style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold, fontSize: 12)))),
+                  pw.Expanded(
+                    flex: 2,
+                    child: pw.Text(
+                      'Total',
+                      style: pw.TextStyle(
+                        color: primaryColor,
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  pw.Expanded(
+                    flex: 2,
+                    child: pw.Align(
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(
+                        CurrencyFormatter.format(
+                          doc.totalAmount,
+                          symbol: 'Rs.',
+                        ),
+                        style: pw.TextStyle(
+                          color: primaryColor,
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -976,7 +1312,14 @@ class DocumentPdfGenerator {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 if (doc.notes != null && doc.notes!.isNotEmpty) ...[
-                  pw.Text('Notes', style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold, fontSize: 11)),
+                  pw.Text(
+                    'Notes',
+                    style: pw.TextStyle(
+                      color: primaryColor,
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                  ),
                   pw.SizedBox(height: 4),
                   pw.Text(doc.notes!, style: const pw.TextStyle(fontSize: 11)),
                   pw.SizedBox(height: 16),
@@ -989,8 +1332,14 @@ class DocumentPdfGenerator {
             pw.Column(
               children: [
                 pw.Image(pw.MemoryImage(signatureBytes), height: 50),
-                pw.Container(width: 150, child: pw.Divider(color: primaryColor)),
-                pw.Text('Authorized Signature', style: pw.TextStyle(fontSize: 10, color: primaryColor)),
+                pw.Container(
+                  width: 150,
+                  child: pw.Divider(color: primaryColor),
+                ),
+                pw.Text(
+                  'Authorized Signature',
+                  style: pw.TextStyle(fontSize: 10, color: primaryColor),
+                ),
               ],
             ),
         ],
