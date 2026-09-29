@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:http/http.dart' as http;
 import '../../core/utils/image_cache_service.dart';
 import '../../core/utils/currency_formatter.dart';
@@ -975,8 +974,9 @@ class DocumentPdfGenerator {
     final hasBank = bankDetail != null;
     final hasUpi = upiDetail != null;
 
-    if (!doc.includePaymentDetails || doc.docType == DocumentType.receipt)
+    if (!doc.includePaymentDetails || doc.docType == DocumentType.receipt) {
       return pw.SizedBox();
+    }
     if (!hasBank && !hasUpi) return pw.SizedBox();
 
     return pw.Container(
@@ -1000,7 +1000,7 @@ class DocumentPdfGenerator {
                     ? pw.BarcodeWidget(
                         barcode: pw.Barcode.qrCode(),
                         data:
-                            'upi://pay?pa=${upiDetail!.details}&pn=${Uri.encodeComponent(profile.businessName)}&am=${doc.totalAmount}',
+                            'upi://pay?pa=${upiDetail.details}&pn=${Uri.encodeComponent(profile.businessName)}&am=${doc.totalAmount}',
                       )
                     : pw.BarcodeWidget(
                         barcode: pw.Barcode.qrCode(),
@@ -1037,7 +1037,7 @@ class DocumentPdfGenerator {
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 4),
                     child: pw.Text(
-                      'UPI (${upiDetail!.title}): ${upiDetail.details}',
+                      'UPI (${upiDetail.title}): ${upiDetail.details}',
                       style: pw.TextStyle(
                         fontSize: 10,
                         fontWeight: pw.FontWeight.bold,
@@ -1046,7 +1046,7 @@ class DocumentPdfGenerator {
                   ),
                 if (hasBank) ...[
                   pw.Text(
-                    'Bank: ${bankDetail!.title}',
+                    'Bank: ${bankDetail.title}',
                     style: pw.TextStyle(
                       fontSize: 10,
                       fontWeight: pw.FontWeight.bold,
@@ -1587,11 +1587,7 @@ class DocumentPdfGenerator {
                       child: pw.Align(
                         alignment: pw.Alignment.centerRight,
                         child: pw.Text(
-                          '-' +
-                              CurrencyFormatter.format(
-                                doc.overallDiscountAmount,
-                                symbol: 'Rs.',
-                              ),
+                          '-${CurrencyFormatter.format(doc.overallDiscountAmount, symbol: 'Rs.')}',
                           style: const pw.TextStyle(fontSize: 11),
                         ),
                       ),

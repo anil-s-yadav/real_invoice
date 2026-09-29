@@ -143,6 +143,22 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
+          final subState = context.read<SubscriptionBloc>().state;
+          final maxAllowed = subState.plan?.maxCompaniesAllowed ?? 1;
+          
+          if (_profiles.length >= maxAllowed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Company limit reached. Please upgrade your plan.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+            );
+            return;
+          }
+
           await Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => const OnboardingScreen(isAddingNewCompany: true),

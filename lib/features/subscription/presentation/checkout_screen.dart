@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import '../data/subscription_repository.dart';
+import '../domain/subscription_plan_model.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final String planName;
@@ -25,10 +28,81 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   final double _gstRate = 0.18; // 18% GST
 
+  late Razorpay _razorpay;
+
   @override
   void initState() {
     super.initState();
     _selectedDuration = 12; // 1 Year plan
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+    super.dispose();
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    double baseTotal = widget.monthlyPrice * _selectedDuration;
+    double invozPerc = _getInvozDiscountPercentage(_selectedDuration);
+    double invozDiscount = baseTotal * invozPerc;
+    double welcomeDiscount = 0.0;
+    if (widget.hasWelcomeOffer) {
+      if (_selectedDuration == 12) welcomeDiscount = baseTotal * 0.50;
+      else if (_selectedDuration == 1) welcomeDiscount = baseTotal;
+    }
+    double subtotal = baseTotal - invozDiscount - welcomeDiscount;
+    if (subtotal < 0) subtotal = 0;
+    double gstAmount = subtotal * _gstRate;
+    double totalPayable = subtotal + gstAmount;
+
+    final repo = SubscriptionRepository();
+    final newPlan = SubscriptionPlanModel(
+       id: widget.planName.toLowerCase() + '_' + DateTime.now().millisecondsSinceEpoch.toString(), 
+       planName: widget.planName,
+       price: baseTotal,
+       durationMonths: _selectedDuration,
+       discountPercentage: (invozDiscount + welcomeDiscount) / baseTotal,
+       discountAmount: invozDiscount + welcomeDiscount,
+       gstAmount: gstAmount,
+       finalAmount: totalPayable,
+       status: 'Active',
+       transactionId: response.paymentId ?? DateTime.now().millisecondsSinceEpoch.toString(),
+       orderId: response.orderId,
+       paymentSignature: response.signature,
+       paymentMethod: 'Razorpay',
+       startDate: DateTime.now(),
+       expiryDate: DateTime.now().add(Duration(days: 30 * _selectedDuration)),
+       autoRenew: true,
+       createdAt: DateTime.now(),
+       maxCompaniesAllowed: widget.planName.toLowerCase().contains('pro') ? 5 : 50,
+    );
+    await repo.saveOrUpgradePlan(newPlan);
+    if (!mounted) return;
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Subscription upgraded successfully!'), backgroundColor: Colors.green),
+    );
+    // Go back to previous screen
+    Navigator.of(context).pop();
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Payment Failed: ${response.message}')),
+    );
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('External Wallet Selected: ${response.walletName}')),
+    );
   }
 
   double _getInvozDiscountPercentage(int months) {
@@ -672,12 +746,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Implement payment gateway
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Payment Gateway Integration Pending'),
-                    ),
-                  );
+                  var options = {
+                    'key': 'rzp_test_ThkLyPi706leO9',
+                    'amount': (totalPayable * 100).toInt(), // in paise
+                    'name': 'Invoz App',
+                    'description': '${widget.planName} - $_selectedDuration Months',
+                    'timeout': 120, 
+                    'prefill': {
+                      'contact': '', 
+                      'email': ''
+                    }
+                  };
+                  try {
+                    _razorpay.open(options);
+                  } catch (e) {
+                    debugPrint(e.toString());
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

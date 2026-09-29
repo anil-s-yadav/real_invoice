@@ -978,6 +978,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildNotificationsDrawer(BuildContext context, bool isDark) {
     return Drawer(
+      width: double.infinity,
       backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
       child: SafeArea(
         child: Column(
@@ -993,17 +994,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                    icon: Icon(
+                      Icons.close,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
+                    ),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
-            Divider(height: 1, color: isDark ? AppColors.darkBorder : AppColors.border),
+            Divider(
+              height: 1,
+              color: isDark ? AppColors.darkBorder : AppColors.border,
+            ),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(16),
@@ -1011,7 +1022,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildNotificationItem(
                     isDark,
                     title: 'Welcome to Invoz!',
-                    message: 'Set up your business profile to start generating professional invoices instantly.',
+                    message:
+                        'Set up your business profile to start generating professional invoices instantly.',
                     time: 'Just now',
                     icon: Icons.celebration,
                     color: Colors.blueAccent,
@@ -1020,7 +1032,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildNotificationItem(
                     isDark,
                     title: 'Claim Your Premium',
-                    message: 'Don\'t miss out on your 1 Year Free Premium offer. Tap to claim it now.',
+                    message:
+                        'Don\'t miss out on your 1 Year Free Premium offer. Tap to claim it now.',
                     time: '1 hr ago',
                     icon: Icons.workspace_premium,
                     color: AppColors.premiumGold,
@@ -1034,13 +1047,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNotificationItem(bool isDark, {required String title, required String message, required String time, required IconData icon, required Color color}) {
+  Widget _buildNotificationItem(
+    bool isDark, {
+    required String title,
+    required String message,
+    required String time,
+    required IconData icon,
+    required Color color,
+  }) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurfaceVariant : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.borderStrong),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.borderStrong,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1063,7 +1085,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -1071,7 +1095,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   message,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -1080,7 +1106,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkTextSecondary : Colors.grey.shade500,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade500,
                   ),
                 ),
               ],

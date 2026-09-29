@@ -11,12 +11,15 @@ class SubscriptionPlanModel {
   final double finalAmount;
   final String status; // 'Active', 'Expired', 'Cancelled'
   final String transactionId;
+  final String? orderId;
+  final String? paymentSignature;
   final String paymentMethod;
   final DateTime startDate;
   final DateTime? expiryDate;
   final bool autoRenew;
   final bool isWelcomeOffer;
   final DateTime createdAt;
+  final int maxCompaniesAllowed;
 
   const SubscriptionPlanModel({
     required this.id,
@@ -29,15 +32,20 @@ class SubscriptionPlanModel {
     required this.finalAmount,
     this.status = 'Active',
     required this.transactionId,
+    this.orderId,
+    this.paymentSignature,
     this.paymentMethod = 'UPI',
     required this.startDate,
     this.expiryDate,
     this.autoRenew = true,
     this.isWelcomeOffer = false,
     required this.createdAt,
+    this.maxCompaniesAllowed = 1,
   });
 
   bool get isFree => planName.trim().toLowerCase() == 'free';
+
+
   bool get isActive => status.trim().toLowerCase() == 'active';
 
   int get daysRemaining {
