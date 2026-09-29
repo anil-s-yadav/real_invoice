@@ -79,7 +79,7 @@ class TemplateThumbnailCard extends StatelessWidget {
                         child: const Icon(
                           Icons.check,
                           color: Colors.white,
-                          size: 16,
+                          size: 20,
                         ),
                       ),
                     ),

@@ -145,13 +145,17 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                     ),
                     IconButton(
                       icon: Icon(
                         Icons.close,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -233,7 +237,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -241,13 +247,17 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     title: Text(
                       'Show Payment Details & QR Code',
                       style: TextStyle(
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                     ),
                     subtitle: Text(
                       'Include bank and UPI info on PDF',
                       style: TextStyle(
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                       ),
                     ),
                     value: _document.includePaymentDetails,
@@ -287,13 +297,17 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
           backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
           appBar: AppBar(
             backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
-            foregroundColor: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            foregroundColor: isDark
+                ? AppColors.darkTextPrimary
+                : AppColors.textPrimary,
             elevation: 0,
             title: Text(
               '${_document.docType.displayName} ${_document.docNumber}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
             ),
             actions: [
@@ -301,7 +315,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 onTap: _showDocumentSettings,
                 child: Icon(
                   Icons.settings_outlined,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
               const SizedBox(width: 10),
@@ -323,7 +339,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 },
                 child: Icon(
                   Icons.edit_outlined,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
 
@@ -352,7 +370,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppDimensions.lg,
                     ),
-                    color: isDark ? AppColors.darkSurface : AppColors.primaryLight,
+                    color: isDark
+                        ? AppColors.darkSurface
+                        : AppColors.primaryLight,
                     child: Row(
                       children: [
                         Expanded(
@@ -361,7 +381,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.primaryDark : AppColors.primary,
+                              color: isDark
+                                  ? AppColors.primaryDark
+                                  : AppColors.primary,
                             ),
                           ),
                         ),
@@ -447,12 +469,16 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppDimensions.lg,
                     ),
-                    color: isDark ? AppColors.darkSurface : AppColors.primaryLight,
+                    color: isDark
+                        ? AppColors.darkSurface
+                        : AppColors.primaryLight,
                     child: Row(
                       children: [
                         Icon(
                           Icons.transform,
-                          color: isDark ? AppColors.primaryDark : AppColors.primary,
+                          color: isDark
+                              ? AppColors.primaryDark
+                              : AppColors.primary,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
@@ -462,7 +488,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.primaryDark : AppColors.primary,
+                              color: isDark
+                                  ? AppColors.primaryDark
+                                  : AppColors.primary,
                             ),
                           ),
                         ),
@@ -472,7 +500,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                             'Convert to Invoice',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: isDark ? AppColors.primaryDark : AppColors.primary,
+                              color: isDark
+                                  ? AppColors.primaryDark
+                                  : AppColors.primary,
                             ),
                           ),
                         ),
@@ -530,7 +560,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       Text(
                         'Double Tap Document to Zoom',
                         style: AppTypography.bodySmall.copyWith(
-                          color: isDark ? AppColors.darkTextMuted : AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.darkTextMuted
+                              : AppColors.textSecondary,
                         ),
                       ),
                       InkWell(
@@ -540,7 +572,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                             Text(
                               'Change Style \u25BE  : ',
                               style: AppTypography.bodySmall.copyWith(
-                                color: isDark ? AppColors.primaryDark : AppColors.primary,
+                                color: isDark
+                                    ? AppColors.primaryDark
+                                    : AppColors.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -548,7 +582,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                               TemplateRegistry.getById(_currentTemplateId).name,
                               style: AppTypography.titleSmall.copyWith(
                                 fontSize: 12,
-                                color: isDark ? AppColors.primaryDark : AppColors.primary,
+                                color: isDark
+                                    ? AppColors.primaryDark
+                                    : AppColors.primary,
                               ),
                             ),
                           ],
@@ -575,7 +611,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     canChangePageFormat: true,
                     canDebug: false,
                     scrollViewDecoration: BoxDecoration(
-                      color: isDark ? AppColors.darkCanvas : const Color(0xFFF1F5F9),
+                      color: isDark
+                          ? AppColors.darkCanvas
+                          : const Color(0xFFF1F5F9),
                     ),
                     pdfPreviewPageDecoration: BoxDecoration(
                       color: Colors.white,
@@ -591,7 +629,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     pdfFileName: '${_document.docNumber}.pdf',
                     loadingWidget: Center(
                       child: CircularProgressIndicator(
-                        color: isDark ? AppColors.primaryDark : AppColors.primary,
+                        color: isDark
+                            ? AppColors.primaryDark
+                            : AppColors.primary,
                       ),
                     ),
                   ),

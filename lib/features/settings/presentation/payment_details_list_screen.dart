@@ -92,8 +92,8 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
               color: hasDetails
                   ? AppColors.primary.withValues(alpha: _isDark ? 0.15 : 0.05)
                   : (_isDark
-                      ? AppColors.darkSurfaceVariant
-                      : AppColors.surfaceVariant.withValues(alpha: 0.6)),
+                        ? AppColors.darkSurfaceVariant
+                        : AppColors.surfaceVariant.withValues(alpha: 0.6)),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(15),
               ),
@@ -122,8 +122,8 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                     const SizedBox(width: 8),
                     Text(
                       hasDetails
-                          ? 'Document Preview (Live)'
-                          : 'Sample Preview (On Documents)',
+                          ? 'payment Details Preview (Live)'
+                          : 'payment Details Preview (Dummy)',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -142,7 +142,9 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                   decoration: BoxDecoration(
                     color: hasDetails
                         ? AppColors.primary.withValues(alpha: 0.1)
-                        : (_isDark ? AppColors.darkSurfaceVariant : Colors.white),
+                        : (_isDark
+                              ? AppColors.darkSurfaceVariant
+                              : Colors.white),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
                       color: hasDetails
@@ -293,10 +295,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                         ),
                         Text(
                           'A/C: 50200012345678',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: _textPrimary,
-                          ),
+                          style: TextStyle(fontSize: 11, color: _textPrimary),
                         ),
                         const Text(
                           'IFSC: HDFC0001234',
@@ -411,7 +410,9 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                       color: _isDark ? AppColors.darkSurface : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: _isDark ? AppColors.darkBorder : AppColors.border,
+                        color: _isDark
+                            ? AppColors.darkBorder
+                            : AppColors.border,
                       ),
                     ),
                     child: Column(
@@ -475,7 +476,9 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: _isDark ? AppColors.darkSurface : Colors.white,
+                            color: _isDark
+                                ? AppColors.darkSurface
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
                               color: _isDark

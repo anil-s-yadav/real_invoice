@@ -10,6 +10,7 @@ class TemplateInfo {
   final Color accentColor;
   final String thumbnailAssetPath;
   final bool isPremium;
+  final List<DocumentType> supportedTypes;
 
   const TemplateInfo({
     required this.id,
@@ -19,6 +20,12 @@ class TemplateInfo {
     required this.accentColor,
     required this.thumbnailAssetPath,
     required this.isPremium,
+    this.supportedTypes = const [
+      DocumentType.invoice,
+      DocumentType.quotation,
+      DocumentType.proforma,
+      DocumentType.receipt,
+    ],
   });
 }
 
@@ -27,6 +34,7 @@ class TemplateRegistry {
 
   static const String freeClassic = 'free_classic';
   static const String premiumModern = 'premium_modern';
+  static const String elegantCenter = 'elegant_center';
 
   static const List<TemplateInfo> allTemplates = [
     TemplateInfo(
@@ -37,6 +45,7 @@ class TemplateRegistry {
       accentColor: AppColors.textPrimary,
       thumbnailAssetPath: 'assets/images/templates/free_template_thumb.png',
       isPremium: false,
+      // By default, Classic Free supports all document types.
     ),
     TemplateInfo(
       id: premiumModern,
@@ -46,6 +55,22 @@ class TemplateRegistry {
       accentColor: AppColors.primary,
       thumbnailAssetPath: 'assets/images/templates/paid_template_thumb.png',
       isPremium: true,
+      // Example: supports everything EXCEPT receipt
+      supportedTypes: [
+        DocumentType.invoice,
+        DocumentType.quotation,
+        DocumentType.proforma,
+      ],
+    ),
+    TemplateInfo(
+      id: elegantCenter,
+      name: 'Elegant Center',
+      description: 'A beautiful centered layout with clean borders and modern typography.',
+      icon: Icons.format_align_center,
+      accentColor: Color(0xFF0D47A1),
+      thumbnailAssetPath: 'assets/images/templates/elegant_center_thumb.png',
+      isPremium: true,
+      // Let's assume elegantCenter supports all types for now
     ),
   ];
 
@@ -57,7 +82,6 @@ class TemplateRegistry {
   }
 
   static List<TemplateInfo> getTemplatesFor(DocumentType type) {
-    // Both Free and Paid apply to all 4 document types.
-    return allTemplates;
+    return allTemplates.where((t) => t.supportedTypes.contains(type)).toList();
   }
 }
