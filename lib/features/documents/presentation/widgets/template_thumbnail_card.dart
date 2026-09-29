@@ -1,3 +1,4 @@
+import '../dummy_template_widget.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../pdf_engine/template_registry.dart';
@@ -34,7 +35,9 @@ class TemplateThumbnailCard extends StatelessWidget {
                 border: Border.all(
                   color: isSelected
                       ? template.accentColor
-                      : (isDark ? AppColors.darkBorder : AppColors.borderStrong),
+                      : (isDark
+                            ? AppColors.darkBorder
+                            : AppColors.borderStrong),
                   width: isSelected ? 3 : 1,
                 ),
                 boxShadow: [
@@ -46,18 +49,19 @@ class TemplateThumbnailCard extends StatelessWidget {
                 ],
               ),
               child: Stack(
+                alignment: AlignmentGeometry.bottomCenter,
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(5),
-                    child: Image.asset(
-                      template.thumbnailAssetPath,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(Icons.image_not_supported, color: Colors.grey),
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        width: 450,
+                        height: 565, // A4 ratio
+                        child: DummyTemplateWidget(
+                          templateId: template.id,
+                          documentType: documentType,
                         ),
                       ),
                     ),
@@ -84,7 +88,10 @@ class TemplateThumbnailCard extends StatelessWidget {
                       top: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.amber,
                           borderRadius: BorderRadius.circular(4),
@@ -119,7 +126,9 @@ class TemplateThumbnailCard extends StatelessWidget {
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected
                   ? template.accentColor
-                  : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                  : (isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary),
             ),
           ),
         ],

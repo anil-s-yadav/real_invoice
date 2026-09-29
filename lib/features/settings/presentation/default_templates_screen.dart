@@ -103,7 +103,9 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
         ),
         centerTitle: true,
         backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
-        foregroundColor: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+        foregroundColor: isDark
+            ? AppColors.darkTextPrimary
+            : AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
         bottom: PreferredSize(
@@ -144,8 +146,9 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
               splashFactory: NoSplash.splashFactory,
               overlayColor: WidgetStateProperty.all(Colors.transparent),
               labelColor: isDark ? AppColors.primaryDark : AppColors.primary,
-              unselectedLabelColor:
-                  isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+              unselectedLabelColor: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary,
               labelStyle: const TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
@@ -278,6 +281,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                             mainAxisSpacing: 20,
                           ),
                       itemCount: templates.length,
+
                       itemBuilder: (context, index) {
                         final t = templates[index];
                         final isSelected = t.id == currentDefaultId;

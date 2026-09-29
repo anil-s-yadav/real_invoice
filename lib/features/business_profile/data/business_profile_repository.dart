@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../domain/business_profile_model.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/utils/image_cache_service.dart';
 
 class BusinessProfileRepository {
   static const String _activeProfileKey = 'active_profile_id';
@@ -55,7 +56,26 @@ class BusinessProfileRepository {
       if (!doc.exists) {
         return BusinessProfile(id: targetId);
       }
-      return BusinessProfile.fromMap(doc.data()!);
+      
+      final profile = BusinessProfile.fromMap(doc.data()!);
+      
+      // Cache remote images locally in background
+      if (profile.logoPath != null && profile.logoPath!.startsWith('http')) {
+        ImageCacheService.cacheImage(pathOrUrl: profile.logoPath, cacheKey: 'logo_').then((localPath) {
+          if (localPath != null && localPath != profile.logoPath) {
+            // We don't need to save back to Firestore, just having it cached is enough
+            // because our PDF generator and UI will use the ImageCacheService as well.
+          }
+        });
+      }
+      if (profile.signaturePath != null && profile.signaturePath!.startsWith('http')) {
+        ImageCacheService.cacheImage(pathOrUrl: profile.signaturePath, cacheKey: 'signature_');
+      }
+      if (profile.stampPath != null && profile.stampPath!.startsWith('http')) {
+        ImageCacheService.cacheImage(pathOrUrl: profile.stampPath, cacheKey: 'stamp_');
+      }
+
+      return profile;
     } catch (e) {
       print('Error fetching profile: $e');
       return BusinessProfile(id: targetId);

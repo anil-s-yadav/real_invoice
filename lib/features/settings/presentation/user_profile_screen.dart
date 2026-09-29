@@ -407,6 +407,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -505,6 +506,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const SizedBox(width: 16),
           Expanded(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
@@ -529,6 +531,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ElevatedButton(
             onPressed: _isSyncing ? null : _handleSync,
             style: ElevatedButton.styleFrom(
+              minimumSize: const Size(0, 40),
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -631,6 +634,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(

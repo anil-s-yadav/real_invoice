@@ -30,6 +30,7 @@ class CompanyDetailScreen extends StatefulWidget {
 class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   late BusinessProfile _profile;
   bool _hasChanges = false;
+  bool _isSaving = false;
 
   late TextEditingController _nameController;
   late TextEditingController _gstinController;
@@ -38,10 +39,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   late TextEditingController _emailController;
   late TextEditingController _addressController;
   late TextEditingController _websiteController;
-  late TextEditingController _bankNameController;
-  late TextEditingController _accountNumberController;
-  late TextEditingController _ifscCodeController;
-  late TextEditingController _upiIdController;
   late TextEditingController _termsController;
   late TextEditingController _notesController;
 
@@ -57,11 +54,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     _emailController = TextEditingController(text: _profile.email ?? '');
     _addressController = TextEditingController(text: _profile.address ?? '');
     _websiteController = TextEditingController(text: _profile.website ?? '');
-    _bankNameController = TextEditingController(text: _profile.bankName ?? '');
-    _accountNumberController =
-        TextEditingController(text: _profile.accountNumber ?? '');
-    _ifscCodeController = TextEditingController(text: _profile.ifscCode ?? '');
-    _upiIdController = TextEditingController(text: _profile.upiId ?? '');
     _termsController = TextEditingController(text: _profile.defaultTerms);
     _notesController = TextEditingController(text: _profile.defaultNotes);
 
@@ -78,10 +70,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     _emailController.addListener(markChanged);
     _addressController.addListener(markChanged);
     _websiteController.addListener(markChanged);
-    _bankNameController.addListener(markChanged);
-    _accountNumberController.addListener(markChanged);
-    _ifscCodeController.addListener(markChanged);
-    _upiIdController.addListener(markChanged);
     _termsController.addListener(markChanged);
     _notesController.addListener(markChanged);
   }
@@ -95,10 +83,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
     _emailController.dispose();
     _addressController.dispose();
     _websiteController.dispose();
-    _bankNameController.dispose();
-    _accountNumberController.dispose();
-    _ifscCodeController.dispose();
-    _upiIdController.dispose();
     _termsController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -150,6 +134,8 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   }
 
   Future<void> _handleUpdate() async {
+    if (_isSaving) return;
+    
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -161,53 +147,48 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
       return;
     }
 
-    final updated = _profile.copyWith(
-      businessName: name,
-      gstin: _gstinController.text.trim().isEmpty
-          ? null
-          : _gstinController.text.trim(),
-      pan: _panController.text.trim().isEmpty
-          ? null
-          : _panController.text.trim(),
-      phone: _phoneController.text.trim().isEmpty
-          ? null
-          : _phoneController.text.trim(),
-      email: _emailController.text.trim().isEmpty
-          ? null
-          : _emailController.text.trim(),
-      address: _addressController.text.trim().isEmpty
-          ? null
-          : _addressController.text.trim(),
-      website: _websiteController.text.trim().isEmpty
-          ? null
-          : _websiteController.text.trim(),
-      bankName: _bankNameController.text.trim().isEmpty
-          ? null
-          : _bankNameController.text.trim(),
-      accountNumber: _accountNumberController.text.trim().isEmpty
-          ? null
-          : _accountNumberController.text.trim(),
-      ifscCode: _ifscCodeController.text.trim().isEmpty
-          ? null
-          : _ifscCodeController.text.trim(),
-      upiId: _upiIdController.text.trim().isEmpty
-          ? null
-          : _upiIdController.text.trim(),
-      defaultTerms: _termsController.text.trim(),
-      defaultNotes: _notesController.text.trim(),
-    );
+    setState(() => _isSaving = true);
 
-    final repo = context.read<BusinessProfileRepository>();
-    await repo.saveProfile(updated);
-    if (mounted) {
-      context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Company updated successfully'),
-          backgroundColor: AppColors.statusPaidText,
-        ),
+    try {
+      final updated = _profile.copyWith(
+        businessName: name,
+        gstin: _gstinController.text.trim().isEmpty
+            ? null
+            : _gstinController.text.trim(),
+        pan: _panController.text.trim().isEmpty
+            ? null
+            : _panController.text.trim(),
+        phone: _phoneController.text.trim().isEmpty
+            ? null
+            : _phoneController.text.trim(),
+        email: _emailController.text.trim().isEmpty
+            ? null
+            : _emailController.text.trim(),
+        address: _addressController.text.trim().isEmpty
+            ? null
+            : _addressController.text.trim(),
+        website: _websiteController.text.trim().isEmpty
+            ? null
+            : _websiteController.text.trim(),
+        defaultTerms: _termsController.text.trim(),
+        defaultNotes: _notesController.text.trim(),
       );
-      Navigator.pop(context, true);
+
+      final repo = context.read<BusinessProfileRepository>();
+      await repo.saveProfile(updated);
+      
+      if (mounted) {
+        context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Company updated successfully'),
+            backgroundColor: AppColors.statusPaidText,
+          ),
+        );
+        Navigator.pop(context, true);
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -369,40 +350,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
 
             const SizedBox(height: 24),
 
-            // Bank & Payment Details
-            _buildSectionTitle(
-              'Bank & Payment Details',
-              Icons.account_balance_outlined,
-            ),
-            const SizedBox(height: 12),
-            AppTextField(
-              controller: _bankNameController,
-              label: 'Bank Name',
-              hint: 'e.g. HDFC Bank',
-              textCapitalization: TextCapitalization.words,
-            ),
-            const SizedBox(height: 12),
-            AppTextField(
-              controller: _accountNumberController,
-              label: 'Account Number',
-              hint: 'e.g. 50100234567890',
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            AppTextField(
-              controller: _ifscCodeController,
-              label: 'IFSC Code',
-              hint: 'e.g. HDFC0001234',
-              textCapitalization: TextCapitalization.characters,
-            ),
-            const SizedBox(height: 12),
-            AppTextField(
-              controller: _upiIdController,
-              label: 'UPI ID / VPA',
-              hint: 'e.g. company@okhdfcbank',
-            ),
-
-            const SizedBox(height: 24),
 
             // Invoice Defaults
             _buildSectionTitle(
@@ -465,7 +412,8 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             // Update Button
             AppButton(
               label: 'Update Company',
-              onPressed: _hasChanges ? _handleUpdate : null,
+              onPressed: _hasChanges && !_isSaving ? _handleUpdate : null,
+              isLoading: _isSaving,
               icon: Icons.save_outlined,
             ),
             const SizedBox(height: 12),

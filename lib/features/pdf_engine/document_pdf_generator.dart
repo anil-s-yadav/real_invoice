@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:http/http.dart' as http;
+import '../../core/utils/image_cache_service.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../core/utils/date_formatter.dart';
 import '../business_profile/domain/business_profile_model.dart';
@@ -21,18 +22,29 @@ class DocumentPdfGenerator {
     if (_imageCache.containsKey(path)) return _imageCache[path];
 
     try {
-      if (path.startsWith('http')) {
-        final response = await http.get(Uri.parse(path));
-        if (response.statusCode == 200) {
-          _imageCache[path] = response.bodyBytes;
-          return response.bodyBytes;
-        }
-      } else {
-        final file = File(path);
-        if (await file.exists()) {
-          final bytes = await file.readAsBytes();
-          _imageCache[path] = bytes;
-          return bytes;
+      // 1. Resolve local path via ImageCacheService if it's a remote URL
+      // For caching key, we use a hash of the URL to ensure uniqueness
+      String cacheKey = path.startsWith('http') ? 'pdf_img_${path.hashCode}' : '';
+      String? resolvedPath = path.startsWith('http') 
+          ? await ImageCacheService.cacheImage(pathOrUrl: path, cacheKey: cacheKey)
+          : path;
+      
+      if (resolvedPath != null) {
+        if (resolvedPath.startsWith('http')) {
+          // Fallback to direct HTTP if caching failed but it's still a URL
+          final response = await http.get(Uri.parse(resolvedPath)).timeout(const Duration(seconds: 5));
+          if (response.statusCode == 200) {
+            _imageCache[path] = response.bodyBytes;
+            return response.bodyBytes;
+          }
+        } else {
+          // Read local file
+          final file = File(resolvedPath);
+          if (await file.exists()) {
+            final bytes = await file.readAsBytes();
+            _imageCache[path] = bytes; // cache in-memory by original path
+            return bytes;
+          }
         }
       }
     } catch (_) {}
@@ -596,6 +608,11 @@ class DocumentPdfGenerator {
     if (bankDetail == null && doc.selectedBankDetailId != 'none' && profile.bankName != null && profile.bankName!.trim().isNotEmpty && profile.accountNumber != null && profile.accountNumber!.trim().isNotEmpty) {
       bankDetail = PaymentDetail(id: 'legacy', type: 'Bank', title: profile.bankName!, details: profile.accountNumber!, extra: profile.ifscCode);
     }
+    // Auto-pick first available bank from profile if still not resolved
+    if (bankDetail == null && doc.selectedBankDetailId != 'none') {
+      final banks = profile.paymentDetails.where((p) => p.type == 'Bank').toList();
+      if (banks.isNotEmpty) bankDetail = banks.first;
+    }
 
     PaymentDetail? upiDetail;
     if (doc.selectedUpiDetailId != null && doc.selectedUpiDetailId != 'none') {
@@ -606,6 +623,11 @@ class DocumentPdfGenerator {
     // If not found or legacy, use legacy fields
     if (upiDetail == null && doc.selectedUpiDetailId != 'none' && profile.upiId != null && profile.upiId!.trim().isNotEmpty) {
       upiDetail = PaymentDetail(id: 'legacy_upi', type: 'UPI', title: 'UPI', details: profile.upiId!);
+    }
+    // Auto-pick first available UPI from profile if still not resolved
+    if (upiDetail == null && doc.selectedUpiDetailId != 'none') {
+      final upis = profile.paymentDetails.where((p) => p.type == 'UPI').toList();
+      if (upis.isNotEmpty) upiDetail = upis.first;
     }
 
     final hasBank = bankDetail != null;

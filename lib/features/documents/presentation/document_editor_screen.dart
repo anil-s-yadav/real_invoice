@@ -78,7 +78,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           : '',
     );
     _issueDate = doc?.issueDate ?? DateTime.now();
-    _includePaymentDetails = doc?.includePaymentDetails ?? false;
+    _includePaymentDetails = doc?.includePaymentDetails ?? true;
     _selectedBankDetailId = doc?.selectedBankDetailId;
     _selectedUpiDetailId = doc?.selectedUpiDetailId;
     _dueDate = doc?.dueDate ?? DateTime.now().add(const Duration(days: 15));
@@ -131,6 +131,30 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
             case DocumentType.proforma:
               _templateId = profile.defaultProformaTemplateId;
               break;
+          }
+
+          // Auto-select first available bank and UPI for new documents
+          if (_selectedBankDetailId == null) {
+            final banks = profile.paymentDetails
+                .where((p) => p.type == 'Bank')
+                .toList();
+            if (banks.isNotEmpty) {
+              _selectedBankDetailId = banks.first.id;
+            } else if (profile.bankName != null &&
+                profile.bankName!.trim().isNotEmpty) {
+              _selectedBankDetailId = 'legacy';
+            }
+          }
+          if (_selectedUpiDetailId == null) {
+            final upis = profile.paymentDetails
+                .where((p) => p.type == 'UPI')
+                .toList();
+            if (upis.isNotEmpty) {
+              _selectedUpiDetailId = upis.first.id;
+            } else if (profile.upiId != null &&
+                profile.upiId!.trim().isNotEmpty) {
+              _selectedUpiDetailId = 'legacy_upi';
+            }
           }
         });
       }
