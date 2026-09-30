@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
@@ -344,20 +345,8 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
               // 1. Informational header
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Your banking information and instant UPI payment QR code are printed automatically at the bottom of your invoices, quotations, and receipts.',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: AdBannerWidget(),
                 ),
               ),
 

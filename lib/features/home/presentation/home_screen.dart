@@ -1,3 +1,4 @@
+import '../../ads/ad_banner_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -378,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildOverviewDashboard(
                     state is HomeLoaded ? state.stats : null,
                   ),
-                  const SizedBox(height: AppDimensions.xxxl),
+                  const SizedBox(height: AppDimensions.xxl),
 
                   // 2. Create Document (Quick Actions - BIG)
                   const Padding(
@@ -556,9 +557,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-
-                  const SizedBox(height: AppDimensions.xl),
-
+                  AdBannerWidget(),
+                  const SizedBox(height: AppDimensions.xxxl),
                   // 3. Management Directories
                   const Padding(
                     padding: EdgeInsets.only(left: 4, bottom: 12),
@@ -617,6 +617,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: AppDimensions.xl),
+                  AdBannerWidget(),
                   const SizedBox(height: AppDimensions.xxxl),
                 ],
               ),
@@ -1014,6 +1016,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Divider(
               height: 1,
               color: isDark ? AppColors.darkBorder : AppColors.border,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AdBannerWidget(),
             ),
             Expanded(
               child: ListView(

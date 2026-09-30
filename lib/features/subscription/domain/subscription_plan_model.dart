@@ -20,6 +20,12 @@ class SubscriptionPlanModel {
   final bool isWelcomeOffer;
   final DateTime createdAt;
   final int maxCompaniesAllowed;
+  final int maxClientsAllowed;
+  final int maxItemsAllowed;
+  final int maxDocumentsPerDay;
+  final int maxDevicesAllowed;
+  final bool isAdFree;
+  final bool hasPremiumTemplates;
 
   const SubscriptionPlanModel({
     required this.id,
@@ -41,6 +47,12 @@ class SubscriptionPlanModel {
     this.isWelcomeOffer = false,
     required this.createdAt,
     this.maxCompaniesAllowed = 1,
+    this.maxClientsAllowed = 3,
+    this.maxItemsAllowed = 3,
+    this.maxDocumentsPerDay = 5,
+    this.maxDevicesAllowed = 1,
+    this.isAdFree = false,
+    this.hasPremiumTemplates = false,
   });
 
   bool get isFree => planName.trim().toLowerCase() == 'free';
@@ -73,6 +85,13 @@ class SubscriptionPlanModel {
       autoRenew: false,
       isWelcomeOffer: false,
       createdAt: now,
+      maxCompaniesAllowed: 1,
+      maxClientsAllowed: 3,
+      maxItemsAllowed: 3,
+      maxDocumentsPerDay: 5,
+      maxDevicesAllowed: 1,
+      isAdFree: false,
+      hasPremiumTemplates: false,
     );
   }
 

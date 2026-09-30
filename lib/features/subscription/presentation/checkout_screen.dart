@@ -52,40 +52,83 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     double invozDiscount = baseTotal * invozPerc;
     double welcomeDiscount = 0.0;
     if (widget.hasWelcomeOffer) {
-      if (_selectedDuration == 12) welcomeDiscount = baseTotal * 0.50;
-      else if (_selectedDuration == 1) welcomeDiscount = baseTotal;
+      if (_selectedDuration == 12) {
+        welcomeDiscount = baseTotal * 0.50;
+      } else if (_selectedDuration == 1)
+        welcomeDiscount = baseTotal;
     }
     double subtotal = baseTotal - invozDiscount - welcomeDiscount;
     if (subtotal < 0) subtotal = 0;
     double gstAmount = subtotal * _gstRate;
     double totalPayable = subtotal + gstAmount;
 
+    int maxCompanies = 1;
+    int maxClients = 3;
+    int maxDocs = 5;
+    int maxDevices = 1;
+    bool isAdFree = false;
+    bool hasPremium = false;
+
+    String pName = widget.planName.toLowerCase();
+    if (pName == 'single') {
+      maxCompanies = 1;
+      maxClients = 10;
+      maxDocs = -1; // -1 means unlimited
+      maxDevices = 2;
+      hasPremium = true;
+    } else if (pName.contains('pro')) {
+      maxCompanies = 3;
+      maxClients = -1;
+      maxDocs = -1;
+      maxDevices = 3;
+      isAdFree = true;
+      hasPremium = true;
+    } else if (pName == 'gold') {
+      maxCompanies = 10;
+      maxClients = -1;
+      maxDocs = -1;
+      maxDevices = -1;
+      isAdFree = true;
+      hasPremium = true;
+    }
+
     final repo = SubscriptionRepository();
     final newPlan = SubscriptionPlanModel(
-       id: widget.planName.toLowerCase() + '_' + DateTime.now().millisecondsSinceEpoch.toString(), 
-       planName: widget.planName,
-       price: baseTotal,
-       durationMonths: _selectedDuration,
-       discountPercentage: (invozDiscount + welcomeDiscount) / baseTotal,
-       discountAmount: invozDiscount + welcomeDiscount,
-       gstAmount: gstAmount,
-       finalAmount: totalPayable,
-       status: 'Active',
-       transactionId: response.paymentId ?? DateTime.now().millisecondsSinceEpoch.toString(),
-       orderId: response.orderId,
-       paymentSignature: response.signature,
-       paymentMethod: 'Razorpay',
-       startDate: DateTime.now(),
-       expiryDate: DateTime.now().add(Duration(days: 30 * _selectedDuration)),
-       autoRenew: true,
-       createdAt: DateTime.now(),
-       maxCompaniesAllowed: widget.planName.toLowerCase().contains('pro') ? 5 : 50,
+      id: '${widget.planName.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}',
+      planName: widget.planName,
+      price: baseTotal,
+      durationMonths: _selectedDuration,
+      discountPercentage: (invozDiscount + welcomeDiscount) / baseTotal,
+      discountAmount: invozDiscount + welcomeDiscount,
+      gstAmount: gstAmount,
+      finalAmount: totalPayable,
+      status: 'Active',
+      transactionId:
+          response.paymentId ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
+      orderId: response.orderId,
+      paymentSignature: response.signature,
+      paymentMethod: 'Razorpay',
+      startDate: DateTime.now(),
+      expiryDate: DateTime.now().add(Duration(days: 30 * _selectedDuration)),
+      autoRenew: true,
+      createdAt: DateTime.now(),
+      maxCompaniesAllowed: maxCompanies,
+      maxClientsAllowed: maxClients,
+      maxItemsAllowed: maxClients, // using same limit for simplicity
+      maxDocumentsPerDay: maxDocs,
+      maxDevicesAllowed: maxDevices,
+      isAdFree: isAdFree,
+      hasPremiumTemplates: hasPremium,
     );
     await repo.saveOrUpgradePlan(newPlan);
     if (!mounted) return;
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Subscription upgraded successfully!'), backgroundColor: Colors.green),
+      const SnackBar(
+        content: Text('Subscription upgraded successfully!'),
+        backgroundColor: Colors.green,
+      ),
     );
     // Go back to previous screen
     Navigator.of(context).pop();
@@ -101,7 +144,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _handleExternalWallet(ExternalWalletResponse response) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('External Wallet Selected: ${response.walletName}')),
+      SnackBar(
+        content: Text('External Wallet Selected: ${response.walletName}'),
+      ),
     );
   }
 
@@ -750,12 +795,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     'key': 'rzp_test_ThkLyPi706leO9',
                     'amount': (totalPayable * 100).toInt(), // in paise
                     'name': 'Invoz App',
-                    'description': '${widget.planName} - $_selectedDuration Months',
-                    'timeout': 120, 
-                    'prefill': {
-                      'contact': '', 
-                      'email': ''
-                    }
+                    'description':
+                        '${widget.planName} - $_selectedDuration Months',
+                    'timeout': 120,
+                    'prefill': {'contact': '', 'email': ''},
                   };
                   try {
                     _razorpay.open(options);
@@ -838,4 +881,3 @@ class _SummaryRow extends StatelessWidget {
     );
   }
 }
-

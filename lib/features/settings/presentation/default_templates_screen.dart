@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_event.dart';
@@ -196,6 +197,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Center(child: AdBannerWidget()),
                   // Active default banner
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -123,6 +124,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ),
                   ),
                 ),
+                Center(child: AdBannerWidget()),
                 Expanded(
                   child: filtered.isEmpty
                       ? Center(
@@ -317,8 +319,8 @@ class _ProductItemCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
                               color: isDark
-                                ? AppColors.darkBorder
-                                : AppColors.border.withValues(alpha: 0.5),
+                                  ? AppColors.darkBorder
+                                  : AppColors.border.withValues(alpha: 0.5),
                             ),
                           ),
                           child: Text(
@@ -345,8 +347,8 @@ class _ProductItemCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
                               color: isDark
-                                ? AppColors.darkBorder
-                                : AppColors.border.withValues(alpha: 0.5),
+                                  ? AppColors.darkBorder
+                                  : AppColors.border.withValues(alpha: 0.5),
                             ),
                           ),
                           child: Text(

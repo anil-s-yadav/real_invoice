@@ -1,3 +1,6 @@
+import 'package:invoz/core/constants/app_dimensions.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
+
 import '../data/document_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -202,87 +205,95 @@ class DocumentListScreenState extends State<DocumentListScreen> {
       ),
       builder: (sheetContext) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Select Date Range',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              ...DateFilterRange.values.map((range) {
-                final isSelected = _selectedDateRangeType == range;
-                return ListTile(
-                  title: Text(
-                    range.displayName,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Select Date Range',
                     style: TextStyle(
-                      fontWeight: isSelected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                       color: isDark
                           ? AppColors.darkTextPrimary
                           : AppColors.textPrimary,
                     ),
                   ),
-                  trailing: isSelected
-                      ? Icon(
-                          Icons.check,
-                          color: isDark
-                              ? AppColors.primaryDark
-                              : AppColors.primary,
-                        )
-                      : null,
-                  onTap: () async {
-                    if (range == DateFilterRange.custom) {
-                      Navigator.pop(sheetContext);
-                      final picked = await showDateRangePicker(
-                        context: context,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                        builder: (pickerContext, child) {
-                          return Theme(
-                            data: Theme.of(pickerContext).copyWith(
-                              colorScheme: isDark
-                                  ? const ColorScheme.dark(
-                                      primary: AppColors.primary,
-                                      onPrimary: Colors.white,
-                                      surface: AppColors.darkSurface,
-                                      onSurface: AppColors.darkTextPrimary,
-                                    )
-                                  : const ColorScheme.light(
-                                      primary: AppColors.primary,
-                                      onPrimary: Colors.white,
-                                      surface: Colors.white,
-                                      onSurface: AppColors.textPrimary,
-                                    ),
-                            ),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (picked != null) {
-                        _applyFilter(
-                          dateRangeType: DateFilterRange.custom,
-                          customStartDate: picked.start,
-                          customEndDate: picked.end,
+                ),
+                ...DateFilterRange.values.map((range) {
+                  final isSelected = _selectedDateRangeType == range;
+                  return ListTile(
+                    title: Text(
+                      range.displayName,
+                      style: TextStyle(
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? Icon(
+                            Icons.check,
+                            color: isDark
+                                ? AppColors.primaryDark
+                                : AppColors.primary,
+                          )
+                        : null,
+                    onTap: () async {
+                      if (range == DateFilterRange.custom) {
+                        Navigator.pop(sheetContext);
+                        final picked = await showDateRangePicker(
+                          context: context,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime.now(),
+                          builder: (pickerContext, child) {
+                            return Theme(
+                              data: Theme.of(pickerContext).copyWith(
+                                colorScheme: isDark
+                                    ? const ColorScheme.dark(
+                                        primary: AppColors.primary,
+                                        onPrimary: Colors.white,
+                                        surface: AppColors.darkSurface,
+                                        onSurface: AppColors.darkTextPrimary,
+                                      )
+                                    : const ColorScheme.light(
+                                        primary: AppColors.primary,
+                                        onPrimary: Colors.white,
+                                        surface: Colors.white,
+                                        onSurface: AppColors.textPrimary,
+                                      ),
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
+                        if (picked != null) {
+                          _applyFilter(
+                            dateRangeType: DateFilterRange.custom,
+                            customStartDate: picked.start,
+                            customEndDate: picked.end,
+                          );
+                        }
+                      } else {
+                        _applyFilter(dateRangeType: range);
+                        Navigator.pop(sheetContext);
                       }
-                    } else {
-                      _applyFilter(dateRangeType: range);
-                      Navigator.pop(sheetContext);
-                    }
-                  },
-                );
-              }),
-            ],
+                    },
+                  );
+                }),
+                const Divider(),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(child: AdBannerWidget()),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -299,64 +310,34 @@ class DocumentListScreenState extends State<DocumentListScreen> {
       ),
       builder: (sheetContext) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Select Status',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  'All Statuses',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
-                  ),
-                ),
-                trailing: _selectedStatus == null
-                    ? Icon(
-                        Icons.check,
-                        color: isDark
-                            ? AppColors.primaryDark
-                            : AppColors.primary,
-                      )
-                    : null,
-                onTap: () {
-                  _applyFilter(clearStatus: true);
-                  Navigator.pop(sheetContext);
-                },
-              ),
-              Divider(
-                height: 1,
-                color: isDark ? AppColors.darkBorder : AppColors.border,
-              ),
-              ...DocumentStatus.values.map((status) {
-                final isSelected = _selectedStatus == status;
-                return ListTile(
-                  title: Text(
-                    status.name.toUpperCase(),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Select Status',
                     style: TextStyle(
-                      fontWeight: isSelected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                       color: isDark
                           ? AppColors.darkTextPrimary
                           : AppColors.textPrimary,
                     ),
                   ),
-                  trailing: isSelected
+                ),
+                ListTile(
+                  title: Text(
+                    'All Statuses',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  trailing: _selectedStatus == null
                       ? Icon(
                           Icons.check,
                           color: isDark
@@ -365,12 +346,50 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                         )
                       : null,
                   onTap: () {
-                    _applyFilter(status: status);
+                    _applyFilter(clearStatus: true);
                     Navigator.pop(sheetContext);
                   },
-                );
-              }),
-            ],
+                ),
+                Divider(
+                  height: 1,
+                  color: isDark ? AppColors.darkBorder : AppColors.border,
+                ),
+                ...DocumentStatus.values.map((status) {
+                  final isSelected = _selectedStatus == status;
+                  return ListTile(
+                    title: Text(
+                      status.name.toUpperCase(),
+                      style: TextStyle(
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? Icon(
+                            Icons.check,
+                            color: isDark
+                                ? AppColors.primaryDark
+                                : AppColors.primary,
+                          )
+                        : null,
+                    onTap: () {
+                      _applyFilter(status: status);
+                      Navigator.pop(sheetContext);
+                    },
+                  );
+                }),
+                const Divider(),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(child: AdBannerWidget()),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -775,6 +794,8 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                   );
                 },
               ),
+
+              Center(child: AdBannerWidget()),
 
               // Documents List
               Expanded(

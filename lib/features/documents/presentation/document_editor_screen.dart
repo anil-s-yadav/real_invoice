@@ -1,3 +1,6 @@
+import '../../subscriptions/bloc/subscription_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../../ads/ad_helper.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -42,6 +45,40 @@ class DocumentEditorScreen extends StatefulWidget {
 }
 
 class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
+  InterstitialAd? _interstitialAd;
+  bool _isAdLoaded = false;
+
+  void _loadInterstitialAd() {
+    final subState = context.read<SubscriptionBloc>().state;
+    if (subState.plan?.isAdFree ?? false) return;
+
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+          _isAdLoaded = true;
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _interstitialAd = null;
+              _isAdLoaded = false;
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _interstitialAd = null;
+              _isAdLoaded = false;
+            },
+          );
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint('InterstitialAd failed to load: $error');
+        },
+      ),
+    );
+  }
+
   late String _documentId;
   late DocumentType _docType;
   late TextEditingController _docNumberController;
@@ -92,6 +129,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeDefaults();
+      _loadInterstitialAd();
     });
   }
 
@@ -309,6 +347,9 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   Future<void> _handleSaveAndPreview() async {
     final doc = await _buildAndSaveDocument();
     if (doc != null && mounted) {
+      if (_isAdLoaded && _interstitialAd != null) {
+        _interstitialAd!.show();
+      }
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => PdfPreviewScreen(document: doc)),
       );

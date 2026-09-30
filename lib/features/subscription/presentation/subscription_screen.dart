@@ -71,6 +71,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'highlight': false,
           'isLimitation': true,
         },
+        {'text': 'No Analytics', 'highlight': false, 'isLimitation': true},
 
         {'text': 'No support', 'highlight': false, 'isLimitation': true},
         {
@@ -95,6 +96,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         {'text': 'Dual device synchronization', 'highlight': false},
         {'text': 'Full access to Premium templates', 'highlight': true},
         {'text': 'Cloud backup & cross-device sync', 'highlight': false},
+        {'text': 'No Analytics', 'highlight': false, 'isLimitation': true},
         {
           'text': 'Standard email support',
           'highlight': false,
@@ -119,6 +121,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         {'text': '100% Ad-free experience', 'highlight': true},
         {'text': 'Up to 3 Company Profiles', 'highlight': true},
         {'text': 'Manage Unlimited clients & Items', 'highlight': true},
+        {'text': 'Full Analytics', 'highlight': true, 'isLimitation': false},
         {'text': 'Multi-device sync (up to 3 devices)', 'highlight': false},
         {'text': 'Unlimited document creation', 'highlight': true},
         {'text': 'All Premium templates & customizations', 'highlight': false},
@@ -140,6 +143,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         {'text': 'Up to 10 Company Profiles', 'highlight': true},
         {'text': 'Manage Unlimited clients & Items', 'highlight': true},
         {'text': 'Unlimited multi-device synchronization', 'highlight': true},
+        {'text': 'Full Analytics', 'highlight': true, 'isLimitation': false},
         {'text': 'Unlimited document creation', 'highlight': true},
         {'text': 'All Premium templates & customizations', 'highlight': false},
         {'text': 'Comprehensive financial analytics', 'highlight': true},
@@ -209,8 +213,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       ],
                     ),
                   ),
-                  shape: RoundedRectangleBorder( 
-                    
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   actions: [
@@ -360,7 +363,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
             // Plan Cards Carousel
             SizedBox(
-              height: 480,
+              height: 540,
               child: PageView.builder(
                 controller: _pageController,
                 itemCount: _plans.length,

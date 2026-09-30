@@ -1,7 +1,6 @@
-import '../../subscriptions/bloc/subscription_bloc.dart';
-import '../../subscription/presentation/subscription_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import 'package:printing/printing.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
@@ -275,6 +274,16 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                         SaveDocumentEvent(_document),
                       );
                     },
+                  ),
+                  Divider(),
+                  const SizedBox(height: AppDimensions.xl),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(child: AdBannerWidget()),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(child: AdBannerWidget()),
                   ),
                 ],
               ),
@@ -639,6 +648,8 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                   ),
                 ),
 
+                // const SizedBox(height: AppDimensions.xl),
+                AdBannerWidget(),
                 // Custom Bottom Bar for Print & Share
                 //
               ],

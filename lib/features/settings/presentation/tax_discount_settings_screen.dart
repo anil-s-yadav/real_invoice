@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -97,7 +98,8 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
   }
 
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
-  Color get _textPrimary => _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+  Color get _textPrimary =>
+      _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +127,10 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: Center(child: AdBannerWidget()),
+            ),
             // Top Preview Card
             _buildSectionHeader('LIVE CALCULATION PREVIEW'),
             _buildLivePreviewCard(),
@@ -174,9 +180,7 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                                 fontWeight: isSelected
                                     ? FontWeight.bold
                                     : FontWeight.w500,
-                                color: isSelected
-                                    ? Colors.white
-                                    : _textPrimary,
+                                color: isSelected ? Colors.white : _textPrimary,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -295,16 +299,16 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                                 fontWeight: isSelected
                                     ? FontWeight.bold
                                     : FontWeight.w500,
-                                color: isSelected
-                                    ? Colors.white
-                                    : _textPrimary,
+                                color: isSelected ? Colors.white : _textPrimary,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 side: BorderSide(
                                   color: isSelected
                                       ? AppColors.primary
-                                      : (_isDark ? AppColors.darkBorder : AppColors.border),
+                                      : (_isDark
+                                            ? AppColors.darkBorder
+                                            : AppColors.border),
                                 ),
                               ),
                               showCheckmark: false,
@@ -463,16 +467,16 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
                             fontWeight: isSelected
                                 ? FontWeight.bold
                                 : FontWeight.w500,
-                            color: isSelected
-                                ? Colors.white
-                                : _textPrimary,
+                            color: isSelected ? Colors.white : _textPrimary,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                             side: BorderSide(
                               color: isSelected
                                   ? AppColors.primary
-                                  : (_isDark ? AppColors.darkBorder : AppColors.border),
+                                  : (_isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.border),
                             ),
                           ),
                           showCheckmark: false,
@@ -610,7 +614,9 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
   Widget _buildDivider() {
     return Divider(
       height: 1,
-      color: (_isDark ? AppColors.darkBorder : AppColors.border).withValues(alpha: 0.5),
+      color: (_isDark ? AppColors.darkBorder : AppColors.border).withValues(
+        alpha: 0.5,
+      ),
       indent: 16,
       endIndent: 16,
     );

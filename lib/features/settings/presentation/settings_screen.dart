@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/theme/theme_cubit.dart';
@@ -59,11 +60,7 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
                   title: 'Company Profile',
                   subtitle: 'Business details, logo & GSTIN',
@@ -77,11 +74,7 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
                   title: 'Payment Profiles',
                   subtitle: 'Bank accounts & UPI details',
@@ -95,11 +88,7 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 BlocBuilder<SubscriptionBloc, SubscriptionState>(
                   builder: (context, subState) {
                     final plan = subState.plan;
@@ -131,6 +120,10 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: AdBannerWidget(),
+          ),
 
           _buildSectionHeader('PREFERENCES'),
           AppCard(
@@ -145,11 +138,7 @@ class SettingsScreen extends StatelessWidget {
                   isFirst: true,
                   onTap: () => _showTemplatesSheet(context),
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
                   title: 'Invoice Numbering',
                   subtitle: 'Prefixes & sequence',
@@ -163,11 +152,7 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
                   title: 'Tax & Discounts',
                   subtitle: 'Default GST & discount rates',
@@ -182,11 +167,7 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 BlocBuilder<ThemeCubit, ThemeMode>(
                   builder: (context, themeMode) {
                     return SettingsTile(
@@ -202,7 +183,9 @@ class SettingsScreen extends StatelessWidget {
                         icon: Icon(
                           Icons.expand_more,
                           size: 20,
-                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                          color: isDark
+                              ? AppColors.darkTextMuted
+                              : AppColors.textMuted,
                         ),
                         alignment: Alignment.centerRight,
                         items: [
@@ -258,7 +241,10 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           const SizedBox(height: 20),
-
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: AdBannerWidget(),
+          ),
           _buildSectionHeader('SUPPORT & ABOUT'),
           AppCard(
             padding: EdgeInsets.zero,
@@ -286,11 +272,7 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
                   title: 'Help & Support',
                   subtitle: 'FAQs, contact & email',
@@ -305,11 +287,7 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
                   title: 'Rate Us',
                   subtitle: 'Share your feedback',
@@ -317,11 +295,7 @@ class SettingsScreen extends StatelessWidget {
                   color: Colors.amber,
                   onTap: () => _showComingSoon(context, 'Rate Us'),
                 ),
-                Divider(
-                  height: 1,
-                  color: dividerColor,
-                  indent: 56,
-                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
                   title: 'App Version',
                   icon: Icons.info_outline,
@@ -339,6 +313,10 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: AdBannerWidget(),
           ),
           const SizedBox(height: 36),
         ],

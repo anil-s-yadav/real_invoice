@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/bloc/app_bloc_observer.dart';
@@ -32,16 +35,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
   Bloc.observer = AppBlocObserver();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
+
   // Explicitly enable offline persistence and unlimited cache size
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
-  
-  runApp(const InvozRoot());
+  runApp(DevicePreview(enabled: kDebugMode, builder: (_) => const InvozRoot()));
+
+  // runApp(const InvozRoot());
 }
 
 class InvozRoot extends StatelessWidget {
