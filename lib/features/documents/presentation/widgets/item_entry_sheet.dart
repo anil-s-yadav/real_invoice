@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -135,8 +136,6 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
   double get _taxableAmount => _grossAmount - _discountAmount;
   double get _taxAmount => _taxableAmount * (_taxPercent / 100.0);
   double get _lineTotal => _taxableAmount + _taxAmount;
-
-
 
   void _handleSave() {
     final title = _titleController.text.trim();
@@ -275,8 +274,7 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   initialValue: _selectedUnit,
-                  dropdownColor:
-                      isDark ? AppColors.darkSurface : Colors.white,
+                  dropdownColor: isDark ? AppColors.darkSurface : Colors.white,
                   decoration: _dropdownDecoration('Unit', isDark),
                   items: _commonUnits
                       .map((u) => DropdownMenuItem(value: u, child: Text(u)))
@@ -290,8 +288,7 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
               Expanded(
                 child: DropdownButtonFormField<double>(
                   initialValue: _taxPercent,
-                  dropdownColor:
-                      isDark ? AppColors.darkSurface : Colors.white,
+                  dropdownColor: isDark ? AppColors.darkSurface : Colors.white,
                   decoration: _dropdownDecoration('GST Tax', isDark),
                   items: _taxRates
                       .map(
@@ -377,7 +374,10 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Tax (${_taxPercent.toStringAsFixed(1)}%)', style: AppTypography.bodySmall),
+                      Text(
+                        'Tax (${_taxPercent.toStringAsFixed(1)}%)',
+                        style: AppTypography.bodySmall,
+                      ),
                       Text(
                         '+ ${CurrencyFormatter.format(_taxAmount)}',
                         style: AppTypography.tabularNumbers.copyWith(
@@ -401,7 +401,9 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                     Text(
                       CurrencyFormatter.format(_lineTotal),
                       style: AppTypography.moneyMedium.copyWith(
-                        color: isDark ? AppColors.primaryDark : AppColors.primary,
+                        color: isDark
+                            ? AppColors.primaryDark
+                            : AppColors.primary,
                       ),
                     ),
                   ],
@@ -418,6 +420,8 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
             onPressed: _handleSave,
             icon: Icons.check,
           ),
+          SizedBox(height: 5),
+          AdBannerWidget(),
         ],
       ),
     );
