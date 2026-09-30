@@ -22,6 +22,7 @@ import 'pdf_preview_screen.dart';
 import 'widgets/payment_entry_sheet.dart';
 import 'package:printing/printing.dart';
 import '../../pdf_engine/document_pdf_generator.dart';
+import '../../settings/data/payment_detail_repository.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 
@@ -1115,11 +1116,15 @@ class _DocumentListItemCard extends StatelessWidget {
             final profileState = context.read<BusinessProfileBloc>().state;
             if (profileState is BusinessProfileLoaded) {
               await Printing.layoutPdf(
-                onLayout: (format) => DocumentPdfGenerator.generate(
-                  document: document,
-                  profile: profileState.profile,
-                  templateId: document.templateId,
-                ),
+                onLayout: (format) async {
+                    final payments = await PaymentDetailRepository().getAllPayments();
+                    return DocumentPdfGenerator.generate(
+                      document: document,
+                      profile: profileState.profile,
+                      payments: payments,
+                      templateId: document.templateId,
+                    );
+                  },
                 name: '${document.docNumber}.pdf',
               );
             } else {

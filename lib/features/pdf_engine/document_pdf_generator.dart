@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:invoz/features/settings/domain/payment_detail_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:http/http.dart' as http;
@@ -59,6 +60,7 @@ class DocumentPdfGenerator {
   static Future<Uint8List> generate({
     required DocumentModel document,
     required BusinessProfile profile,
+    required List<PaymentDetail> payments,
     String? templateId,
   }) async {
     final pdf = pw.Document(
@@ -100,6 +102,7 @@ class DocumentPdfGenerator {
               context,
               document,
               profile,
+              payments: payments,
               logoBytes: logoBytes,
               signatureBytes: signatureBytes,
             );
@@ -109,6 +112,7 @@ class DocumentPdfGenerator {
               context,
               document,
               profile,
+              payments: payments,
               logoBytes: logoBytes,
               signatureBytes: signatureBytes,
             );
@@ -117,6 +121,7 @@ class DocumentPdfGenerator {
             context,
             document,
             profile,
+            payments: payments,
             logoBytes: logoBytes,
             signatureBytes: signatureBytes,
           );
@@ -131,6 +136,7 @@ class DocumentPdfGenerator {
     pw.Context context,
     DocumentModel doc,
     BusinessProfile profile, {
+    required List<PaymentDetail> payments,
     Uint8List? logoBytes,
     Uint8List? signatureBytes,
   }) {
@@ -632,6 +638,7 @@ class DocumentPdfGenerator {
           pw.Expanded(
             child: _buildPaymentDetails(
               doc,
+              payments,
               profile,
               primaryColor: primaryColor,
             ),
@@ -662,6 +669,7 @@ class DocumentPdfGenerator {
     pw.Context context,
     DocumentModel doc,
     BusinessProfile profile, {
+    required List<PaymentDetail> payments,
     Uint8List? logoBytes,
     Uint8List? signatureBytes,
   }) {
@@ -883,6 +891,7 @@ class DocumentPdfGenerator {
           pw.Expanded(
             child: _buildPaymentDetails(
               doc,
+              payments,
               profile,
               primaryColor: primaryColor,
             ),
@@ -912,6 +921,7 @@ class DocumentPdfGenerator {
 
   static pw.Widget _buildPaymentDetails(
     DocumentModel doc,
+    List<PaymentDetail> payments,
     BusinessProfile profile, {
     PdfColor? primaryColor,
   }) {
@@ -919,7 +929,7 @@ class DocumentPdfGenerator {
     if (doc.selectedBankDetailId != null &&
         doc.selectedBankDetailId != 'none') {
       try {
-        bankDetail = profile.paymentDetails.firstWhere(
+        bankDetail = payments.firstWhere(
           (p) => p.id == doc.selectedBankDetailId,
         );
       } catch (_) {}
@@ -939,18 +949,14 @@ class DocumentPdfGenerator {
       );
     }
     if (bankDetail == null && doc.selectedBankDetailId != 'none') {
-      final banks = profile.paymentDetails
-          .where((p) => p.type == 'Bank')
-          .toList();
+      final banks = payments.where((p) => p.type == 'Bank').toList();
       if (banks.isNotEmpty) bankDetail = banks.first;
     }
 
     PaymentDetail? upiDetail;
     if (doc.selectedUpiDetailId != null && doc.selectedUpiDetailId != 'none') {
       try {
-        upiDetail = profile.paymentDetails.firstWhere(
-          (p) => p.id == doc.selectedUpiDetailId,
-        );
+        upiDetail = payments.firstWhere((p) => p.id == doc.selectedUpiDetailId);
       } catch (_) {}
     }
     if (upiDetail == null &&
@@ -965,9 +971,7 @@ class DocumentPdfGenerator {
       );
     }
     if (upiDetail == null && doc.selectedUpiDetailId != 'none') {
-      final upis = profile.paymentDetails
-          .where((p) => p.type == 'UPI')
-          .toList();
+      final upis = payments.where((p) => p.type == 'UPI').toList();
       if (upis.isNotEmpty) upiDetail = upis.first;
     }
 
@@ -1176,6 +1180,7 @@ class DocumentPdfGenerator {
     pw.Context context,
     DocumentModel doc,
     BusinessProfile profile, {
+    required List<PaymentDetail> payments,
     Uint8List? logoBytes,
     Uint8List? signatureBytes,
   }) {
@@ -1661,7 +1666,12 @@ class DocumentPdfGenerator {
                   pw.Text(doc.notes!, style: const pw.TextStyle(fontSize: 11)),
                   pw.SizedBox(height: 16),
                 ],
-                _buildPaymentDetails(doc, profile, primaryColor: primaryColor),
+                _buildPaymentDetails(
+                  doc,
+                  payments,
+                  profile,
+                  primaryColor: primaryColor,
+                ),
               ],
             ),
           ),

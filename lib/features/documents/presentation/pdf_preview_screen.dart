@@ -20,6 +20,8 @@ import '../data/document_repository.dart';
 import '../domain/document_model.dart';
 import 'document_editor_screen.dart';
 import 'widgets/payment_entry_sheet.dart';
+import '../../settings/data/payment_detail_repository.dart';
+import '../../settings/domain/payment_detail_model.dart';
 import 'widgets/template_thumbnail_card.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
@@ -613,11 +615,16 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 // Clean styled Native Interactive PDF Viewer
                 Expanded(
                   child: PdfPreview(
-                    build: (format) => DocumentPdfGenerator.generate(
-                      document: _document,
-                      profile: profile,
-                      templateId: _currentTemplateId,
-                    ),
+                    build: (format) async {
+                        final repo = PaymentDetailRepository();
+                        final payments = await repo.getAllPayments();
+                        return DocumentPdfGenerator.generate(
+                          document: _document,
+                          profile: profile,
+                          payments: payments,
+                          templateId: _currentTemplateId,
+                        );
+                      },
                     previewPageMargin: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 10,
