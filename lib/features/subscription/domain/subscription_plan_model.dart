@@ -26,6 +26,7 @@ class SubscriptionPlanModel {
   final int maxDevicesAllowed;
   final bool isAdFree;
   final bool hasPremiumTemplates;
+  final bool hasAnalytics;
 
   const SubscriptionPlanModel({
     required this.id,
@@ -53,6 +54,7 @@ class SubscriptionPlanModel {
     this.maxDevicesAllowed = 1,
     this.isAdFree = false,
     this.hasPremiumTemplates = false,
+    this.hasAnalytics = false,
   });
 
   bool get isFree => planName.trim().toLowerCase() == 'free';
@@ -92,6 +94,7 @@ class SubscriptionPlanModel {
       maxDevicesAllowed: 1,
       isAdFree: false,
       hasPremiumTemplates: false,
+      hasAnalytics: false,
     );
   }
 

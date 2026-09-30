@@ -1,5 +1,6 @@
 import '../../ads/ad_banner_widget.dart';
 import 'package:flutter/material.dart';
+import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
@@ -47,6 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      InterstitialAdManager.loadAd(context);
+    });
     _checkPromoBanner();
   }
 

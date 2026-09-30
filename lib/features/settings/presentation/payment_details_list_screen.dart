@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import 'package:uuid/uuid.dart';
@@ -510,7 +511,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                               padding: const EdgeInsets.only(top: 3),
                               child: Text(
                                 item.type == 'Bank'
-                                    ? 'A/C: ${item.details}${item.extra != null && item.extra!.isNotEmpty ? '  •  IFSC: ${item.extra}' : ''}'
+                                    ? 'A/C: ${item.details}${item.extra != null && item.extra!.isNotEmpty ? '  â€¢  IFSC: ${item.extra}' : ''}'
                                     : 'UPI: ${item.details}',
                                 style: const TextStyle(
                                   color: AppColors.textSecondary,

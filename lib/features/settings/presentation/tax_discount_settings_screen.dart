@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../ads/interstitial_ad_manager.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';

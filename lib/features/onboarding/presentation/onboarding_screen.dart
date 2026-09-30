@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../ads/interstitial_ad_manager.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -37,7 +38,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String _selectedLanguage = 'English';
   String _selectedCountry = 'India';
   String _selectedCurrencyCode = 'INR';
-  String _selectedCurrencySymbol = '₹';
+  String _selectedCurrencySymbol = 'â‚¹';
 
   // Step 2, 3, 4: Images
   String? _logoPath;
@@ -63,12 +64,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     'Arabic',
   ];
   final List<Map<String, String>> _countries = [
-    {'name': 'India', 'currency': 'INR', 'symbol': '₹'},
+    {'name': 'India', 'currency': 'INR', 'symbol': 'â‚¹'},
     {'name': 'United States', 'currency': 'USD', 'symbol': '\$'},
-    {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': '£'},
+    {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': 'Â£'},
     {'name': 'Australia', 'currency': 'AUD', 'symbol': 'A\$'},
     {'name': 'Canada', 'currency': 'CAD', 'symbol': 'C\$'},
-    {'name': 'Eurozone', 'currency': 'EUR', 'symbol': '€'},
+    {'name': 'Eurozone', 'currency': 'EUR', 'symbol': 'â‚¬'},
     {'name': 'UAE', 'currency': 'AED', 'symbol': 'AED'},
     {'name': 'Singapore', 'currency': 'SGD', 'symbol': 'S\$'},
   ];

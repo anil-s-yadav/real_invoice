@@ -68,6 +68,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     int maxDevices = 1;
     bool isAdFree = false;
     bool hasPremium = false;
+    bool hasAnalytics = false;
 
     String pName = widget.planName.toLowerCase();
     if (pName == 'single') {
@@ -83,13 +84,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       maxDevices = 3;
       isAdFree = true;
       hasPremium = true;
-    } else if (pName == 'gold') {
+    hasAnalytics = true;
+      } else if (pName == 'gold') {
       maxCompanies = 10;
       maxClients = -1;
       maxDocs = -1;
       maxDevices = -1;
       isAdFree = true;
       hasPremium = true;
+      hasAnalytics = true;
     }
 
     final repo = SubscriptionRepository();
@@ -120,6 +123,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       maxDevicesAllowed: maxDevices,
       isAdFree: isAdFree,
       hasPremiumTemplates: hasPremium,
+          hasAnalytics: hasAnalytics,
     );
     await repo.saveOrUpgradePlan(newPlan);
     if (!mounted) return;

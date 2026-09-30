@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
@@ -107,6 +108,7 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
     context.read<CustomerBloc>().add(SaveCustomerEvent(customer));
 
     if (mounted) {
+      InterstitialAdManager.showAd(context);
       Navigator.of(context).pop(customer);
     }
   }
