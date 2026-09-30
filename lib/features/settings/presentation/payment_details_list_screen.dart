@@ -590,6 +590,7 @@ class _AddPaymentSheetState extends State<_AddPaymentSheet> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
+        InterstitialAdManager.showAd(context);
       widget.onSave(
         PaymentDetail(
           id: const Uuid().v4(),

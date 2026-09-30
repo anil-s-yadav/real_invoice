@@ -194,6 +194,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       }
 
       if (mounted) {
+        InterstitialAdManager.showAd(context);
         if (widget.isAddingNewCompany) {
           Navigator.of(context).pop();
         } else {

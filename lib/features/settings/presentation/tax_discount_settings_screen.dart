@@ -86,7 +86,8 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
     await _settingsRepo.setDefaultTaxEnabled(_autoApplyTax);
 
     if (mounted) {
-      setState(() => _isSaving = false);
+        InterstitialAdManager.showAd(context);
+        setState(() => _isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Tax & Discount defaults saved successfully!'),

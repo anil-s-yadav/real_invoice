@@ -562,46 +562,51 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 // Template pill chip indicator
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
+                    horizontal: 12,
                     vertical: 4,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Double Tap Document to Zoom',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: isDark
-                              ? AppColors.darkTextMuted
-                              : AppColors.textSecondary,
+                  child: FittedBox(
+                    child: Row(
+                      spacing: 40,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Double Tap Document to Zoom',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: isDark
+                                ? AppColors.darkTextMuted
+                                : AppColors.textSecondary,
+                          ),
                         ),
-                      ),
-                      InkWell(
-                        onTap: _showTemplateSelector,
-                        child: Row(
-                          children: [
-                            Text(
-                              'Change Style \u25BE  : ',
-                              style: AppTypography.bodySmall.copyWith(
-                                color: isDark
-                                    ? AppColors.primaryDark
-                                    : AppColors.primary,
-                                fontWeight: FontWeight.w600,
+                        InkWell(
+                          onTap: _showTemplateSelector,
+                          child: Row(
+                            children: [
+                              Text(
+                                'Change Style \u25BE  : ',
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: isDark
+                                      ? AppColors.primaryDark
+                                      : AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            Text(
-                              TemplateRegistry.getById(_currentTemplateId).name,
-                              style: AppTypography.titleSmall.copyWith(
-                                fontSize: 12,
-                                color: isDark
-                                    ? AppColors.primaryDark
-                                    : AppColors.primary,
+                              Text(
+                                TemplateRegistry.getById(
+                                  _currentTemplateId,
+                                ).name,
+                                style: AppTypography.titleSmall.copyWith(
+                                  fontSize: 12,
+                                  color: isDark
+                                      ? AppColors.primaryDark
+                                      : AppColors.primary,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 
@@ -648,10 +653,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                   ),
                 ),
 
-                // const SizedBox(height: AppDimensions.xl),
                 AdBannerWidget(),
-                // Custom Bottom Bar for Print & Share
-                //
               ],
             ),
           ),

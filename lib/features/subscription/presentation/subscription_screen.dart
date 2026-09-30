@@ -363,7 +363,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
             // Plan Cards Carousel
             SizedBox(
-              height: 540,
+              height: 530,
               child: PageView.builder(
                 controller: _pageController,
                 itemCount: _plans.length,
@@ -701,26 +701,28 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.support_agent_rounded,
-                          color: AppColors.primary,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Questions about our plans? We\'re here to help.',
-                          style: TextStyle(
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.textPrimary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                    FittedBox(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.support_agent_rounded,
+                            color: AppColors.primary,
+                            size: 18,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Text(
+                            'Questions about our plans? We\'re here to help.',
+                            style: TextStyle(
+                              color: isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.textPrimary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Row(
