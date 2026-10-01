@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
@@ -213,15 +214,16 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                     selectedColor: isDark
                         ? AppColors.primary.withValues(alpha: 0.25)
                         : AppColors.primaryLight,
-                    backgroundColor:
-                        isDark ? AppColors.darkSurface : AppColors.surface,
+                    backgroundColor: isDark
+                        ? AppColors.darkSurface
+                        : AppColors.surface,
                     checkmarkColor: AppColors.primary,
                     labelStyle: TextStyle(
                       color: isSelected
                           ? AppColors.primary
                           : (isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.textSecondary),
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary),
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.normal,
@@ -260,15 +262,16 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                 selectedColor: isDark
                     ? AppColors.primary.withValues(alpha: 0.25)
                     : AppColors.primaryLight,
-                backgroundColor:
-                    isDark ? AppColors.darkSurface : AppColors.surface,
+                backgroundColor: isDark
+                    ? AppColors.darkSurface
+                    : AppColors.surface,
                 checkmarkColor: AppColors.primary,
                 labelStyle: TextStyle(
                   color: isSelected
                       ? AppColors.primary
                       : (isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary),
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary),
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
                 side: BorderSide(
@@ -299,6 +302,8 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
             isLoading: _isSaving,
             icon: Icons.check,
           ),
+          SizedBox(height: 5),
+          AdBannerWidget(),
         ],
       ),
     );

@@ -4,10 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../business_profile/bloc/business_profile_bloc.dart';
-import '../../business_profile/bloc/business_profile_event.dart';
-import '../../business_profile/bloc/business_profile_state.dart';
-import '../../business_profile/domain/business_profile_model.dart';
+import '../data/payment_detail_repository.dart';
+import '../domain/payment_detail_model.dart';
 
 class PaymentDetailsListScreen extends StatefulWidget {
   const PaymentDetailsListScreen({super.key});
@@ -18,7 +16,26 @@ class PaymentDetailsListScreen extends StatefulWidget {
 }
 
 class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
-  void _showAddPaymentSheet(BuildContext context, BusinessProfile profile) {
+  List<PaymentDetail> _payments = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPayments();
+  }
+  
+  Future<void> _loadPayments() async {
+    final repo = PaymentDetailRepository();
+    final payments = await repo.getAllPayments();
+    if (mounted) {
+      setState(() {
+        _payments = payments;
+        _isLoading = false;
+      });
+    }
+  }
+  void _showAddPaymentSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -26,41 +43,25 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) => _AddPaymentSheet(
-        onSave: (detail) {
-          final updated = profile.copyWith(
-            paymentDetails: [...profile.paymentDetails, detail],
-          );
-          context.read<BusinessProfileBloc>().add(
-            UpdateBusinessProfileEvent(updated),
-          );
-          Navigator.pop(ctx);
+        onSave: (detail) async {
+          await PaymentDetailRepository().savePayment(detail);
+          _loadPayments();
+          if (ctx.mounted) Navigator.pop(ctx);
         },
       ),
     );
   }
 
-  void _deletePayment(
-    BuildContext context,
-    BusinessProfile profile,
-    String id,
-  ) {
-    final updatedList = profile.paymentDetails
-        .where((e) => e.id != id)
-        .toList();
-    final updated = profile.copyWith(paymentDetails: updatedList);
-    context.read<BusinessProfileBloc>().add(
-      UpdateBusinessProfileEvent(updated),
-    );
+  void _deletePayment(String id) async {
+    await PaymentDetailRepository().deletePayment(id);
+    _loadPayments();
   }
 
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
   Color get _textPrimary =>
       _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
 
-  Widget _buildSamplePreviewCard(
-    BusinessProfile profile,
-    List<PaymentDetail> details,
-  ) {
+  Widget _buildSamplePreviewCard(List<PaymentDetail> details) {
     final hasDetails = details.isNotEmpty;
     final bankDetails = details.where((p) => p.type == 'Bank').toList();
     final upiDetails = details.where((p) => p.type == 'UPI').toList();
@@ -329,17 +330,9 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
         centerTitle: true,
         elevation: 0,
       ),
-      body: BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
-        builder: (context, state) {
-          if (state is BusinessProfileLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
-          }
-          final profile = state is BusinessProfileLoaded
-              ? state.profile
-              : const BusinessProfile();
-          final details = profile.paymentDetails;
+      body: Builder(builder: (context) {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    final details = _payments;
 
           return CustomScrollView(
             slivers: [
@@ -353,7 +346,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
 
               // 2. Sample Preview Card
               SliverToBoxAdapter(
-                child: _buildSamplePreviewCard(profile, details),
+                child: _buildSamplePreviewCard(details),
               ),
 
               // 3. Section Title & Add Action
@@ -375,7 +368,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                       if (details.isNotEmpty)
                         TextButton.icon(
                           onPressed: () =>
-                              _showAddPaymentSheet(context, profile),
+                              _showAddPaymentSheet(context),
                           icon: const Icon(Icons.add_circle_outline, size: 16),
                           label: const Text(
                             'Add New',
@@ -433,7 +426,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                         const SizedBox(height: 20),
                         ElevatedButton.icon(
                           onPressed: () =>
-                              _showAddPaymentSheet(context, profile),
+                              _showAddPaymentSheet(context),
                           icon: const Icon(Icons.add_rounded, size: 20),
                           label: const Text(
                             'Add Bank Account or UPI',
@@ -526,7 +519,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                                 size: 22,
                               ),
                               onPressed: () =>
-                                  _deletePayment(context, profile, item.id),
+                                  _deletePayment(item.id),
                             ),
                           ),
                         ),
@@ -538,7 +531,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
                     child: OutlinedButton.icon(
-                      onPressed: () => _showAddPaymentSheet(context, profile),
+                      onPressed: () => _showAddPaymentSheet(context),
                       icon: const Icon(Icons.add_rounded),
                       label: const Text(
                         'Add Another Method',

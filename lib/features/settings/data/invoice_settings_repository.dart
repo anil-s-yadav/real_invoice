@@ -101,44 +101,79 @@ class InvoiceSettingsRepository {
     await _updateSetting(_keyPaddingDigits, value);
   }
 
+
+  DocumentReference<Map<String, dynamic>>? get _taxSettingsRef {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('settings')
+        .doc('tax_settings');
+  }
+
+  Future<Map<String, dynamic>> _getTaxSettingsMap() async {
+    final ref = _taxSettingsRef;
+    if (ref == null) return {};
+    try {
+      final doc = await ref.get();
+      if (doc.exists) {
+        return doc.data() ?? {};
+      }
+    } catch (e) {
+      print('Error fetching tax settings: $e');
+    }
+    return {};
+  }
+
+  Future<void> _updateTaxSetting(String key, dynamic value) async {
+    final ref = _taxSettingsRef;
+    if (ref == null) return;
+    try {
+      await ref.set({key: value}, SetOptions(merge: true));
+    } catch (e) {
+      print('Error saving tax setting $key: $e');
+    }
+  }
+
   // Tax & Discount preferences
-  Future<double> getDefaultTaxRate() async {
-    final data = await _getSettingsMap();
+Future<double> getDefaultTaxRate() async {
+    final data = await _getTaxSettingsMap();
     final value = data[_keyDefaultTaxRate];
     if (value is num) return value.toDouble();
     return 18.0;
   }
 
   Future<void> setDefaultTaxRate(double rate) async {
-    await _updateSetting(_keyDefaultTaxRate, rate);
+    await _updateTaxSetting(_keyDefaultTaxRate, rate);
   }
 
   Future<double> getDefaultDiscountRate() async {
-    final data = await _getSettingsMap();
+    final data = await _getTaxSettingsMap();
     final value = data[_keyDefaultDiscountRate];
     if (value is num) return value.toDouble();
     return 0.0;
   }
 
   Future<void> setDefaultDiscountRate(double rate) async {
-    await _updateSetting(_keyDefaultDiscountRate, rate);
+    await _updateTaxSetting(_keyDefaultDiscountRate, rate);
   }
 
   Future<String> getDefaultTaxLabel() async {
-    final data = await _getSettingsMap();
+    final data = await _getTaxSettingsMap();
     return data[_keyDefaultTaxLabel] as String? ?? 'GST';
   }
 
   Future<void> setDefaultTaxLabel(String label) async {
-    await _updateSetting(_keyDefaultTaxLabel, label);
+    await _updateTaxSetting(_keyDefaultTaxLabel, label);
   }
 
   Future<bool> getDefaultTaxEnabled() async {
-    final data = await _getSettingsMap();
+    final data = await _getTaxSettingsMap();
     return data[_keyDefaultTaxEnabled] as bool? ?? true;
   }
 
   Future<void> setDefaultTaxEnabled(bool enabled) async {
-    await _updateSetting(_keyDefaultTaxEnabled, enabled);
+    await _updateTaxSetting(_keyDefaultTaxEnabled, enabled);
   }
 }

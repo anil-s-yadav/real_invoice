@@ -24,6 +24,8 @@ import '../bloc/document_event.dart';
 import '../data/document_repository.dart';
 import '../domain/document_item_model.dart';
 import '../domain/document_model.dart';
+import '../../settings/data/payment_detail_repository.dart';
+import '../../settings/domain/payment_detail_model.dart';
 import '../../settings/presentation/payment_details_list_screen.dart';
 import 'pdf_preview_screen.dart';
 import 'widgets/customer_select_sheet.dart';
@@ -97,12 +99,16 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   bool _isSaving = false;
   bool _isInitialized = false;
   bool _includePaymentDetails = false;
+  List<PaymentDetail> _payments = [];
+  bool _isLoadingPayments = true;
   String? _selectedBankDetailId;
   String? _selectedUpiDetailId;
 
   @override
   void initState() {
     super.initState();
+    _loadPayments();
+
     final doc = widget.initialDocument;
     _documentId = doc?.id ?? const Uuid().v4();
     _docType = doc?.docType ?? widget.initialType;
@@ -173,7 +179,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
           // Auto-select first available bank and UPI for new documents
           if (_selectedBankDetailId == null) {
-            final banks = profile.paymentDetails
+            final banks = _payments
                 .where((p) => p.type == 'Bank')
                 .toList();
             if (banks.isNotEmpty) {
@@ -184,7 +190,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
             }
           }
           if (_selectedUpiDetailId == null) {
-            final upis = profile.paymentDetails
+            final upis = _payments
                 .where((p) => p.type == 'UPI')
                 .toList();
             if (upis.isNotEmpty) {
@@ -202,6 +208,18 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   }
 
   @override
+  
+  Future<void> _loadPayments() async {
+    final repo = PaymentDetailRepository();
+    final payments = await repo.getAllPayments();
+    if (mounted) {
+      setState(() {
+        _payments = payments;
+        _isLoadingPayments = false;
+      });
+    }
+  }
+
   void dispose() {
     _docNumberController.dispose();
     _poNumberController.dispose();
@@ -1439,10 +1457,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           builder: (context, state) {
             if (state is! BusinessProfileLoaded) return const SizedBox();
             final profile = state.profile;
-            final banks = profile.paymentDetails
+            final banks = _payments
                 .where((p) => p.type == 'Bank')
                 .toList();
-            final upis = profile.paymentDetails
+            final upis = _payments
                 .where((p) => p.type == 'UPI')
                 .toList();
 

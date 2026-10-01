@@ -42,12 +42,9 @@ class DocumentRepository {
   }
 
   Future<CollectionReference<Map<String, dynamic>>> _getDocumentsRef() async {
-    final companyId = await _getCompanyId();
     return FirebaseFirestore.instance
         .collection('users')
         .doc(_userId)
-        .collection('companies')
-        .doc(companyId)
         .collection('documents');
   }
 

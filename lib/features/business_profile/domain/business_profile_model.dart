@@ -1,40 +1,6 @@
 import 'dart:convert';
 
-class PaymentDetail {
-  final String id;
-  final String type; // 'Bank' or 'UPI'
-  final String title;
-  final String details; // Account number or UPI ID
-  final String? extra; // IFSC code (for Bank)
 
-  const PaymentDetail({
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.details,
-    this.extra,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'type': type,
-      'title': title,
-      'details': details,
-      'extra': extra,
-    };
-  }
-
-  factory PaymentDetail.fromMap(Map<String, dynamic> map) {
-    return PaymentDetail(
-      id: map['id'] ?? '',
-      type: map['type'] ?? 'Bank',
-      title: map['title'] ?? '',
-      details: map['details'] ?? '',
-      extra: map['extra'],
-    );
-  }
-}
 
 class BusinessProfile {
   final String id;
@@ -60,7 +26,6 @@ class BusinessProfile {
   final String defaultQuotationTemplateId;
   final String defaultReceiptTemplateId;
   final String defaultProformaTemplateId;
-  final List<PaymentDetail> paymentDetails;
 
   const BusinessProfile({
     this.id = 'default_profile',
@@ -87,7 +52,6 @@ class BusinessProfile {
     this.defaultQuotationTemplateId = 'modern_crimson',
     this.defaultReceiptTemplateId = 'modern_crimson',
     this.defaultProformaTemplateId = 'modern_crimson',
-    this.paymentDetails = const [],
   });
 
   bool get isConfigured => businessName.trim().isNotEmpty;
@@ -116,7 +80,6 @@ class BusinessProfile {
     String? defaultQuotationTemplateId,
     String? defaultReceiptTemplateId,
     String? defaultProformaTemplateId,
-    List<PaymentDetail>? paymentDetails,
   }) {
     return BusinessProfile(
       id: id ?? this.id,
@@ -146,7 +109,6 @@ class BusinessProfile {
           defaultReceiptTemplateId ?? this.defaultReceiptTemplateId,
       defaultProformaTemplateId:
           defaultProformaTemplateId ?? this.defaultProformaTemplateId,
-      paymentDetails: paymentDetails ?? this.paymentDetails,
     );
   }
 
@@ -175,24 +137,10 @@ class BusinessProfile {
       'defaultQuotationTemplateId': defaultQuotationTemplateId,
       'defaultReceiptTemplateId': defaultReceiptTemplateId,
       'defaultProformaTemplateId': defaultProformaTemplateId,
-      'paymentDetailsJson': jsonEncode(
-        paymentDetails.map((e) => e.toMap()).toList(),
-      ),
     };
   }
 
   factory BusinessProfile.fromMap(Map<String, dynamic> map) {
-    List<PaymentDetail> parsedPayments = [];
-    if (map['paymentDetailsJson'] != null) {
-      try {
-        final List<dynamic> decoded = jsonDecode(map['paymentDetailsJson']);
-        parsedPayments = decoded
-            .map((e) => PaymentDetail.fromMap(e as Map<String, dynamic>))
-            .toList();
-      } catch (e) {
-        // Fallback or ignore
-      }
-    }
 
     return BusinessProfile(
       id: map['id'] as String? ?? 'default_profile',
@@ -224,7 +172,6 @@ class BusinessProfile {
           map['defaultReceiptTemplateId'] as String? ?? 'modern_crimson',
       defaultProformaTemplateId:
           map['defaultProformaTemplateId'] as String? ?? 'modern_crimson',
-      paymentDetails: parsedPayments,
     );
   }
 }

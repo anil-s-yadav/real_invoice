@@ -228,6 +228,7 @@ void main() {
         final pdfBytes = await DocumentPdfGenerator.generate(
           document: doc,
           profile: profile,
+      payments: [],
           templateId: template.id,
         );
         expect(pdfBytes.isNotEmpty, isTrue);

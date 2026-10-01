@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
@@ -207,6 +208,8 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
             isLoading: _isSaving,
             icon: Icons.check,
           ),
+          SizedBox(height: 5),
+          AdBannerWidget(),
         ],
       ),
     );
