@@ -62,7 +62,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         {'text': 'Create up to 5 documents / day', 'highlight': false},
         {'text': 'Single device access', 'highlight': false},
         {
-          'text': 'Cloud backup but No device sync',
+          'text': 'Secure cloud backup',
           'highlight': false,
           'isLimitation': true,
         },
@@ -73,7 +73,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         },
         {'text': 'No Analytics', 'highlight': false, 'isLimitation': true},
 
-        {'text': 'No support', 'highlight': false, 'isLimitation': true},
+        {
+          'text': 'Help center support',
+          'highlight': false,
+          'isLimitation': true,
+        },
         {
           'text': 'No ads free experience',
           'highlight': false,
@@ -95,7 +99,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         {'text': 'Unlimited document creation', 'highlight': true},
         {'text': 'Dual device synchronization', 'highlight': false},
         {'text': 'Full access to Premium templates', 'highlight': true},
-        {'text': 'Cloud backup & cross-device sync', 'highlight': false},
+        {'text': 'Cloud backup + sync across 2 devices', 'highlight': false},
         {'text': 'No Analytics', 'highlight': false, 'isLimitation': true},
         {
           'text': 'Standard email support',
