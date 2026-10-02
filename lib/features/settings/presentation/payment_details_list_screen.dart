@@ -17,7 +17,6 @@ class PaymentDetailsListScreen extends StatefulWidget {
 
 class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
   List<PaymentDetail> _payments = [];
-  bool _isLoading = true;
 
   @override
   void initState() {
@@ -31,7 +30,6 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
     if (mounted) {
       setState(() {
         _payments = payments;
-        _isLoading = false;
       });
     }
   }
@@ -331,7 +329,6 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
         elevation: 0,
       ),
       body: Builder(builder: (context) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
     final details = _payments;
 
           return CustomScrollView(

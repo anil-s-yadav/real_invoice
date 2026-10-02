@@ -18,7 +18,6 @@ class TaxDiscountSettingsScreen extends StatefulWidget {
 
 class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
   final _settingsRepo = InvoiceSettingsRepository();
-  bool _isLoading = true;
   bool _isSaving = false;
 
   late TextEditingController _taxLabelController;
@@ -34,8 +33,8 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
   void initState() {
     super.initState();
     _taxLabelController = TextEditingController(text: 'GST');
-    _taxRateController = TextEditingController(text: '18.0');
-    _discountRateController = TextEditingController(text: '0.0');
+    _taxRateController = TextEditingController(text: '18');
+    _discountRateController = TextEditingController(text: '0');
     _loadSettings();
   }
 
@@ -55,7 +54,6 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
         );
         _taxLabelController.text = taxLabel;
         _autoApplyTax = taxEnabled;
-        _isLoading = false;
       });
     }
   }
@@ -105,15 +103,6 @@ class _TaxDiscountSettingsScreenState extends State<TaxDiscountSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Tax & Discounts')),
-        body: const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(

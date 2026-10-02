@@ -15,7 +15,6 @@ class InvoiceNumberingScreen extends StatefulWidget {
 
 class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
   final _settingsRepo = InvoiceSettingsRepository();
-  bool _isLoading = true;
   bool _isSaving = false;
 
   late TextEditingController _invoicePrefixController;
@@ -60,7 +59,6 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
         _proformaPrefixController.text = proPrefix;
         _includeYear = incYear;
         _paddingDigits = padding;
-        _isLoading = false;
       });
     }
   }
@@ -128,15 +126,6 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Invoice Numbering')),
-        body: const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
