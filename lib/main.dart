@@ -173,8 +173,39 @@ class InvozApp extends StatelessWidget {
               builder: (context, hasCompletedOnboarding) {
                 Widget homeWidget;
                 if (authState is AuthInitial || authState is AuthLoading) {
-                  homeWidget = const Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
+                  homeWidget = Scaffold(
+                    backgroundColor: themeMode == ThemeMode.dark
+                        ? const Color(0xFF0F172A)
+                        : Colors.white,
+                    body: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/icons/applogo.png',
+                            width: 140,
+                            height: 140,
+                          ),
+                          const SizedBox(height: 32),
+                          const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFF4F46E5), // Indigo / AppColors.primary
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Setting up your workspace...',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: themeMode == ThemeMode.dark
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 } else if (authState is Authenticated) {
                   homeWidget = hasCompletedOnboarding

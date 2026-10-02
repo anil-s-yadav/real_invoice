@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../business_profile/bloc/business_profile_bloc.dart';
+import '../../business_profile/bloc/business_profile_state.dart';
 import '../data/subscription_repository.dart';
 import '../domain/subscription_plan_model.dart';
 
@@ -325,13 +329,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _triggerPayment(double totalPayable) {
+    String prefillEmail = '';
+    String prefillContact = '';
+    try {
+      final profileState = context.read<BusinessProfileBloc>().state;
+      if (profileState is BusinessProfileLoaded) {
+        prefillEmail = profileState.profile.email ?? '';
+        prefillContact = profileState.profile.phone ?? '';
+      }
+    } catch (_) {}
+
+    if (prefillEmail.isEmpty) {
+      try {
+        prefillEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+      } catch (_) {}
+    }
+
     final options = {
       'key': 'rzp_test_ThkLyPi706leO9',
       'amount': (totalPayable * 100).toInt(),
       'name': 'Invoz App',
       'description': '${widget.planName} - $_selectedDuration Months Plan',
       'timeout': 120,
-      'prefill': {'contact': '', 'email': ''},
+      'prefill': {'contact': prefillContact, 'email': prefillEmail},
       'theme': {'color': '#4F46E5'},
     };
     try {
@@ -348,10 +368,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final double invozDiscount = baseTotal * invozPerc;
 
     double welcomeDiscount = 0.0;
+    double welcomePerc = 0.0;
     if (widget.hasWelcomeOffer) {
       if (_selectedDuration == 12) {
+        welcomePerc = 0.50;
         welcomeDiscount = baseTotal * 0.50;
       } else if (_selectedDuration == 1) {
+        welcomePerc = 1.00;
         welcomeDiscount = baseTotal;
       }
     }
@@ -482,7 +505,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             _buildOrderSummaryCard(
               isDark: isDark,
               baseTotal: baseTotal,
+              invozPerc: invozPerc,
               invozDiscount: invozDiscount,
+              welcomePerc: welcomePerc,
               welcomeDiscount: welcomeDiscount,
               totalDiscount: totalDiscount,
               subtotal: subtotal,
@@ -843,7 +868,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget _buildOrderSummaryCard({
     required bool isDark,
     required double baseTotal,
+    required double invozPerc,
     required double invozDiscount,
+    required double welcomePerc,
     required double welcomeDiscount,
     required double totalDiscount,
     required double subtotal,
@@ -876,14 +903,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
           if (invozDiscount > 0)
             _buildSummaryRow(
-              'Plan Discount',
+              'Plan Discount (${(invozPerc * 100).toInt()}%)',
               '- ₹${invozDiscount.toStringAsFixed(2)}',
               color: Colors.green,
               isDark: isDark,
             ),
           if (welcomeDiscount > 0)
             _buildSummaryRow(
-              'Welcome Offer',
+              'Welcome Offer (${(welcomePerc * 100).toInt()}%)',
               '- ₹${welcomeDiscount.toStringAsFixed(2)}',
               color: Colors.green,
               isDark: isDark,
