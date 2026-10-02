@@ -883,7 +883,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           if (welcomeDiscount > 0)
             _buildSummaryRow(
-              'Welcome Promotional Offer',
+              'Welcome Offer',
               '- ₹${welcomeDiscount.toStringAsFixed(2)}',
               color: Colors.green,
               isDark: isDark,

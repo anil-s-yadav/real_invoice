@@ -24,24 +24,28 @@ class ActivateSubscriptionEvent extends SubscriptionEvent {
 
 abstract class SubscriptionState extends Equatable {
   final SubscriptionPlanModel? plan;
-  const SubscriptionState([this.plan]);
+  final bool isEligibleForWelcomeOffer;
+  const SubscriptionState({this.plan, this.isEligibleForWelcomeOffer = false});
 
   @override
-  List<Object?> get props => [plan];
+  List<Object?> get props => [plan, isEligibleForWelcomeOffer];
 }
 
 class FreeTierState extends SubscriptionState {
-  const FreeTierState([super.plan]);
+  const FreeTierState({super.plan, super.isEligibleForWelcomeOffer});
 }
 
 class PremiumTierState extends SubscriptionState {
   final DateTime? expiryDate;
 
-  const PremiumTierState({this.expiryDate, SubscriptionPlanModel? plan})
-      : super(plan);
+  const PremiumTierState({
+    this.expiryDate,
+    super.plan,
+    super.isEligibleForWelcomeOffer,
+  });
 
   @override
-  List<Object?> get props => [expiryDate, plan];
+  List<Object?> get props => [expiryDate, plan, isEligibleForWelcomeOffer];
 }
 
 class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
@@ -59,10 +63,23 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     final repo = repository ?? SubscriptionRepository();
     final plan = await repo.getCurrentPlan();
 
+    bool isEligible = false;
+    try {
+      final history = await repo.getPlanHistory();
+      // Eligible if user has no premium plan in their history
+      isEligible = !history.any((p) => !p.isFree);
+    } catch (_) {}
+
     if (plan.isFree || !plan.isActive) {
-      emit(FreeTierState(plan));
+      emit(FreeTierState(plan: plan, isEligibleForWelcomeOffer: isEligible));
     } else {
-      emit(PremiumTierState(expiryDate: plan.expiryDate, plan: plan));
+      emit(
+        PremiumTierState(
+          expiryDate: plan.expiryDate,
+          plan: plan,
+          isEligibleForWelcomeOffer: isEligible,
+        ),
+      );
     }
   }
 
@@ -73,13 +90,25 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     final repo = repository ?? SubscriptionRepository();
     await repo.saveOrUpgradePlan(event.plan);
 
+    // Keep the current eligibility state (it shouldn't matter as much after activation,
+    // but we can retain the old one or just evaluate it again).
+    // After activating a paid plan, they are no longer eligible, but let's just pass false
+    // or evaluate it. We'll pass false since they just activated a plan.
     if (event.plan.isFree || !event.plan.isActive) {
-      emit(FreeTierState(event.plan));
+      emit(
+        FreeTierState(
+          plan: event.plan,
+          isEligibleForWelcomeOffer: state.isEligibleForWelcomeOffer,
+        ),
+      );
     } else {
-      emit(PremiumTierState(
-        expiryDate: event.plan.expiryDate,
-        plan: event.plan,
-      ));
+      emit(
+        PremiumTierState(
+          expiryDate: event.plan.expiryDate,
+          plan: event.plan,
+          isEligibleForWelcomeOffer: false,
+        ),
+      );
     }
   }
 }

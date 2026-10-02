@@ -148,19 +148,16 @@ void main() {
   });
 
   group('Template Registry & PDF Generation', () {
-    test('Template Registry contains all 7 promised styles', () {
+    test('Template Registry contains all 3 promised styles', () {
       expect(
         TemplateRegistry.allTemplates.length,
-        7,
-        reason: 'Should contain 7 template styles (Sunset Orange added)',
+        3,
+        reason: 'Should contain 3 template styles',
       );
       final ids = TemplateRegistry.allTemplates.map((t) => t.id).toList();
-      expect(ids, contains('modern_crimson'));
-      expect(ids, contains('minimal'));
-      expect(ids, contains('corporate'));
-      expect(ids, contains('elegant'));
-      expect(ids, contains('compact'));
-      expect(ids, contains('bold'));
+      expect(ids, contains('free_classic'));
+      expect(ids, contains('premium_modern'));
+      expect(ids, contains('elegant_center'));
     });
 
     test('generates valid PDF bytes across all 6 templates', () async {

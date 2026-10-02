@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import 'checkout_screen.dart';
 
@@ -165,659 +167,687 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Choose Your Plan',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline_rounded),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text(
-                    'Plan Details',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  content: const SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '• Company Profiles: Number of distinct businesses you can manage.',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          '• Clients: Number of unique customers you can invoice.',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          '• Documents: Total invoices, estimates, and receipts created.',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          '• Multi-device Sync: Access your data seamlessly across multiple devices.',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          '• Premium Templates: Access to advanced, customizable invoice designs.',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        'Got it',
+    return BlocBuilder<SubscriptionBloc, SubscriptionState>(
+      builder: (context, state) {
+        final isEligible = state.isEligibleForWelcomeOffer;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Choose Your Plan',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.help_outline_rounded),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text(
+                        'Plan Details',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            Text(
-              'Scale Your Business With invoz',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
-                letterSpacing: -0.5,
-              ),
-            ),
-
-            // const SizedBox(height: 6),
-            // const Text(
-            //   'Select a plan tailored to your volume. Upgrade or switch whenever you need.',
-            //   textAlign: TextAlign.center,
-            //   style: TextStyle(
-            //     fontSize: 13,
-            //     color: AppColors.textSecondary,
-            //     height: 1.4,
-            //   ),
-            // ),
-            //   ],
-            // ),
-            // ),
-            const SizedBox(height: 10),
-
-            // Welcome Offer Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: (isDark ? AppColors.darkSurface : Colors.white),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primary, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.local_offer_rounded,
-                          color: AppColors.primary,
-                          size: 20,
+                      content: const SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '• Company Profiles: Number of distinct businesses you can manage.',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              '• Clients: Number of unique customers you can invoice.',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              '• Documents: Total invoices, estimates, and receipts created.',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              '• Multi-device Sync: Access your data seamlessly across multiple devices.',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              '• Premium Templates: Access to advanced, customizable invoice designs.',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Welcome Offer',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.textPrimary,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
                           child: const Text(
-                            'First-time buyer',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
+                            'Got it',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '• 50% Extra Discount on 1 Year Plan',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '• 100% Free on 1 Month Plan',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Your discount will be auto-applied at checkout.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Plan Cards Carousel
-            SizedBox(
-              height: 530,
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: _plans.length,
-                onPageChanged: (index) {
-                  setState(() {
-                    _selectedPlanIndex = index;
-                  });
-                },
-                itemBuilder: (context, index) {
-                  final plan = _plans[index];
-                  final isSelected = _selectedPlanIndex == index;
-                  final planAccent = plan['accentColor'] as Color;
-                  final badge = plan['badge'] as String?;
-                  final badgeBg = plan['badgeBg'] as Color;
-                  final badgeTextColor = plan['badgeTextColor'] as Color;
-                  final features =
-                      plan['features'] as List<Map<String, dynamic>>;
-
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeOutCubic,
-                    margin: EdgeInsets.only(
-                      right: 12,
-                      left: index == 0 ? 4 : 4,
-                      top: isSelected ? 4 : 18,
-                      bottom: isSelected ? 4 : 18,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkSurface : Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: isSelected
-                            ? planAccent
-                            : (isDark
-                                  ? AppColors.darkBorder
-                                  : AppColors.border),
-                        width: isSelected ? 2 : 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isSelected
-                              ? planAccent.withValues(alpha: 0.18)
-                              : Colors.black.withValues(
-                                  alpha: isDark ? 0.2 : 0.04,
-                                ),
-                          blurRadius: isSelected ? 22 : 10,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(22.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Top row: Plan name + Badge
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                plan['name'] as String,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                  color: planAccent,
-                                  letterSpacing: -0.3,
-                                ),
-                              ),
-                              if (badge != null)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: badgeBg,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: badgeTextColor.withValues(
-                                        alpha: 0.25,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    badge,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                      color: badgeTextColor,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            plan['tagline'] as String,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.textSecondary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Pricing display
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
-                            children: [
-                              Text(
-                                (plan['price'] as double) == 0.0
-                                    ? 'Free'
-                                    : '\u20B9${(plan['price'] as double).toStringAsFixed(0)}',
-                                style: TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.w900,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                  letterSpacing: -1,
-                                ),
-                              ),
-                              if ((plan['price'] as double) > 0.0)
-                                Text(
-                                  ' / month',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: isDark
-                                        ? AppColors.darkTextSecondary
-                                        : AppColors.textSecondary,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-                          Divider(
-                            height: 1,
-                            color: isDark
-                                ? AppColors.darkBorder
-                                : AppColors.border,
-                          ),
-                          const SizedBox(height: 14),
-
-                          // Feature list
-                          Expanded(
-                            child: ListView.separated(
-                              physics: const BouncingScrollPhysics(),
-                              padding: EdgeInsets.zero,
-                              itemCount: features.length,
-                              separatorBuilder: (context, _) =>
-                                  const SizedBox(height: 10),
-                              itemBuilder: (context, fIdx) {
-                                final feature = features[fIdx];
-                                final isLimitation =
-                                    feature['isLimitation'] == true;
-                                final isHighlight =
-                                    feature['highlight'] == true;
-
-                                return Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      width: 20,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        color: isLimitation
-                                            ? (isDark
-                                                  ? AppColors.darkSurfaceVariant
-                                                  : Colors.grey.shade100)
-                                            : planAccent.withValues(
-                                                alpha: 0.12,
-                                              ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        isLimitation
-                                            ? Icons.remove
-                                            : Icons.check,
-                                        size: 13,
-                                        color: isLimitation
-                                            ? (isDark
-                                                  ? AppColors.darkTextMuted
-                                                  : Colors.grey.shade600)
-                                            : planAccent,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        feature['text'] as String,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: isHighlight
-                                              ? FontWeight.w600
-                                              : FontWeight.w500,
-                                          color: isLimitation
-                                              ? (isDark
-                                                    ? AppColors
-                                                          .darkTextSecondary
-                                                    : AppColors.textSecondary)
-                                              : (isDark
-                                                    ? AppColors.darkTextPrimary
-                                                    : AppColors.textPrimary),
-                                          height: 1.25,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   );
                 },
               ),
-            ),
-
-            const SizedBox(height: 14),
-
-            // Carousel dots indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_plans.length, (dotIdx) {
-                final isSelected = _selectedPlanIndex == dotIdx;
-                final planColor = _plans[dotIdx]['accentColor'] as Color;
-
-                return GestureDetector(
-                  onTap: () {
-                    _pageController.animateToPage(
-                      dotIdx,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOutCubic,
-                    );
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: isSelected ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: isSelected ? planColor : AppColors.borderStrong,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                Text(
+                  'Scale Your Business With invoz',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
+                    letterSpacing: -0.5,
                   ),
-                );
-              }),
-            ),
+                ),
 
-            const SizedBox(height: 20),
+                // const SizedBox(height: 6),
+                // const Text(
+                //   'Select a plan tailored to your volume. Upgrade or switch whenever you need.',
+                //   textAlign: TextAlign.center,
+                //   style: TextStyle(
+                //     fontSize: 13,
+                //     color: AppColors.textSecondary,
+                //     height: 1.4,
+                //   ),
+                // ),
+                //   ],
+                // ),
+                // ),
+                const SizedBox(height: 10),
 
-            // Action CTA Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: isFreePlan
-                      ? null
-                      : () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CheckoutScreen(
-                                planName: selectedPlan['name'] as String,
-                                monthlyPrice: selectedPlan['price'] as double,
-                                hasWelcomeOffer: true,
-                              ),
-                            ),
-                          );
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: AppColors.surfaceVariant,
-                    disabledForegroundColor: AppColors.textMuted,
-                    elevation: isFreePlan ? 0 : 4,
-                    shadowColor: accentColor.withValues(alpha: 0.35),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        isFreePlan
-                            ? 'Your Current Free Plan'
-                            : 'Continue with ${selectedPlan['name']}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                // Welcome Offer Section
+                if (isEligible) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: (isDark ? AppColors.darkSurface : Colors.white),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primary,
+                          width: 1.5,
                         ),
-                      ),
-                      if (!isFreePlan) ...[
-                        const SizedBox(width: 8),
-                        const Icon(Icons.arrow_forward_rounded, size: 18),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Support & Assistance Card
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurface : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.border,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: isDark ? 0.2 : 0.03,
-                      ),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    FittedBox(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.support_agent_rounded,
-                            color: AppColors.primary,
-                            size: 18,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
-                          const SizedBox(width: 8),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.local_offer_rounded,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Welcome Offer',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary,
+                                ),
+                              ),
+                              const Spacer(),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'First-time buyer',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
                           Text(
-                            'Questions about our plans? We\'re here to help.',
+                            '• 50% Extra Discount on 1 Year Plan',
                             style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
                               color: isDark
                                   ? AppColors.darkTextPrimary
                                   : AppColors.textPrimary,
-                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '• 100% Free on 1 Month Plan',
+                            style: TextStyle(
+                              fontSize: 13,
                               fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Your discount will be auto-applied at checkout.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () => _makePhoneCall('+918441061235'),
-                            icon: const Icon(
-                              Icons.phone_outlined,
-                              size: 14,
-                              color: AppColors.primary,
+                  ),
+                  const SizedBox(height: 10),
+                ],
+
+                // Plan Cards Carousel
+                SizedBox(
+                  height: 530,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: _plans.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _selectedPlanIndex = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      final plan = _plans[index];
+                      final isSelected = _selectedPlanIndex == index;
+                      final planAccent = plan['accentColor'] as Color;
+                      final badge = plan['badge'] as String?;
+                      final badgeBg = plan['badgeBg'] as Color;
+                      final badgeTextColor = plan['badgeTextColor'] as Color;
+                      final features =
+                          plan['features'] as List<Map<String, dynamic>>;
+
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        margin: EdgeInsets.only(
+                          right: 12,
+                          left: index == 0 ? 4 : 4,
+                          top: isSelected ? 4 : 18,
+                          bottom: isSelected ? 4 : 18,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark ? AppColors.darkSurface : Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: isSelected
+                                ? planAccent
+                                : (isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.border),
+                            width: isSelected ? 2 : 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isSelected
+                                  ? planAccent.withValues(alpha: 0.18)
+                                  : Colors.black.withValues(
+                                      alpha: isDark ? 0.2 : 0.04,
+                                    ),
+                              blurRadius: isSelected ? 22 : 10,
+                              offset: const Offset(0, 8),
                             ),
-                            label: Text(
-                              '+91 8441061235',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? AppColors.darkTextPrimary
-                                    : AppColors.textPrimary,
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(22.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Top row: Plan name + Badge
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    plan['name'] as String,
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w800,
+                                      color: planAccent,
+                                      letterSpacing: -0.3,
+                                    ),
+                                  ),
+                                  if (badge != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: badgeBg,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: badgeTextColor.withValues(
+                                            alpha: 0.25,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        badge,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w800,
+                                          color: badgeTextColor,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
+                              const SizedBox(height: 4),
+                              Text(
+                                plan['tagline'] as String,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Pricing display
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
+                                children: [
+                                  Text(
+                                    (plan['price'] as double) == 0.0
+                                        ? 'Free'
+                                        : '\u20B9${(plan['price'] as double).toStringAsFixed(0)}',
+                                    style: TextStyle(
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.w900,
+                                      color: isDark
+                                          ? AppColors.darkTextPrimary
+                                          : AppColors.textPrimary,
+                                      letterSpacing: -1,
+                                    ),
+                                  ),
+                                  if ((plan['price'] as double) > 0.0)
+                                    Text(
+                                      ' / month',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textSecondary,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              Divider(
+                                height: 1,
                                 color: isDark
                                     ? AppColors.darkBorder
                                     : AppColors.border,
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                              const SizedBox(height: 14),
+
+                              // Feature list
+                              Expanded(
+                                child: ListView.separated(
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: EdgeInsets.zero,
+                                  itemCount: features.length,
+                                  separatorBuilder: (context, _) =>
+                                      const SizedBox(height: 10),
+                                  itemBuilder: (context, fIdx) {
+                                    final feature = features[fIdx];
+                                    final isLimitation =
+                                        feature['isLimitation'] == true;
+                                    final isHighlight =
+                                        feature['highlight'] == true;
+
+                                    return Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 20,
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: isLimitation
+                                                ? (isDark
+                                                      ? AppColors
+                                                            .darkSurfaceVariant
+                                                      : Colors.grey.shade100)
+                                                : planAccent.withValues(
+                                                    alpha: 0.12,
+                                                  ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            isLimitation
+                                                ? Icons.remove
+                                                : Icons.check,
+                                            size: 13,
+                                            color: isLimitation
+                                                ? (isDark
+                                                      ? AppColors.darkTextMuted
+                                                      : Colors.grey.shade600)
+                                                : planAccent,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            feature['text'] as String,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: isHighlight
+                                                  ? FontWeight.w600
+                                                  : FontWeight.w500,
+                                              color: isLimitation
+                                                  ? (isDark
+                                                        ? AppColors
+                                                              .darkTextSecondary
+                                                        : AppColors
+                                                              .textSecondary)
+                                                  : (isDark
+                                                        ? AppColors
+                                                              .darkTextPrimary
+                                                        : AppColors
+                                                              .textPrimary),
+                                              height: 1.25,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () => _sendEmail('support@invoz.app'),
-                            icon: const Icon(
-                              Icons.mail_outline_rounded,
-                              size: 14,
-                              color: Color(0xFF0D9488),
-                            ),
-                            label: Text(
-                              'Email Support',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? AppColors.darkTextPrimary
-                                    : AppColors.textPrimary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: isDark
-                                    ? AppColors.darkBorder
-                                    : AppColors.border,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                // Carousel dots indicator
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(_plans.length, (dotIdx) {
+                    final isSelected = _selectedPlanIndex == dotIdx;
+                    final planColor = _plans[dotIdx]['accentColor'] as Color;
+
+                    return GestureDetector(
+                      onTap: () {
+                        _pageController.animateToPage(
+                          dotIdx,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOutCubic,
+                        );
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: isSelected ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? planColor
+                              : AppColors.borderStrong,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Action CTA Button
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton(
+                      onPressed: isFreePlan
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CheckoutScreen(
+                                    planName: selectedPlan['name'] as String,
+                                    monthlyPrice:
+                                        selectedPlan['price'] as double,
+                                    hasWelcomeOffer: isEligible,
+                                  ),
+                                ),
+                              );
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: AppColors.surfaceVariant,
+                        disabledForegroundColor: AppColors.textMuted,
+                        elevation: isFreePlan ? 0 : 4,
+                        shadowColor: accentColor.withValues(alpha: 0.35),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            isFreePlan
+                                ? 'Your Current Free Plan'
+                                : 'Continue with ${selectedPlan['name']}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
+                          if (!isFreePlan) ...[
+                            const SizedBox(width: 8),
+                            const Icon(Icons.arrow_forward_rounded, size: 18),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Support & Assistance Card
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? AppColors.darkBorder : AppColors.border,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.2 : 0.03,
+                          ),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                  ],
+                    child: Column(
+                      children: [
+                        FittedBox(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.support_agent_rounded,
+                                color: AppColors.primary,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Questions about our plans? We\'re here to help.',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () =>
+                                    _makePhoneCall('+918441061235'),
+                                icon: const Icon(
+                                  Icons.phone_outlined,
+                                  size: 14,
+                                  color: AppColors.primary,
+                                ),
+                                label: Text(
+                                  '+91 8441061235',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.border,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () =>
+                                    _sendEmail('support@invoz.app'),
+                                icon: const Icon(
+                                  Icons.mail_outline_rounded,
+                                  size: 14,
+                                  color: Color(0xFF0D9488),
+                                ),
+                                label: Text(
+                                  'Email Support',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.border,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 16),
-            const Text(
-              'Secure 256-bit encryption • Cancel anytime • Instant activation',
-              style: TextStyle(
-                fontSize: 11,
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w500,
-              ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Secure 256-bit encryption • Cancel anytime • Instant activation',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
             ),
-            const SizedBox(height: 32),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

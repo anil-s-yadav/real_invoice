@@ -24,7 +24,7 @@ class MockAuthRepository implements AuthRepository {
   Future<void> signOut() async {}
 
   @override
-  Future<void> registerDevice() async {}
+  Future<void> registerDevice({bool force = false}) async {}
 
   @override
   Future<void> logOutAllDevices() async {}
