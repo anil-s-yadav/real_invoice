@@ -106,7 +106,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       finalAmount: totalPayable,
       status: 'Active',
       transactionId:
-          response.paymentId ?? DateTime.now().millisecondsSinceEpoch.toString(),
+          response.paymentId ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       orderId: response.orderId,
       paymentSignature: response.signature,
       paymentMethod: 'Razorpay',
@@ -185,7 +186,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
             ),
           ],
@@ -201,7 +204,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 14),
@@ -269,7 +274,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Got it', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Got it',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -291,7 +299,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.4,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
               children: [
                 TextSpan(
@@ -301,7 +311,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 TextSpan(
                   text: description,
                   style: TextStyle(
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -328,7 +340,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       debugPrint(e.toString());
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -415,11 +426,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : const Color(0xFF0F172A),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
@@ -438,10 +454,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             const SizedBox(height: 12),
 
             // Dynamic Duration Cards
-            ..._durations.map((duration) => _buildDurationOptionCard(duration, isDark)),
+            ..._durations.map(
+              (duration) => _buildDurationOptionCard(duration, isDark),
+            ),
 
             // Welcome Offer banner notification if applied
-            if (widget.hasWelcomeOffer && (_selectedDuration == 12 || _selectedDuration == 1)) ...[
+            if (widget.hasWelcomeOffer &&
+                (_selectedDuration == 12 || _selectedDuration == 1)) ...[
               const SizedBox(height: 4),
               _buildWelcomeOfferBanner(),
             ],
@@ -454,7 +473,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : const Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 12),
@@ -572,7 +593,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.22),
                     borderRadius: BorderRadius.circular(10),
@@ -611,12 +635,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } else if (duration == 6) {
       title = '6 Months';
-      subtitle = '₹${(widget.monthlyPrice * 0.95).toStringAsFixed(0)}/mo • Billed bi-annually';
+      subtitle =
+          '₹${(widget.monthlyPrice * 0.95).toStringAsFixed(0)}/mo • Billed bi-annually';
       badgeText = 'SAVE 5%';
       badgeColor = const Color(0xFF059669);
     } else {
       title = '1 Year';
-      subtitle = '₹${(widget.monthlyPrice * (widget.hasWelcomeOffer ? 0.40 : 0.80)).toStringAsFixed(0)}/mo • Best Value';
+      subtitle =
+          '₹${(widget.monthlyPrice * (widget.hasWelcomeOffer ? 0.40 : 0.80)).toStringAsFixed(0)}/mo • Best Value';
       badgeText = widget.hasWelcomeOffer ? 'SAVE 60%' : 'SAVE 20%';
       badgeColor = const Color(0xFFD97706); // Amber/Gold badge
     }
@@ -668,7 +694,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   border: Border.all(
                     color: isSelected
                         ? AppColors.primary
-                        : (isDark ? Colors.grey[600]! : const Color(0xFFCBD5E1)),
+                        : (isDark
+                              ? Colors.grey[600]!
+                              : const Color(0xFFCBD5E1)),
                     width: 2,
                   ),
                 ),
@@ -692,13 +720,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           title,
                           style: TextStyle(
                             fontSize: 15,
-                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                            color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
+                            fontWeight: isSelected
+                                ? FontWeight.w800
+                                : FontWeight.w600,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : const Color(0xFF0F172A),
                           ),
                         ),
                         if (badgeText != null)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 2.5,
+                            ),
                             decoration: BoxDecoration(
                               color: badgeColor,
                               borderRadius: BorderRadius.circular(6),
@@ -720,7 +755,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       subtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B),
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : const Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -736,13 +773,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : const Color(0xFF0F172A),
                     ),
                   ),
                   if (isSelected && duration == 12)
                     const Text(
                       'Billed Annually',
-                      style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.green,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                 ],
               ),
@@ -772,7 +815,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               color: Color(0xFF10B981),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.celebration_rounded, color: Colors.white, size: 14),
+            child: const Icon(
+              Icons.celebration_rounded,
+              color: Colors.white,
+              size: 14,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -854,7 +901,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           _buildSummaryRow(
             'GST (18% Mandated)',
             '+ ₹${gstAmount.toStringAsFixed(2)}',
-            color: isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B),
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : const Color(0xFF64748B),
             isDark: isDark,
           ),
           const Padding(
@@ -872,7 +921,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : const Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -904,7 +955,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.stars_rounded, size: 16, color: Color(0xFF059669)),
+                  const Icon(
+                    Icons.stars_rounded,
+                    size: 16,
+                    color: Color(0xFF059669),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Total savings on this order: ₹${totalDiscount.toStringAsFixed(0)}',
@@ -940,8 +995,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             style: TextStyle(
               fontSize: 14,
               color: isBold
-                  ? (isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A))
-                  : (isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B)),
+                  ? (isDark
+                        ? AppColors.darkTextPrimary
+                        : const Color(0xFF0F172A))
+                  : (isDark
+                        ? AppColors.darkTextSecondary
+                        : const Color(0xFF64748B)),
               fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
@@ -949,10 +1008,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             value,
             style: TextStyle(
               fontSize: 14,
-              color: color ??
+              color:
+                  color ??
                   (isBold
-                      ? (isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A))
-                      : (isDark ? AppColors.darkTextSecondary : const Color(0xFF334155))),
+                      ? (isDark
+                            ? AppColors.darkTextPrimary
+                            : const Color(0xFF0F172A))
+                      : (isDark
+                            ? AppColors.darkTextSecondary
+                            : const Color(0xFF334155))),
               fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
             ),
           ),
@@ -1030,7 +1094,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 color: isDark ? AppColors.darkSurface : Colors.white,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+                  color: isDark
+                      ? AppColors.darkBorder
+                      : const Color(0xFFE2E8F0),
                 ),
               ),
               child: Text(
@@ -1038,7 +1104,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkTextSecondary : const Color(0xFF475569),
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : const Color(0xFF475569),
                 ),
               ),
             );
@@ -1066,7 +1134,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             icon: Icons.shield_rounded,
             iconColor: Colors.blueAccent,
             title: '256-Bit Bank-Grade Encryption',
-            subtitle: 'Your transactions and account data are encrypted end-to-end.',
+            subtitle:
+                'Your transactions and account data are encrypted end-to-end.',
             isDark: isDark,
           ),
           const SizedBox(height: 14),
@@ -1074,7 +1143,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             icon: Icons.published_with_changes_rounded,
             iconColor: Colors.green,
             title: '7-Day Money-Back Guarantee',
-            subtitle: 'Try risk-free. If not completely satisfied, get a full 100% refund.',
+            subtitle:
+                'Try risk-free. If not completely satisfied, get a full 100% refund.',
             isDark: isDark,
           ),
           const SizedBox(height: 14),
@@ -1082,7 +1152,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             icon: Icons.bolt_rounded,
             iconColor: Colors.amber,
             title: 'Instant Plan Activation',
-            subtitle: 'Your plan limits and premium tools are unlocked immediately upon payment.',
+            subtitle:
+                'Your plan limits and premium tools are unlocked immediately upon payment.',
             isDark: isDark,
           ),
         ],
@@ -1118,7 +1189,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(height: 2),
@@ -1126,7 +1199,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 subtitle,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B),
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : const Color(0xFF64748B),
                   height: 1.3,
                 ),
               ),
