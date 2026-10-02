@@ -23,6 +23,8 @@ import 'widgets/payment_entry_sheet.dart';
 import '../../settings/data/payment_detail_repository.dart';
 import '../../settings/domain/payment_detail_model.dart';
 import 'widgets/template_thumbnail_card.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
+import '../../subscription/presentation/subscription_screen.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
   final DocumentModel document;
@@ -187,6 +189,23 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     return InkWell(
                       onTap: () {
                         if (!isSelected) {
+                          if (t.isPremium) {
+                            final subState = context.read<SubscriptionBloc>().state;
+                            if (!(subState.plan?.hasPremiumTemplates ?? false)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Premium template. Please upgrade your plan.'),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                              Navigator.pop(bottomSheetContext); // Close the sheet
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+                              );
+                              return;
+                            }
+                          }
+
                           setState(() {
                             _currentTemplateId = t.id;
                             _document = _document.copyWith(templateId: t.id);
