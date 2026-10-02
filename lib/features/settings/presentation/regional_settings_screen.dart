@@ -18,7 +18,7 @@ class RegionalSettingsScreen extends StatefulWidget {
 
 class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
   String _selectedLanguage = 'English';
-  String _selectedCountry = 'Indiannnn';
+  String _selectedCountry = 'India';
   String _selectedCurrencyCode = 'INR';
   String _selectedCurrencySymbol = '₹';
   bool _isLoading = true;
@@ -279,7 +279,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                             (c) => c['name'] == val,
                           );
                           _selectedCurrencyCode = country['currency']!;
-                          String _selectedCurrencySymbol = '\u20B9';
+                          _selectedCurrencySymbol = country['symbol']!;
                         });
                       },
                       icon: Icons.location_on_outlined,

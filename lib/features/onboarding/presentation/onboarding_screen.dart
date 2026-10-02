@@ -441,7 +441,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 _selectedCountry = val;
                 final country = AppConstants.countries.firstWhere((c) => c['name'] == val);
                 _selectedCurrencyCode = country['currency']!;
-                String _selectedCurrencySymbol = '\u20B9';
+                _selectedCurrencySymbol = country['symbol']!;
               });
             },
             icon: Icons.location_on_outlined,
