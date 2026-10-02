@@ -676,9 +676,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       badgeText = 'SAVE 5%';
       badgeColor = const Color(0xFF059669);
     } else {
-      title = '12 Months (1 Year)';
+      title = '1 Year';
       subtitle = '₹${(widget.monthlyPrice * (widget.hasWelcomeOffer ? 0.40 : 0.80)).toStringAsFixed(0)}/mo • Best Value';
-      badgeText = widget.hasWelcomeOffer ? 'SUPER OFFER: 60% OFF' : 'POPULAR • SAVE 20%';
+      badgeText = widget.hasWelcomeOffer ? 'SAVE 60%' : 'SAVE 20%';
       badgeColor = const Color(0xFFD97706); // Amber/Gold badge
     }
 
@@ -737,14 +737,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ? const Icon(Icons.check, size: 14, color: Colors.white)
                     : null,
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
 
               // Title, Subtitle, and Badge
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 6,
+                      runSpacing: 4,
                       children: [
                         Text(
                           title,
@@ -754,8 +757,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
                           ),
                         ),
-                        if (badgeText != null) ...[
-                          const SizedBox(width: 8),
+                        if (badgeText != null)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                             decoration: BoxDecoration(
@@ -772,7 +774,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               ),
                             ),
                           ),
-                        ],
                       ],
                     ),
                     const SizedBox(height: 3),
