@@ -818,17 +818,7 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                           description: hasFilters
                               ? 'Try adjusting filters.'
                               : 'Create your first invoice or quotation.',
-                          actionLabel: hasFilters ? null : 'Create Document',
-                          onAction: hasFilters
-                              ? null
-                              : () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => DocumentEditorScreen(
-                                      initialType: DocumentType.invoice,
-                                    ),
-                                  ),
-                                ),
-                        );
+                          );
                       }
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(
