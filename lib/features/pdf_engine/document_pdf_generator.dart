@@ -934,20 +934,7 @@ class DocumentPdfGenerator {
         );
       } catch (_) {}
     }
-    if (bankDetail == null &&
-        doc.selectedBankDetailId != 'none' &&
-        profile.bankName != null &&
-        profile.bankName!.trim().isNotEmpty &&
-        profile.accountNumber != null &&
-        profile.accountNumber!.trim().isNotEmpty) {
-      bankDetail = PaymentDetail(
-        id: 'legacy',
-        type: 'Bank',
-        title: profile.bankName!,
-        details: profile.accountNumber!,
-        extra: profile.ifscCode,
-      );
-    }
+
     if (bankDetail == null && doc.selectedBankDetailId != 'none') {
       final banks = payments.where((p) => p.type == 'Bank').toList();
       if (banks.isNotEmpty) bankDetail = banks.first;
@@ -959,17 +946,7 @@ class DocumentPdfGenerator {
         upiDetail = payments.firstWhere((p) => p.id == doc.selectedUpiDetailId);
       } catch (_) {}
     }
-    if (upiDetail == null &&
-        doc.selectedUpiDetailId != 'none' &&
-        profile.upiId != null &&
-        profile.upiId!.trim().isNotEmpty) {
-      upiDetail = PaymentDetail(
-        id: 'legacy_upi',
-        type: 'UPI',
-        title: 'UPI',
-        details: profile.upiId!,
-      );
-    }
+
     if (upiDetail == null && doc.selectedUpiDetailId != 'none') {
       final upis = payments.where((p) => p.type == 'UPI').toList();
       if (upis.isNotEmpty) upiDetail = upis.first;

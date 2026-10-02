@@ -181,10 +181,6 @@ void main() {
         email: 'contact@apex.in',
         address: '101 Cyber City, Gurugram, Haryana',
         gstin: '06AAAAA0000A1Z5',
-        upiId: 'apex@upi',
-        bankName: 'HDFC Bank',
-        accountNumber: '50100234567890',
-        ifscCode: 'HDFC0001234',
       );
 
       const item1 = DocumentItem(
