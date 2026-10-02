@@ -14,6 +14,9 @@ import '../../customers/data/customer_repository.dart';
 import '../../products/data/product_repository.dart';
 import '../../business_profile/data/business_profile_repository.dart';
 import '../data/payment_detail_repository.dart';
+import '../data/invoice_settings_repository.dart';
+import '../data/template_settings_repository.dart';
+
 import '../../documents/bloc/document_bloc.dart';
 import '../../documents/bloc/document_event.dart';
 import '../../customers/bloc/customer_bloc.dart';
@@ -53,6 +56,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
       final payRepo = PaymentDetailRepository();
       await payRepo.getAllPayments(forceSync: true);
+
+      final invSettingsRepo = InvoiceSettingsRepository();
+      await invSettingsRepo.syncSettings();
+
+      final tplSettingsRepo = TemplateSettingsRepository();
+      await tplSettingsRepo.syncSettings();
 
       if (mounted) {
         context.read<DocumentBloc>().add(const LoadDocumentsEvent());

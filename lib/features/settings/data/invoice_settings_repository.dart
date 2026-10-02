@@ -25,6 +25,14 @@ class InvoiceSettingsRepository {
         .doc('invoice_settings');
   }
 
+  Future<void> syncSettings() async {
+    final ref = _settingsRef;
+    if (ref == null) return;
+    try {
+      await ref.get(const GetOptions(source: Source.server));
+    } catch (_) {}
+  }
+
   Future<Map<String, dynamic>> _getSettingsMap() async {
     final ref = _settingsRef;
     if (ref == null) return {};

@@ -18,6 +18,14 @@ class TemplateSettingsRepository {
         .doc('template_settings');
   }
 
+  Future<void> syncSettings() async {
+    final ref = _ref;
+    if (ref == null) return;
+    try {
+      await ref.get(const GetOptions(source: Source.server));
+    } catch (_) {}
+  }
+
   Future<Map<String, dynamic>> _getMap() async {
     final ref = _ref;
     if (ref == null) return {};
