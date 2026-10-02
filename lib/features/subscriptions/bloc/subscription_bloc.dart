@@ -14,6 +14,10 @@ class CheckSubscriptionStatusEvent extends SubscriptionEvent {
   const CheckSubscriptionStatusEvent();
 }
 
+class ObserveSubscriptionEvent extends SubscriptionEvent {
+  const ObserveSubscriptionEvent();
+}
+
 class ActivateSubscriptionEvent extends SubscriptionEvent {
   final SubscriptionPlanModel plan;
   const ActivateSubscriptionEvent(this.plan);
@@ -60,6 +64,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   SubscriptionBloc({this.repository}) : super(const FreeTierState()) {
     on<CheckSubscriptionStatusEvent>(_onCheckStatus);
+    on<ObserveSubscriptionEvent>(_onObserveStatus);
     on<ActivateSubscriptionEvent>(_onActivatePlan);
   }
 
@@ -70,13 +75,46 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     final repo = repository ?? SubscriptionRepository();
     final plan = await repo.getCurrentPlan();
 
-    bool isEligible = false;
+    bool isEligible = await _checkEligibility(repo);
+    _emitPlanState(plan, isEligible, emit);
+  }
+
+  Future<void> _onObserveStatus(
+    ObserveSubscriptionEvent event,
+    Emitter<SubscriptionState> emit,
+  ) async {
+    final repo = repository ?? SubscriptionRepository();
+    
+    // Check initial eligibility
+    final isEligible = await _checkEligibility(repo);
+    
+    await emit.forEach<SubscriptionPlanModel>(
+      repo.currentPlanStream(),
+      onData: (plan) {
+        if (plan.isFree || !plan.isActive) {
+          return FreeTierState(plan: plan, isEligibleForWelcomeOffer: isEligible);
+        } else {
+          return PremiumTierState(
+            expiryDate: plan.expiryDate,
+            plan: plan,
+            isEligibleForWelcomeOffer: isEligible,
+          );
+        }
+      },
+      onError: (_, __) => state,
+    );
+  }
+
+  Future<bool> _checkEligibility(SubscriptionRepository repo) async {
     try {
       final history = await repo.getPlanHistory();
-      // Eligible if user has no premium plan in their history
-      isEligible = !history.any((p) => !p.isFree);
-    } catch (_) {}
+      return !history.any((p) => !p.isFree);
+    } catch (_) {
+      return false;
+    }
+  }
 
+  void _emitPlanState(SubscriptionPlanModel plan, bool isEligible, Emitter<SubscriptionState> emit) {
     if (plan.isFree || !plan.isActive) {
       emit(FreeTierState(plan: plan, isEligibleForWelcomeOffer: isEligible));
     } else {
@@ -96,26 +134,8 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   ) async {
     final repo = repository ?? SubscriptionRepository();
     await repo.saveOrUpgradePlan(event.plan);
-
-    // Keep the current eligibility state (it shouldn't matter as much after activation,
-    // but we can retain the old one or just evaluate it again).
-    // After activating a paid plan, they are no longer eligible, but let's just pass false
-    // or evaluate it. We'll pass false since they just activated a plan.
-    if (event.plan.isFree || !event.plan.isActive) {
-      emit(
-        FreeTierState(
-          plan: event.plan,
-          isEligibleForWelcomeOffer: state.isEligibleForWelcomeOffer,
-        ),
-      );
-    } else {
-      emit(
-        PremiumTierState(
-          expiryDate: event.plan.expiryDate,
-          plan: event.plan,
-          isEligibleForWelcomeOffer: false,
-        ),
-      );
-    }
+    // State will automatically update if we are observing the stream.
+    // However, if we aren't observing, we manually emit here as a fallback.
+    _emitPlanState(event.plan, false, emit);
   }
 }

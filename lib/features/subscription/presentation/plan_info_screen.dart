@@ -10,6 +10,7 @@ import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../data/subscription_repository.dart';
 import '../domain/subscription_plan_model.dart';
 import 'subscription_screen.dart';
+import 'checkout_screen.dart';
 
 class PlanInfoScreen extends StatefulWidget {
   const PlanInfoScreen({super.key});
@@ -160,21 +161,44 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
 
   Widget _buildActivePlanCard(SubscriptionPlanModel plan) {
     final isFree = plan.isFree;
+    final isActive = plan.isActive;
     final isCancelled = plan.status.toLowerCase() == 'cancelled';
+    
+    String badgeText;
+    Color badgeColor;
+    Color badgeTextColor = Colors.white;
+
+    if (isFree) {
+      badgeText = 'FREE TIER';
+      badgeColor = Colors.white.withValues(alpha: 0.2);
+    } else if (isCancelled) {
+      badgeText = 'CANCELLED';
+      badgeColor = Colors.orange.withValues(alpha: 0.9);
+    } else if (!isActive) {
+      badgeText = 'EXPIRED';
+      badgeColor = AppColors.statusOverdueText; // Red color
+    } else {
+      badgeText = 'ACTIVE';
+      badgeColor = AppColors.premiumGold;
+      badgeTextColor = Colors.black;
+    }
 
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isFree
-              ? [const Color(0xFF334155), const Color(0xFF1E293B)]
-              : [AppColors.primary, AppColors.primaryDark],
+          colors: (isFree || !isActive)
+              ? [const Color(0xFF334155), const Color(0xFF1E293B)] // Greyed out if free or expired
+              : [
+                  SubscriptionPlanModel.getAccentColor(plan.planName),
+                  SubscriptionPlanModel.getSecondaryAccentColor(plan.planName)
+                ],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: (isFree ? Colors.black : AppColors.primary).withValues(
+            color: ((isFree || !isActive) ? Colors.black : SubscriptionPlanModel.getAccentColor(plan.planName)).withValues(
               alpha: 0.25,
             ),
             blurRadius: 12,
@@ -222,17 +246,13 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: isCancelled
-                      ? Colors.orange.withValues(alpha: 0.9)
-                      : (isFree
-                            ? Colors.white.withValues(alpha: 0.2)
-                            : AppColors.premiumGold),
+                  color: badgeColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  isCancelled ? 'CANCELLED' : (isFree ? 'FREE TIER' : 'ACTIVE'),
+                  badgeText,
                   style: TextStyle(
-                    color: isFree || isCancelled ? Colors.white : Colors.black,
+                    color: badgeTextColor,
                     fontSize: 10,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.5,
@@ -261,7 +281,9 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
             isFree
                 ? 'Standard offline invoicing features included forever.'
                 : (plan.expiryDate != null
-                      ? 'Valid until ${DateFormat('MMMM d, yyyy').format(plan.expiryDate!)} (${plan.daysRemaining} days remaining)'
+                      ? (isActive 
+                          ? 'Valid until ${DateFormat('MMMM d, yyyy').format(plan.expiryDate!)} (${plan.daysRemaining} days remaining)'
+                          : 'Expired on ${DateFormat('MMMM d, yyyy').format(plan.expiryDate!)}')
                       : 'Active Subscription'),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.85),
@@ -491,17 +513,17 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
               Row(
                 children: [
                   Icon(
-                    Icons.check_circle_rounded,
+                    plan.isActive ? Icons.check_circle_rounded : Icons.cancel_rounded,
                     size: 14,
-                    color: Colors.green,
+                    color: plan.isActive ? Colors.green : AppColors.statusOverdueText,
                   ),
                   SizedBox(width: 4),
                   Text(
                     plan.status,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green,
+                      color: plan.isActive ? Colors.green : AppColors.statusOverdueText,
                     ),
                   ),
                 ],
@@ -514,6 +536,42 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
   }
 
   Widget _buildActionButtons(SubscriptionPlanModel plan) {
+    final isExpired = !plan.isActive && !plan.isFree;
+    
+    if (isExpired) {
+      return Column(
+        children: [
+          AppButton(
+            label: 'Renew ${plan.planName} Plan',
+            icon: Icons.autorenew_rounded,
+            onPressed: () {
+              final isEligible = context.read<SubscriptionBloc>().state.isEligibleForWelcomeOffer;
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => CheckoutScreen(
+                    planName: plan.planName,
+                    monthlyPrice: plan.price,
+                    hasWelcomeOffer: isEligible,
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 10),
+          AppButton(
+            label: 'Browse Other Plans',
+            icon: Icons.explore_rounded,
+            variant: AppButtonVariant.outline,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+              );
+            },
+          ),
+        ],
+      );
+    }
+
     return Column(
       children: [
         AppButton(
@@ -525,7 +583,7 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
             );
           },
         ),
-        if (!plan.isFree && plan.status.toLowerCase() != 'cancelled') ...[
+        if (!plan.isFree && plan.status.toLowerCase() != 'cancelled' && plan.isActive) ...[
           SizedBox(height: 10),
           AppButton(
             label: 'Cancel Subscription',

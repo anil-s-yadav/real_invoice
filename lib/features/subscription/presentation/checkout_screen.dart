@@ -574,21 +574,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   // --- COMPONENT: HERO PLAN CARD ---
   Widget _buildHeroPlanCard(bool isDark) {
+    final primaryAccent = SubscriptionPlanModel.getAccentColor(widget.planName);
+    final secondaryAccent = SubscriptionPlanModel.getSecondaryAccentColor(widget.planName);
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF4F46E5), // Indigo
-            Color(0xFF3730A3), // Deep Indigo
+            primaryAccent,
+            secondaryAccent,
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+            color: primaryAccent.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

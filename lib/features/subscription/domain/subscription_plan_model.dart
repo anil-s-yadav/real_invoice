@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:flutter/material.dart';
 class SubscriptionPlanModel {
   final String id;
   final String planName;
@@ -65,10 +65,29 @@ class SubscriptionPlanModel {
     if (expiryDate == null) return true; // For lifetime plans
     return expiryDate!.isAfter(DateTime.now());
   }
+
   int get daysRemaining {
     if (expiryDate == null) return 0;
     final diff = expiryDate!.difference(DateTime.now()).inDays;
     return diff > 0 ? diff : 0;
+  }
+
+  static Color getAccentColor(String planName) {
+    final name = planName.toLowerCase();
+    if (name.contains('free')) return const Color(0xFF64748B);
+    if (name.contains('single')) return const Color(0xFF2563EB); // Blue
+    if (name.contains('professional')) return const Color(0xFF4F46E5); // Indigo
+    if (name.contains('gold')) return const Color(0xFFD97706); // Gold
+    return const Color(0xFF4F46E5); // fallback primary
+  }
+
+  static Color getSecondaryAccentColor(String planName) {
+    final name = planName.toLowerCase();
+    if (name.contains('free')) return const Color(0xFF475569);
+    if (name.contains('single')) return const Color(0xFF1D4ED8);
+    if (name.contains('professional')) return const Color(0xFF3730A3);
+    if (name.contains('gold')) return const Color(0xFFB45309);
+    return const Color(0xFF3730A3); // fallback primaryDark
   }
 
   factory SubscriptionPlanModel.defaultFree() {

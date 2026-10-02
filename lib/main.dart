@@ -146,7 +146,7 @@ class InvozRoot extends StatelessWidget {
           ),
           BlocProvider(
             create: (_) =>
-                SubscriptionBloc()..add(const CheckSubscriptionStatusEvent()),
+                SubscriptionBloc()..add(const ObserveSubscriptionEvent()),
           ),
           BlocProvider(
             create: (ctx) =>

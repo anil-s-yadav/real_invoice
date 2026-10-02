@@ -610,24 +610,27 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: isFree
+                  colors: (isFree || !isActive)
                       ? (isDark
                             ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
                             : [Colors.white, const Color(0xFFF8FAFC)])
-                      : [const Color(0xFF4338CA), const Color(0xFF312E81)],
+                      : [
+                          SubscriptionPlanModel.getAccentColor(plan.planName),
+                          SubscriptionPlanModel.getSecondaryAccentColor(plan.planName)
+                        ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isFree
+                  color: (isFree || !isActive)
                       ? (isDark ? AppColors.darkBorder : AppColors.border)
                       : const Color(0xFFF59E0B).withValues(alpha: 0.4),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: isFree
+                    color: (isFree || !isActive)
                         ? Colors.black.withValues(alpha: 0.04)
-                        : const Color(0xFF312E81).withValues(alpha: 0.25),
+                        : SubscriptionPlanModel.getAccentColor(plan.planName).withValues(alpha: 0.25),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -639,16 +642,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: isFree
+                      color: (isFree || !isActive)
                           ? AppColors.primary.withValues(alpha: 0.12)
                           : const Color(0xFFF59E0B).withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      isFree
+                      (isFree || !isActive)
                           ? Icons.workspace_premium_outlined
                           : Icons.workspace_premium_rounded,
-                      color: isFree
+                      color: (isFree || !isActive)
                           ? AppColors.primary
                           : const Color(0xFFFBBF24),
                       size: 26,
@@ -667,7 +670,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: isFree
+                                color: (isFree || !isActive)
                                     ? (isDark
                                           ? AppColors.darkTextPrimary
                                           : AppColors.textPrimary)
@@ -685,7 +688,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     ? (isDark
                                           ? AppColors.darkSurfaceVariant
                                           : AppColors.canvas)
-                                    : const Color(0xFFF59E0B),
+                                    : (!isActive ? AppColors.statusOverdueText : const Color(0xFFF59E0B)),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -697,7 +700,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       ? (isDark
                                             ? AppColors.darkTextSecondary
                                             : AppColors.textSecondary)
-                                      : Colors.black,
+                                      : (!isActive ? Colors.white : Colors.black),
                                   letterSpacing: 0.5,
                                 ),
                               ),
@@ -709,7 +712,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           expiryText,
                           style: TextStyle(
                             fontSize: 12.5,
-                            color: isFree
+                            color: (isFree || !isActive)
                                 ? (isDark
                                       ? AppColors.darkTextSecondary
                                       : AppColors.textSecondary)
@@ -722,7 +725,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: isFree
+                      color: (isFree || !isActive)
                           ? (isDark
                                 ? AppColors.darkSurfaceVariant
                                 : AppColors.canvas)
@@ -732,7 +735,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     child: Icon(
                       Icons.chevron_right_rounded,
                       size: 18,
-                      color: isFree
+                      color: (isFree || !isActive)
                           ? (isDark
                                 ? AppColors.darkTextSecondary
                                 : AppColors.textSecondary)
