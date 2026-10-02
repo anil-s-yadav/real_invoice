@@ -329,31 +329,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  List<String> _getPlanFeatures(String planName) {
-    final name = planName.toLowerCase();
-    if (name == 'single') {
-      return [
-        '1 Company & 10 Clients',
-        'Unlimited Invoices & Receipts',
-        '2 Devices Synchronization',
-        '100% Ad-Free Experience',
-      ];
-    } else if (name.contains('pro')) {
-      return [
-        '3 Companies & Unlimited Clients',
-        'Unlimited Invoices, Quotes & Receipts',
-        '3 Devices Simultaneous Login',
-        'Comprehensive Business Analytics',
-      ];
-    } else {
-      return [
-        '10 Companies & Unlimited Clients',
-        'Unlimited Documents & Templates',
-        'Unlimited Device Access',
-        'Full Analytics & VIP Priority Support',
-      ];
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -377,8 +352,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final double totalPayable = subtotal + gstAmount;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final features = _getPlanFeatures(widget.planName);
-
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkCanvas : const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -430,7 +403,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. HERO PLAN CARD
-            _buildHeroPlanCard(isDark, features),
+            _buildHeroPlanCard(isDark),
             const SizedBox(height: 24),
 
             // 2. DURATION SELECTOR TITLE & OPTIONS
@@ -517,7 +490,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   // --- COMPONENT: HERO PLAN CARD ---
-  Widget _buildHeroPlanCard(bool isDark, List<String> features) {
+  Widget _buildHeroPlanCard(bool isDark) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -555,97 +528,63 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.workspace_premium_rounded,
+                        color: Colors.amberAccent,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.workspace_premium_rounded,
-                            color: Colors.amberAccent,
-                            size: 24,
+                        Text(
+                          '${widget.planName} Plan',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: 0.2,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${widget.planName} Plan',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: 0.2,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'All Premium Features Unlocked',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withValues(alpha: 0.85),
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 2),
+                        Text(
+                          'All Premium Features Unlocked',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.85),
+                          ),
                         ),
                       ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.22),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '₹${widget.monthlyPrice.toStringAsFixed(0)}/mo',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
-                Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
-                const SizedBox(height: 14),
-                // Feature checklist bullets
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  children: features.map((feat) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.check_circle_rounded,
-                          size: 16,
-                          color: Color(0xFF6EE7B7), // Mint green
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          feat,
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.95),
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '₹${widget.monthlyPrice.toStringAsFixed(0)}/mo',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),
