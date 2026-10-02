@@ -1,30 +1,35 @@
 import re
 
-filepath = 'lib/features/home/presentation/home_screen.dart'
+filepath = 'lib/main.dart'
 with open(filepath, 'r', encoding='utf-8') as f:
     content = f.read()
 
-old_logic = '''          if (maxDocs != -1) {
-            final today = DateTime.now();
-            int todayCount = docState.documents.where((d) =>
-              d.createdAt.year == today.year &&
-              d.createdAt.month == today.month &&
-              d.createdAt.day == today.day
-            ).length;'''
+# Remove DevicePreview from runApp
+old_runapp = 'runApp(DevicePreview(enabled: kDebugMode, builder: (_) => const InvozRoot()));'
+new_runapp = 'runApp(const InvozRoot());'
+content = content.replace(old_runapp, new_runapp)
 
-new_logic = '''          if (maxDocs != -1) {
-            final today = DateTime.now();
-            int todayCount = 0;
-            if (docState is DocumentLoaded) {
-              todayCount = docState.documents.where((d) =>
-                d.createdAt.year == today.year &&
-                d.createdAt.month == today.month &&
-                d.createdAt.day == today.day
-              ).length;
-            }'''
+# Swap Firebase and MobileAds initialization just to be safe
+old_init = '''  WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
+  Bloc.observer = AppBlocObserver();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);'''
 
-content = content.replace(old_logic, new_logic)
+new_init = '''  WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = AppBlocObserver();
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    debugPrint("Firebase init failed: $e");
+  }
+  try {
+    await MobileAds.instance.initialize();
+  } catch (e) {
+    debugPrint("MobileAds init failed: $e");
+  }'''
+
+content = content.replace(old_init, new_init)
 
 with open(filepath, 'w', encoding='utf-8') as f:
     f.write(content)
-print('Updated home')
+print('Updated main.dart')
