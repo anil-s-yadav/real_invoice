@@ -66,8 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (lastDismissed != null) {
         final now = DateTime.now();
         final difference = now.difference(lastDismissed).inDays;
-        if (difference < 7) {
-          // Less than 7 days since dismissal
+        if (difference < 2) {
+          // Less than 2 days since dismissal
           setState(() {
             _showPromoBanner = false;
           });
