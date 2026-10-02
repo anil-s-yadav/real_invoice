@@ -77,6 +77,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       maxDocs = -1; // -1 means unlimited
       maxDevices = 2;
       hasPremium = true;
+      isAdFree = true;
     } else if (pName.contains('pro')) {
       maxCompanies = 3;
       maxClients = -1;

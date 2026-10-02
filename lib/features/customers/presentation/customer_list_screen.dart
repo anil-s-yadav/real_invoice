@@ -11,6 +11,8 @@ import '../bloc/customer_event.dart';
 import '../bloc/customer_state.dart';
 import '../domain/customer_model.dart';
 import 'customer_editor_sheet.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
+import '../../subscription/presentation/subscription_screen.dart';
 
 class CustomerListScreen extends StatefulWidget {
   const CustomerListScreen({super.key});
@@ -165,7 +167,30 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'customer_fab',
-        onPressed: () => CustomerEditorSheet.show(context),
+        onPressed: () {
+          final state = context.read<CustomerBloc>().state;
+          final subState = context.read<SubscriptionBloc>().state;
+          final maxClients = subState.plan?.maxClientsAllowed ?? 3;
+          
+          int currentCount = 0;
+          if (state is CustomerLoaded) {
+            currentCount = state.customers.length;
+          }
+          
+          if (maxClients != -1 && currentCount >= maxClients) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Client limit reached. Please upgrade your plan.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+            );
+            return;
+          }
+          CustomerEditorSheet.show(context);
+        },
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 4,

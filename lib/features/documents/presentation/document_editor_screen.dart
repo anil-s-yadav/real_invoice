@@ -29,6 +29,7 @@ import '../../settings/domain/payment_detail_model.dart';
 import '../../settings/presentation/payment_details_list_screen.dart';
 import 'pdf_preview_screen.dart';
 import 'widgets/customer_select_sheet.dart';
+import '../../customers/presentation/customer_editor_sheet.dart';
 import 'widgets/item_entry_sheet.dart';
 import 'widgets/product_select_sheet.dart';
 
@@ -882,19 +883,40 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 const SizedBox(height: 16),
               ],
               const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    final newCustomer = await CustomerSelectSheet.show(context);
-                    if (newCustomer != null) {
-                      setState(() => _selectedCustomer = newCustomer);
-                    }
-                  },
-                  icon: const Icon(Icons.swap_horiz),
-                  label: const Text('Change Customer'),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        final newCustomer = await CustomerSelectSheet.show(context);
+                        if (newCustomer != null) {
+                          setState(() => _selectedCustomer = newCustomer);
+                        }
+                      },
+                      icon: const Icon(Icons.contacts_outlined),
+                      label: const Text('Saved'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        final newCustomer = await CustomerEditorSheet.show(
+                          context,
+                          customer: customer,
+                          saveToDb: false,
+                        );
+                        if (newCustomer != null) {
+                          setState(() => _selectedCustomer = newCustomer);
+                        }
+                      },
+                      icon: const Icon(Icons.edit_outlined),
+                      label: const Text('Edit Manual'),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
             ],
@@ -931,44 +953,46 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
   Widget _buildCustomerSection() {
     if (_selectedCustomer == null) {
-      return GestureDetector(
-        onTap: () async {
-          final customer = await CustomerSelectSheet.show(context);
-          if (customer != null) {
-            setState(() => _selectedCustomer = customer);
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.3),
-              style: BorderStyle.solid,
-              width: 1.5,
+      return Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                final customer = await CustomerSelectSheet.show(context);
+                if (customer != null) {
+                  setState(() => _selectedCustomer = customer);
+                }
+              },
+              icon: const Icon(Icons.contacts_outlined),
+              label: const Text('Saved'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
             ),
           ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.person_add_alt_1_rounded,
-                color: AppColors.primary,
-                size: 24,
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                final customer = await CustomerEditorSheet.show(context, saveToDb: false);
+                if (customer != null) {
+                  setState(() => _selectedCustomer = customer);
+                }
+              },
+              icon: const Icon(Icons.edit_outlined),
+              label: const Text('Manual Entry'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              SizedBox(width: 12),
-              Text(
-                'Add Customer / Client',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       );
     }
 

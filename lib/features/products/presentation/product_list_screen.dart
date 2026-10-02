@@ -12,6 +12,8 @@ import '../bloc/product_event.dart';
 import '../bloc/product_state.dart';
 import '../domain/product_model.dart';
 import 'product_editor_sheet.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
+import '../../subscription/presentation/subscription_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -169,7 +171,30 @@ class _ProductListScreenState extends State<ProductListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'product_fab',
-        onPressed: () => ProductEditorSheet.show(context),
+        onPressed: () {
+          final state = context.read<ProductBloc>().state;
+          final subState = context.read<SubscriptionBloc>().state;
+          final maxItems = subState.plan?.maxItemsAllowed ?? 3;
+          
+          int currentCount = 0;
+          if (state is ProductLoaded) {
+            currentCount = state.products.length;
+          }
+          
+          if (maxItems != -1 && currentCount >= maxItems) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Item limit reached. Please upgrade your plan.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+            );
+            return;
+          }
+          ProductEditorSheet.show(context);
+        },
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 4,

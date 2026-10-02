@@ -1,3 +1,5 @@
+import 'package:invoz/features/documents/bloc/document_state.dart';
+
 import '../../ads/ad_banner_widget.dart';
 import 'package:flutter/material.dart';
 import '../../ads/interstitial_ad_manager.dart';
@@ -14,6 +16,8 @@ import '../../business_profile/presentation/manage_company_list_screen.dart';
 import '../../documents/data/document_repository.dart';
 import '../../documents/domain/document_model.dart';
 import '../../documents/presentation/document_editor_screen.dart';
+import '../../documents/bloc/document_bloc.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
@@ -809,6 +813,40 @@ class _HomeScreenState extends State<HomeScreen> {
     return Expanded(
       child: GestureDetector(
         onTap: () {
+          final docState = context.read<DocumentBloc>().state;
+          final subState = context.read<SubscriptionBloc>().state;
+          final maxDocs = subState.plan?.maxDocumentsPerDay ?? 5;
+
+          if (maxDocs != -1) {
+            final today = DateTime.now();
+            int todayCount = 0;
+            if (docState is DocumentLoaded) {
+              todayCount = docState.documents
+                  .where(
+                    (d) =>
+                        d.createdAt.year == today.year &&
+                        d.createdAt.month == today.month &&
+                        d.createdAt.day == today.day,
+                  )
+                  .length;
+            }
+
+            if (todayCount >= maxDocs) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Daily document limit reached. Please upgrade your plan.',
+                  ),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+              );
+              return;
+            }
+          }
+
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => DocumentEditorScreen(initialType: type),

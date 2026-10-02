@@ -107,9 +107,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           'isLimitation': true,
         },
         {
-          'text': 'Minimal ads (small banners only)',
-          'highlight': false,
-          'isLimitation': true,
+          'text': '100% Ad-free experience',
+          'highlight': true,
+          'isLimitation': false,
         },
       ],
     },

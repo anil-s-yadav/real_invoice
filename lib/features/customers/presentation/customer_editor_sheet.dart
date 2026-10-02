@@ -14,14 +14,25 @@ import '../domain/customer_model.dart';
 
 class CustomerEditorSheet extends StatefulWidget {
   final Customer? initialCustomer;
+  final bool saveToDb;
 
-  const CustomerEditorSheet({super.key, this.initialCustomer});
+  const CustomerEditorSheet({
+    super.key,
+    this.initialCustomer,
+    this.saveToDb = true,
+  });
 
-  static Future<Customer?> show(BuildContext context, {Customer? customer}) {
+  static Future<Customer?> show(
+    BuildContext context, {
+    Customer? customer,
+    bool saveToDb = true,
+  }) {
     return AppBottomSheet.show<Customer>(
       context: context,
-      title: customer != null ? 'Edit Customer' : 'New Customer',
-      child: CustomerEditorSheet(initialCustomer: customer),
+      title: saveToDb
+          ? (customer != null ? 'Edit Customer' : 'New Customer')
+          : 'Enter Customer Details',
+      child: CustomerEditorSheet(initialCustomer: customer, saveToDb: saveToDb),
     );
   }
 
