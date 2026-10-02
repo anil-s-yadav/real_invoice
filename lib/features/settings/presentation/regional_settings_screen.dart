@@ -20,7 +20,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
   String _selectedLanguage = 'English';
   String _selectedCountry = 'India';
   String _selectedCurrencyCode = 'INR';
-  String _selectedCurrencySymbol = '₹';
+  String _selectedCurrencySymbol = '\u20B9';
   bool _isLoading = true;
 
   @override
@@ -222,7 +222,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Regional Settingstt',
+                      'Regional Settings',
                       style: AppTypography.displayMedium.copyWith(
                         color: isDark
                             ? AppColors.darkTextPrimary

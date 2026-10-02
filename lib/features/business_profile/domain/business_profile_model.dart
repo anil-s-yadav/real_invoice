@@ -2,6 +2,8 @@ import 'dart:convert';
 
 
 
+import '../../../core/constants/app_constants.dart';
+
 class BusinessProfile {
   final String id;
   final String businessName;
@@ -163,7 +165,10 @@ class BusinessProfile {
       defaultNotes:
           map['defaultNotes'] as String? ?? 'Thank you for your business!',
       currencyCode: map['currencyCode'] as String? ?? 'INR',
-      currencySymbol: map['currencySymbol'] as String? ?? '\u20B9',
+      currencySymbol: _sanitizeCurrencySymbol(
+        map['currencyCode'] as String? ?? 'INR',
+        map['currencySymbol'] as String? ?? '\u20B9',
+      ),
       defaultInvoiceTemplateId:
           map['defaultInvoiceTemplateId'] as String? ?? 'modern_crimson',
       defaultQuotationTemplateId:
@@ -173,5 +178,14 @@ class BusinessProfile {
       defaultProformaTemplateId:
           map['defaultProformaTemplateId'] as String? ?? 'modern_crimson',
     );
+  }
+  static String _sanitizeCurrencySymbol(String code, String fallback) {
+    try {
+      final matchingCountry = AppConstants.countries.firstWhere(
+          (c) => c['currency'] == code);
+      return matchingCountry['symbol']!;
+    } catch (e) {
+      return fallback;
+    }
   }
 }
