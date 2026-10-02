@@ -26,10 +26,10 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
   final List<Map<String, String>> _countries = [
     {'name': 'India', 'currency': 'INR', 'symbol': '\u20B9'},
     {'name': 'United States', 'currency': 'USD', 'symbol': '\$'},
-    {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': '£'},
+    {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': '\u00A3'},
     {'name': 'Australia', 'currency': 'AUD', 'symbol': 'A\$'},
     {'name': 'Canada', 'currency': 'CAD', 'symbol': 'C\$'},
-    {'name': 'Eurozone', 'currency': 'EUR', 'symbol': '€'},
+    {'name': 'Eurozone', 'currency': 'EUR', 'symbol': '\u20AC'},
     {'name': 'UAE', 'currency': 'AED', 'symbol': 'AED'},
     {'name': 'Singapore', 'currency': 'SGD', 'symbol': 'S\$'},
   ];
@@ -280,7 +280,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                             (c) => c['name'] == val,
                           );
                           _selectedCurrencyCode = country['currency']!;
-                          _selectedCurrencySymbol = country['symbol']!;
+  String _selectedCurrencySymbol = '\u20B9';
                         });
                       },
                       icon: Icons.location_on_outlined,

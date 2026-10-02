@@ -38,7 +38,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String _selectedLanguage = 'English';
   String _selectedCountry = 'India';
   String _selectedCurrencyCode = 'INR';
-  String _selectedCurrencySymbol = 'â‚¹';
+  String _selectedCurrencySymbol = '\u20B9';
 
   // Step 2, 3, 4: Images
   String? _logoPath;
@@ -64,12 +64,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     'Arabic',
   ];
   final List<Map<String, String>> _countries = [
-    {'name': 'India', 'currency': 'INR', 'symbol': 'â‚¹'},
+    {'name': 'India', 'currency': 'INR', 'symbol': '\u20B9'},
     {'name': 'United States', 'currency': 'USD', 'symbol': '\$'},
-    {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': 'Â£'},
+    {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': '\u00A3'},
     {'name': 'Australia', 'currency': 'AUD', 'symbol': 'A\$'},
     {'name': 'Canada', 'currency': 'CAD', 'symbol': 'C\$'},
-    {'name': 'Eurozone', 'currency': 'EUR', 'symbol': 'â‚¬'},
+    {'name': 'Eurozone', 'currency': 'EUR', 'symbol': '\u20AC'},
     {'name': 'UAE', 'currency': 'AED', 'symbol': 'AED'},
     {'name': 'Singapore', 'currency': 'SGD', 'symbol': 'S\$'},
   ];
@@ -458,7 +458,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 _selectedCountry = val;
                 final country = _countries.firstWhere((c) => c['name'] == val);
                 _selectedCurrencyCode = country['currency']!;
-                _selectedCurrencySymbol = country['symbol']!;
+  String _selectedCurrencySymbol = '\u20B9';
               });
             },
             icon: Icons.location_on_outlined,

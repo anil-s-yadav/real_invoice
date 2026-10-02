@@ -558,7 +558,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Balance Due: ₹',
+                            'Balance Due: \u20B9',
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,

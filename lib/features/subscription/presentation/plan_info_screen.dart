@@ -246,8 +246,8 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
           // Price & Duration
           Text(
             isFree
-                ? '₹0 / Lifetime'
-                : '₹${plan.finalAmount.toStringAsFixed(0)} / ${plan.durationMonths} ${plan.durationMonths == 1 ? 'Month' : 'Months'}',
+                ? '\u20B90 / Lifetime'
+                : '\u20B9${plan.finalAmount.toStringAsFixed(0)} / ${plan.durationMonths} ${plan.durationMonths == 1 ? 'Month' : 'Months'}',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 26,
@@ -363,7 +363,7 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
           SizedBox(height: 14),
           _buildSummaryRow(
             'Plan Base Price',
-            '₹${(plan.price * plan.durationMonths).toStringAsFixed(2)}',
+            '\u20B9${(plan.price * plan.durationMonths).toStringAsFixed(2)}',
           ),
           _buildSummaryRow(
             'Duration',
@@ -372,18 +372,18 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
           if (plan.discountAmount > 0)
             _buildSummaryRow(
               'Discount Applied (${plan.discountPercentage.toInt()}%)',
-              '-₹${plan.discountAmount.toStringAsFixed(2)}',
+              '-\u20B9${plan.discountAmount.toStringAsFixed(2)}',
               valueColor: Colors.green,
             ),
           if (plan.gstAmount > 0)
             _buildSummaryRow(
               'Taxes & GST (18%)',
-              '+₹${plan.gstAmount.toStringAsFixed(2)}',
+              '+\u20B9${plan.gstAmount.toStringAsFixed(2)}',
             ),
           const Divider(height: 20),
           _buildSummaryRow(
             'Net Amount Paid',
-            '₹${plan.finalAmount.toStringAsFixed(2)}',
+            '\u20B9${plan.finalAmount.toStringAsFixed(2)}',
             isBold: true,
           ),
           _buildSummaryRow('Payment Method', plan.paymentMethod),
@@ -668,7 +668,7 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
                 style: TextStyle(fontSize: 12, color: _textSecondary),
               ),
               Text(
-                '₹${item.finalAmount.toStringAsFixed(2)}',
+                '\u20B9${item.finalAmount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,

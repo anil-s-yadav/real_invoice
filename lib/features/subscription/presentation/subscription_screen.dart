@@ -484,7 +484,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               Text(
                                 (plan['price'] as double) == 0.0
                                     ? 'Free'
-                                    : '₹${(plan['price'] as double).toStringAsFixed(0)}',
+                                    : '\u20B9${(plan['price'] as double).toStringAsFixed(0)}',
                                 style: TextStyle(
                                   fontSize: 36,
                                   fontWeight: FontWeight.w900,

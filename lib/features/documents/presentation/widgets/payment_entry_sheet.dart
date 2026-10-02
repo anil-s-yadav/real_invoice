@@ -181,7 +181,7 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
               child: Center(
                 widthFactor: 1.0,
                 child: Text(
-                  '₹',
+                  '\u20B9',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),

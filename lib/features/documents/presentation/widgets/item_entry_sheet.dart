@@ -255,7 +255,7 @@ class _ItemEntrySheetState extends State<ItemEntrySheet> {
                     child: Center(
                       widthFactor: 1.0,
                       child: Text(
-                        '₹',
+                        '\u20B9',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

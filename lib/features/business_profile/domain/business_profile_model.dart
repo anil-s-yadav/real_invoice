@@ -47,7 +47,7 @@ class BusinessProfile {
         '1. Payment is due within 15 days of invoice date.\n2. Please mention invoice number in bank transfer/UPI notes.',
     this.defaultNotes = 'Thank you for your business!',
     this.currencyCode = 'INR',
-    this.currencySymbol = '₹',
+    this.currencySymbol = '\u20B9',
     this.defaultInvoiceTemplateId = 'modern_crimson',
     this.defaultQuotationTemplateId = 'modern_crimson',
     this.defaultReceiptTemplateId = 'modern_crimson',
@@ -163,7 +163,7 @@ class BusinessProfile {
       defaultNotes:
           map['defaultNotes'] as String? ?? 'Thank you for your business!',
       currencyCode: map['currencyCode'] as String? ?? 'INR',
-      currencySymbol: map['currencySymbol'] as String? ?? '₹',
+      currencySymbol: map['currencySymbol'] as String? ?? '\u20B9',
       defaultInvoiceTemplateId:
           map['defaultInvoiceTemplateId'] as String? ?? 'modern_crimson',
       defaultQuotationTemplateId:

@@ -449,7 +449,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '₹${widget.monthlyPrice.toStringAsFixed(0)}/mo',
+                      '\u20B9${widget.monthlyPrice.toStringAsFixed(0)}/mo',
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -607,7 +607,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ),
                           Text(
-                            '₹${(widget.monthlyPrice * duration).toStringAsFixed(0)}',
+                            '\u20B9${(widget.monthlyPrice * duration).toStringAsFixed(0)}',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -682,27 +682,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 children: [
                   _SummaryRow(
                     'Base Amount (${_selectedDuration}m)',
-                    '₹${baseTotal.toStringAsFixed(2)}',
+                    '\u20B9${baseTotal.toStringAsFixed(2)}',
                   ),
 
                   if (invozDiscount > 0)
                     _SummaryRow(
                       'invoz Discount (${(invozPerc * 100).toStringAsFixed(0)}%)',
-                      '- ₹${invozDiscount.toStringAsFixed(2)}',
+                      '- \u20B9${invozDiscount.toStringAsFixed(2)}',
                       color: Colors.green,
                     ),
 
                   if (welcomeDiscount > 0)
                     _SummaryRow(
                       'Welcome Offer (${_selectedDuration == 12 ? "50%" : "100%"})',
-                      '- ₹${welcomeDiscount.toStringAsFixed(2)}',
+                      '- \u20B9${welcomeDiscount.toStringAsFixed(2)}',
                       color: Colors.green,
                     ),
 
                   if (platformFeeApplied > 0)
                     _SummaryRow(
                       'Platform Fee',
-                      '+ ₹${platformFeeApplied.toStringAsFixed(2)}',
+                      '+ \u20B9${platformFeeApplied.toStringAsFixed(2)}',
                       color: Colors.orange,
                     ),
 
@@ -712,12 +712,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                   _SummaryRow(
                     'Subtotal',
-                    '₹${subtotal.toStringAsFixed(2)}',
+                    '\u20B9${subtotal.toStringAsFixed(2)}',
                     isBold: true,
                   ),
                   _SummaryRow(
                     'GST (18%)',
-                    '+ ₹${gstAmount.toStringAsFixed(2)}',
+                    '+ \u20B9${gstAmount.toStringAsFixed(2)}',
                     color: isDark
                         ? AppColors.darkTextSecondary
                         : AppColors.textSecondary,
@@ -740,7 +740,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ),
                       Text(
-                        '₹${totalPayable.toStringAsFixed(2)}',
+                        '\u20B9${totalPayable.toStringAsFixed(2)}',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
@@ -778,7 +778,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Awesome! You are saving ₹${(invozDiscount + yearlyDiscount + welcomeDiscount).toStringAsFixed(0)}',
+                        'Awesome! You are saving \u20B9${(invozDiscount + yearlyDiscount + welcomeDiscount).toStringAsFixed(0)}',
                         style: const TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,

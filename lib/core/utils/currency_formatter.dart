@@ -6,7 +6,7 @@ class CurrencyFormatter {
 
   static String format(
     double amount, {
-    String symbol = '₹',
+    String symbol = '\u20B9',
     bool isIndian = true,
     int decimalDigits = 2,
   }) {
@@ -29,8 +29,8 @@ class CurrencyFormatter {
     }
   }
 
-  /// Compact representation for dashboard cards, e.g. ₹ 1.25L or ₹ 45K
-  static String formatCompact(double amount, {String symbol = '₹'}) {
+  /// Compact representation for dashboard cards, e.g. \u20B9 1.25L or \u20B9 45K
+  static String formatCompact(double amount, {String symbol = '\u20B9'}) {
     if (amount >= 10000000) {
       return '$symbol ${(amount / 10000000).toStringAsFixed(2)} Cr';
     } else if (amount >= 100000) {
