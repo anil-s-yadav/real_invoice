@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../ads/interstitial_ad_manager.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/widgets/app_button.dart';
@@ -108,6 +109,7 @@ class _InvoiceNumberingScreenState extends State<InvoiceNumberingScreen> {
     await _settingsRepo.setPaddingDigits(_paddingDigits);
 
     if (mounted) {
+      InterstitialAdManager.showAd(context);
       setState(() => _isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
