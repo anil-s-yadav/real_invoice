@@ -1117,14 +1117,15 @@ class _DocumentListItemCard extends StatelessWidget {
             if (profileState is BusinessProfileLoaded) {
               await Printing.layoutPdf(
                 onLayout: (format) async {
-                    final payments = await PaymentDetailRepository().getAllPayments();
-                    return DocumentPdfGenerator.generate(
-                      document: document,
-                      profile: profileState.profile,
-                      payments: payments,
-                      templateId: document.templateId,
-                    );
-                  },
+                  final payments = await PaymentDetailRepository()
+                      .getAllPayments();
+                  return DocumentPdfGenerator.generate(
+                    document: document,
+                    profile: profileState.profile,
+                    payments: payments,
+                    templateId: document.templateId,
+                  );
+                },
                 name: '${document.docNumber}.pdf',
               );
             } else {

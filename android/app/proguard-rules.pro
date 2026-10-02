@@ -20,3 +20,7 @@
 
 # Firebase
 -keep class com.google.firebase.** { *; }
+
+# Ignore Missing Play Core classes referenced by Flutter Engine
+-dontwarn com.google.android.play.core.**
+-dontwarn io.flutter.embedding.engine.deferredcomponents.**
