@@ -14,7 +14,7 @@ class PaymentDetailRepository {
     return FirebaseFirestore.instance
         .collection('users')
         .doc(_userId)
-        .collection('payments');
+        .collection('payment_profiles');
   }
 
   Future<List<PaymentDetail>> getAllPayments({bool forceSync = false}) async {
