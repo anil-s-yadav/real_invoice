@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/bloc/app_bloc_observer.dart';
@@ -57,11 +56,7 @@ void main() async {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              "App Error:
-${details.exception}
-
-Stacktrace:
-${details.stack}",
+              "App Error:\n${details.exception}\n\nStacktrace:\n${details.stack}",
               style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
           ),
@@ -72,16 +67,19 @@ ${details.stack}",
 
   Bloc.observer = AppBlocObserver();
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     debugPrint("Firebase init failed: $e");
   }
+  // Fire-and-forget: don't await MobileAds init so native crash won't block app
   try {
-    await MobileAds.instance.initialize();
+    MobileAds.instance.initialize();
   } catch (e) {
     debugPrint("MobileAds init failed: $e");
   }
-  
+
   try {
     // Explicitly enable offline persistence and unlimited cache size
     FirebaseFirestore.instance.settings = const Settings(
@@ -91,7 +89,7 @@ ${details.stack}",
   } catch (e) {
     debugPrint("Firestore settings failed: $e");
   }
-  
+
   runApp(const InvozRoot());
 }
 
