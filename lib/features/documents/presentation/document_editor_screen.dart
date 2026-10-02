@@ -185,9 +185,6 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 .toList();
             if (banks.isNotEmpty) {
               _selectedBankDetailId = banks.first.id;
-            } else if (profile.bankName != null &&
-                profile.bankName!.trim().isNotEmpty) {
-              _selectedBankDetailId = 'legacy';
             }
           }
           if (_selectedUpiDetailId == null) {
@@ -196,9 +193,6 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 .toList();
             if (upis.isNotEmpty) {
               _selectedUpiDetailId = upis.first.id;
-            } else if (profile.upiId != null &&
-                profile.upiId!.trim().isNotEmpty) {
-              _selectedUpiDetailId = 'legacy_upi';
             }
           }
         });
@@ -1488,31 +1482,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                 .where((p) => p.type == 'UPI')
                 .toList();
 
-            // Add legacy options if needed
-            if (banks.isEmpty &&
-                profile.bankName != null &&
-                profile.bankName!.isNotEmpty) {
-              banks.add(
-                PaymentDetail(
-                  id: 'legacy',
-                  type: 'Bank',
-                  title: 'Legacy Bank Profile',
-                  details: profile.accountNumber ?? '',
-                ),
-              );
-            }
-            if (upis.isEmpty &&
-                profile.upiId != null &&
-                profile.upiId!.isNotEmpty) {
-              upis.add(
-                PaymentDetail(
-                  id: 'legacy_upi',
-                  type: 'UPI',
-                  title: 'Legacy UPI',
-                  details: profile.upiId!,
-                ),
-              );
-            }
+
 
             final hasAny = banks.isNotEmpty || upis.isNotEmpty;
 
