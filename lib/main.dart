@@ -35,16 +35,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MobileAds.instance.initialize();
   Bloc.observer = AppBlocObserver();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    debugPrint("Firebase init failed: $e");
+  }
+  try {
+    await MobileAds.instance.initialize();
+  } catch (e) {
+    debugPrint("MobileAds init failed: $e");
+  }
 
   // Explicitly enable offline persistence and unlimited cache size
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
-  runApp(DevicePreview(enabled: kDebugMode, builder: (_) => const InvozRoot()));
+  runApp(const InvozRoot());
 
   // runApp(const InvozRoot());
 }
