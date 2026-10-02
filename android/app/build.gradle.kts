@@ -50,5 +50,7 @@ flutter {
 }
 
 dependencies {
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.multidex:multidex:2.0.1")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 }

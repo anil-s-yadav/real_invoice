@@ -33,13 +33,46 @@ import 'firebase_options.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'dart:ui'; // Added for PlatformDispatcher
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Catch Dart errors and show them on screen instead of crashing silently
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint("FlutterError: ${details.exception}");
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint("PlatformError: $error");
+    return true;
+  };
+
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.red,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              "App Error:
+${details.exception}
+
+Stacktrace:
+${details.stack}",
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ),
+        ),
+      ),
+    );
+  };
+
   Bloc.observer = AppBlocObserver();
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   } catch (e) {
     debugPrint("Firebase init failed: $e");
   }
@@ -48,15 +81,18 @@ void main() async {
   } catch (e) {
     debugPrint("MobileAds init failed: $e");
   }
-
-  // Explicitly enable offline persistence and unlimited cache size
-  FirebaseFirestore.instance.settings = const Settings(
-    persistenceEnabled: true,
-    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-  );
+  
+  try {
+    // Explicitly enable offline persistence and unlimited cache size
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
+  } catch (e) {
+    debugPrint("Firestore settings failed: $e");
+  }
+  
   runApp(const InvozRoot());
-
-  // runApp(const InvozRoot());
 }
 
 class InvozRoot extends StatelessWidget {
