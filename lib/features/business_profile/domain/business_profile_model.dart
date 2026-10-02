@@ -20,10 +20,6 @@ class BusinessProfile {
   final String defaultNotes;
   final String currencyCode;
   final String currencySymbol;
-  final String defaultInvoiceTemplateId;
-  final String defaultQuotationTemplateId;
-  final String defaultReceiptTemplateId;
-  final String defaultProformaTemplateId;
 
   const BusinessProfile({
     this.id = 'default_profile',
@@ -42,10 +38,6 @@ class BusinessProfile {
     this.defaultNotes = 'Thank you for your business!',
     this.currencyCode = 'INR',
     this.currencySymbol = '\u20B9',
-    this.defaultInvoiceTemplateId = 'modern_crimson',
-    this.defaultQuotationTemplateId = 'modern_crimson',
-    this.defaultReceiptTemplateId = 'modern_crimson',
-    this.defaultProformaTemplateId = 'modern_crimson',
   });
 
   bool get isConfigured => businessName.trim().isNotEmpty;
@@ -66,10 +58,6 @@ class BusinessProfile {
     String? defaultNotes,
     String? currencyCode,
     String? currencySymbol,
-    String? defaultInvoiceTemplateId,
-    String? defaultQuotationTemplateId,
-    String? defaultReceiptTemplateId,
-    String? defaultProformaTemplateId,
   }) {
     return BusinessProfile(
       id: id ?? this.id,
@@ -87,14 +75,6 @@ class BusinessProfile {
       defaultNotes: defaultNotes ?? this.defaultNotes,
       currencyCode: currencyCode ?? this.currencyCode,
       currencySymbol: currencySymbol ?? this.currencySymbol,
-      defaultInvoiceTemplateId:
-          defaultInvoiceTemplateId ?? this.defaultInvoiceTemplateId,
-      defaultQuotationTemplateId:
-          defaultQuotationTemplateId ?? this.defaultQuotationTemplateId,
-      defaultReceiptTemplateId:
-          defaultReceiptTemplateId ?? this.defaultReceiptTemplateId,
-      defaultProformaTemplateId:
-          defaultProformaTemplateId ?? this.defaultProformaTemplateId,
     );
   }
 
@@ -115,10 +95,6 @@ class BusinessProfile {
       'defaultNotes': defaultNotes,
       'currencyCode': currencyCode,
       'currencySymbol': currencySymbol,
-      'defaultInvoiceTemplateId': defaultInvoiceTemplateId,
-      'defaultQuotationTemplateId': defaultQuotationTemplateId,
-      'defaultReceiptTemplateId': defaultReceiptTemplateId,
-      'defaultProformaTemplateId': defaultProformaTemplateId,
     };
   }
 
@@ -145,14 +121,6 @@ class BusinessProfile {
         map['currencyCode'] as String? ?? 'INR',
         map['currencySymbol'] as String? ?? '\u20B9',
       ),
-      defaultInvoiceTemplateId:
-          map['defaultInvoiceTemplateId'] as String? ?? 'modern_crimson',
-      defaultQuotationTemplateId:
-          map['defaultQuotationTemplateId'] as String? ?? 'modern_crimson',
-      defaultReceiptTemplateId:
-          map['defaultReceiptTemplateId'] as String? ?? 'modern_crimson',
-      defaultProformaTemplateId:
-          map['defaultProformaTemplateId'] as String? ?? 'modern_crimson',
     );
   }
   static String _sanitizeCurrencySymbol(String code, String fallback) {

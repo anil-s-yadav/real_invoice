@@ -3,6 +3,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../ads/ad_helper.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../settings/data/template_settings_repository.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
@@ -14,7 +15,7 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
-import '../../business_profile/domain/business_profile_model.dart';
+
 import '../../business_profile/presentation/manage_company_list_screen.dart';
 import '../../customers/domain/customer_model.dart';
 import '../../home/bloc/home_bloc.dart';
@@ -102,6 +103,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   bool _includePaymentDetails = false;
   List<PaymentDetail> _payments = [];
   bool _isLoadingPayments = true;
+  
   String? _selectedBankDetailId;
   String? _selectedUpiDetailId;
 
@@ -162,21 +164,12 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           _notesController.text = profile.defaultNotes;
         }
 
+        final templateRepo = TemplateSettingsRepository();
+        final defaultTemplateId = await templateRepo.getDefaultTemplate(_docType);
+        
+        if (!mounted) return;
         setState(() {
-          switch (_docType) {
-            case DocumentType.invoice:
-              _templateId = profile.defaultInvoiceTemplateId;
-              break;
-            case DocumentType.quotation:
-              _templateId = profile.defaultQuotationTemplateId;
-              break;
-            case DocumentType.receipt:
-              _templateId = profile.defaultReceiptTemplateId;
-              break;
-            case DocumentType.proforma:
-              _templateId = profile.defaultProformaTemplateId;
-              break;
-          }
+          _templateId = defaultTemplateId;
 
           // Auto-select first available bank and UPI for new documents
           if (_selectedBankDetailId == null) {

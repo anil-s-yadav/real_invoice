@@ -10,6 +10,7 @@ import '../../documents/domain/document_model.dart';
 import '../../documents/presentation/template_preview_screen.dart';
 import '../../documents/presentation/widgets/template_thumbnail_card.dart';
 import '../../pdf_engine/template_registry.dart';
+import '../data/template_settings_repository.dart';
 
 class DefaultTemplatesScreen extends StatefulWidget {
   final int initialIndex;
@@ -23,6 +24,9 @@ class DefaultTemplatesScreen extends StatefulWidget {
 class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final _repo = TemplateSettingsRepository();
+  Map<DocumentType, String> _defaults = {};
+  bool _isLoading = true;
 
   static const List<DocumentType> _types = [
     DocumentType.invoice,
@@ -39,6 +43,25 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
       vsync: this,
       initialIndex: widget.initialIndex,
     );
+    _loadDefaults();
+  }
+
+  Future<void> _loadDefaults() async {
+    final inv = await _repo.getDefaultTemplate(DocumentType.invoice);
+    final quo = await _repo.getDefaultTemplate(DocumentType.quotation);
+    final rec = await _repo.getDefaultTemplate(DocumentType.receipt);
+    final pro = await _repo.getDefaultTemplate(DocumentType.proforma);
+    if (mounted) {
+      setState(() {
+        _defaults = {
+          DocumentType.invoice: inv,
+          DocumentType.quotation: quo,
+          DocumentType.receipt: rec,
+          DocumentType.proforma: pro,
+        };
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -73,18 +96,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
     }
   }
 
-  String _getDefaultTemplateId(DocumentType type, BusinessProfile profile) {
-    switch (type) {
-      case DocumentType.invoice:
-        return profile.defaultInvoiceTemplateId;
-      case DocumentType.quotation:
-        return profile.defaultQuotationTemplateId;
-      case DocumentType.receipt:
-        return profile.defaultReceiptTemplateId;
-      case DocumentType.proforma:
-        return profile.defaultProformaTemplateId;
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +199,7 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
             controller: _tabController,
             children: _types.map((type) {
               final templates = TemplateRegistry.getTemplatesFor(type);
-              final currentDefaultId = _getDefaultTemplateId(type, profile);
+              final currentDefaultId = _defaults[type] ?? 'modern_crimson';
               final currentTemplate = TemplateRegistry.getById(
                 currentDefaultId,
               );
@@ -301,28 +313,11 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                               profile: profile,
                               isDefault: isSelected,
 
-                              onSetDefault: () {
-                                final updatedProfile = profile.copyWith(
-                                  defaultInvoiceTemplateId:
-                                      type == DocumentType.invoice
-                                      ? t.id
-                                      : profile.defaultInvoiceTemplateId,
-                                  defaultQuotationTemplateId:
-                                      type == DocumentType.quotation
-                                      ? t.id
-                                      : profile.defaultQuotationTemplateId,
-                                  defaultReceiptTemplateId:
-                                      type == DocumentType.receipt
-                                      ? t.id
-                                      : profile.defaultReceiptTemplateId,
-                                  defaultProformaTemplateId:
-                                      type == DocumentType.proforma
-                                      ? t.id
-                                      : profile.defaultProformaTemplateId,
-                                );
-                                context.read<BusinessProfileBloc>().add(
-                                  UpdateBusinessProfileEvent(updatedProfile),
-                                );
+                              onSetDefault: () async {
+                                await _repo.setDefaultTemplate(type, t.id);
+                                setState(() {
+                                  _defaults[type] = t.id;
+                                });
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
