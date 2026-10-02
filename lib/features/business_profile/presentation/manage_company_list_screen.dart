@@ -150,14 +150,53 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
           final maxAllowed = subState.plan?.maxCompaniesAllowed ?? 1;
           
           if (_profiles.length >= maxAllowed) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Company limit reached. Please upgrade your plan.'),
-                backgroundColor: Colors.orange,
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                title: const Row(
+                  children: [
+                    Icon(Icons.workspace_premium, color: Colors.orange, size: 28),
+                    SizedBox(width: 12),
+                    Text('Limit Reached'),
+                  ],
+                ),
+                content: Text(
+                  'Your current plan allows up to $maxAllowed company profile${maxAllowed == 1 ? '' : 's'}. Upgrade to a premium plan to create and manage multiple companies seamlessly.',
+                  style: const TextStyle(fontSize: 16, height: 1.4),
+                ),
+                actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text(
+                      'Maybe Later',
+                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SubscriptionScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('Upgrade Plan', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ),
-            );
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
             );
             return;
           }
