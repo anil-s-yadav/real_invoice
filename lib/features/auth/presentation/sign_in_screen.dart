@@ -26,6 +26,62 @@ class SignInScreen extends StatelessWidget {
           builder: (context, state) {
             final isLoading = state is AuthLoading;
 
+            if (state is AuthDeviceLimitReached) {
+              return Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.devices, color: Colors.orange, size: 64),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Device Limit Reached',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Your account has reached the maximum number of devices allowed by your current plan. Would you like to log out of your previous devices to use this one?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isDark ? Colors.grey[400] : Colors.grey[700],
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          context.read<AuthBloc>().add(ForceLoginOnDeviceEvent(state.user));
+                        },
+                        child: const Text('Logout Other Devices & Login Here', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(const SignOutRequestedEvent());
+                      },
+                      child: const Text('Cancel & Sign Out', style: TextStyle(color: Colors.grey)),
+                    ),
+                  ],
+                ),
+              );
+            }
+
             return Stack(
               children: [
                 // Background decorations

@@ -35,6 +35,11 @@ class SignOutRequestedEvent extends AuthEvent {
   const SignOutRequestedEvent();
 }
 
+class ForceLoginOnDeviceEvent extends AuthEvent {
+  final AuthUser user;
+  const ForceLoginOnDeviceEvent(this.user);
+}
+
 class LogOutAllDevicesRequestedEvent extends AuthEvent {
   const LogOutAllDevicesRequestedEvent();
 }
@@ -68,6 +73,11 @@ class Unauthenticated extends AuthState {
   const Unauthenticated();
 }
 
+class AuthDeviceLimitReached extends AuthState {
+  final AuthUser user;
+  const AuthDeviceLimitReached(this.user);
+}
+
 class AuthError extends AuthState {
   final String message;
 
@@ -86,8 +96,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthLoading());
       final user = await authRepository.getCurrentUser();
       if (user != null) {
-        authRepository.registerDevice();
-        emit(Authenticated(user: user));
+        try {
+          await authRepository.registerDevice();
+          emit(Authenticated(user: user));
+        } on DeviceLimitException {
+          emit(AuthDeviceLimitReached(user));
+        } catch (e) {
+          emit(Authenticated(user: user)); // fallback
+        }
       } else {
         emit(const Unauthenticated());
       }
@@ -106,8 +122,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = await authRepository.signInWithGoogle();
         if (user != null) {
-          await authRepository.registerDevice();
-          emit(Authenticated(user: user));
+          try {
+            await authRepository.registerDevice();
+            emit(Authenticated(user: user));
+          } on DeviceLimitException {
+            emit(AuthDeviceLimitReached(user));
+          }
         } else {
           emit(const Unauthenticated());
         }
@@ -125,8 +145,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthLoading());
       try {
         final user = await authRepository.signInWithApple();
-        await authRepository.registerDevice();
-        emit(Authenticated(user: user));
+        try {
+          await authRepository.registerDevice();
+          emit(Authenticated(user: user));
+        } on DeviceLimitException {
+          emit(AuthDeviceLimitReached(user));
+        }
       } catch (e) {
         emit(AuthError('Failed to sign in with Apple: $e'));
         emit(const Unauthenticated());
@@ -139,6 +163,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const Unauthenticated());
     });
 
+    
+    on<ForceLoginOnDeviceEvent>((event, emit) async {
+      emit(const AuthLoading());
+      try {
+        await authRepository.registerDevice(force: true);
+        emit(Authenticated(user: event.user));
+      } catch (e) {
+        emit(AuthError('Failed to switch device.'));
+        emit(const Unauthenticated());
+      }
+    });
     on<LogOutAllDevicesRequestedEvent>((event, emit) async {
       emit(const AuthLoading());
       try {

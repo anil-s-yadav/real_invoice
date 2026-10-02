@@ -12,6 +12,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import '../domain/auth_user_model.dart';
 import '../domain/device_model.dart';
+import '../../subscription/domain/subscription_plan_model.dart';
+
+class DeviceLimitException implements Exception {
+  final List<DeviceModel> devices;
+  DeviceLimitException(this.devices);
+}
 
 abstract class AuthRepository {
   Stream<AuthUser?> get user;
@@ -19,7 +25,7 @@ abstract class AuthRepository {
   Future<AuthUser> signInWithApple();
   Future<void> signOut();
   Future<AuthUser?> getCurrentUser();
-  Future<void> registerDevice();
+  Future<void> registerDevice({bool force = false});
   Future<void> logOutAllDevices();
 }
 
@@ -152,7 +158,7 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> registerDevice() async {
+  Future<void> registerDevice({bool force = false}) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) return;
 
@@ -214,6 +220,51 @@ class FirebaseAuthRepository implements AuthRepository {
         lastActive: DateTime.now(),
         platform: platformStr,
       );
+
+      // Check device limits
+      if (!force) {
+        final subDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('settings')
+            .doc('subscription_plan')
+            .get();
+            
+        int maxDevices = 1;
+        if (subDoc.exists) {
+          final plan = SubscriptionPlanModel.fromMap(subDoc.data()!, subDoc.id);
+          maxDevices = plan.maxDevicesAllowed;
+        }
+
+        final devicesSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('devices')
+            .get();
+            
+        final activeDevices = devicesSnapshot.docs.map((d) => DeviceModel.fromFirestore(d)).toList();
+        
+        // If this exact device is already registered, we can just update its lastActive.
+        // But if it's not, we check limit.
+        final isAlreadyRegistered = activeDevices.any((d) => d.deviceId == deviceId);
+        
+        if (!isAlreadyRegistered) {
+          // Exclude expired devices? We can just count them all for now.
+          if (maxDevices != -1 && activeDevices.length >= maxDevices) {
+            throw DeviceLimitException(activeDevices);
+          }
+        }
+      } else {
+        // If forced, clear old devices first
+        final devicesSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('devices')
+            .get();
+        for (var doc in devicesSnapshot.docs) {
+           await doc.reference.delete();
+        }
+      }
 
       await FirebaseFirestore.instance
           .collection('users')
