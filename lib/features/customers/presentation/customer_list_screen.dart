@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
@@ -171,21 +172,18 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           final state = context.read<CustomerBloc>().state;
           final subState = context.read<SubscriptionBloc>().state;
           final maxClients = subState.plan?.maxClientsAllowed ?? 3;
-          
+
           int currentCount = 0;
           if (state is CustomerLoaded) {
             currentCount = state.customers.length;
           }
-          
+
           if (maxClients != -1 && currentCount >= maxClients) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Client limit reached. Please upgrade your plan.'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+            PremiumDialogHelper.showLimitReachedDialog(
+              context: context,
+              title: 'Limit Reached',
+              message:
+                  'Your current plan allows up to $maxClients client${maxClients == 1 ? '' : 's'}. Upgrade to a premium plan to add unlimited clients.',
             );
             return;
           }

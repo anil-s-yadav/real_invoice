@@ -58,7 +58,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       'badgeTextColor': const Color(0xFF475569),
       'features': [
         {'text': '1 Company Profile', 'highlight': true},
-        {'text': 'Manage up to 3 clients & Items', 'highlight': false},
+        {'text': 'Manage up to 3 clients & 3 Items', 'highlight': false},
         {'text': 'Create up to 5 documents / day', 'highlight': false},
         {'text': 'Single device access', 'highlight': false},
         {
@@ -95,7 +95,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       'badgeTextColor': const Color(0xFF1D4ED8),
       'features': [
         {'text': '1 Company Profile', 'highlight': true},
-        {'text': 'Manage up to 10 clients & Items', 'highlight': false},
+        {'text': 'Manage up to 10 clients & 10 Items', 'highlight': false},
         {'text': 'Unlimited document creation', 'highlight': true},
         {'text': 'Dual device synchronization', 'highlight': false},
         {'text': 'Full access to Premium templates', 'highlight': true},

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
@@ -175,21 +176,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
           final state = context.read<ProductBloc>().state;
           final subState = context.read<SubscriptionBloc>().state;
           final maxItems = subState.plan?.maxItemsAllowed ?? 3;
-          
+
           int currentCount = 0;
           if (state is ProductLoaded) {
             currentCount = state.products.length;
           }
-          
+
           if (maxItems != -1 && currentCount >= maxItems) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Item limit reached. Please upgrade your plan.'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+            PremiumDialogHelper.showLimitReachedDialog(
+              context: context,
+              title: 'Limit Reached',
+              message:
+                  'Your current plan allows up to $maxItems product${maxItems == 1 ? '' : 's'}. Upgrade to a premium plan to add unlimited items.',
             );
             return;
           }

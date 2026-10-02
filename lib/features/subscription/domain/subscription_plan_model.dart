@@ -117,6 +117,14 @@ class SubscriptionPlanModel {
       'autoRenew': autoRenew,
       'isWelcomeOffer': isWelcomeOffer,
       'createdAt': Timestamp.fromDate(createdAt),
+      'maxCompaniesAllowed': maxCompaniesAllowed,
+      'maxClientsAllowed': maxClientsAllowed,
+      'maxItemsAllowed': maxItemsAllowed,
+      'maxDocumentsPerDay': maxDocumentsPerDay,
+      'maxDevicesAllowed': maxDevicesAllowed,
+      'isAdFree': isAdFree,
+      'hasPremiumTemplates': hasPremiumTemplates,
+      'hasAnalytics': hasAnalytics,
     };
   }
 
@@ -160,6 +168,14 @@ class SubscriptionPlanModel {
       autoRenew: map['autoRenew'] as bool? ?? true,
       isWelcomeOffer: map['isWelcomeOffer'] as bool? ?? false,
       createdAt: parseTimestamp(map['createdAt'], now),
+      maxCompaniesAllowed: (map['maxCompaniesAllowed'] as num?)?.toInt() ?? 1,
+      maxClientsAllowed: (map['maxClientsAllowed'] as num?)?.toInt() ?? 3,
+      maxItemsAllowed: (map['maxItemsAllowed'] as num?)?.toInt() ?? 3,
+      maxDocumentsPerDay: (map['maxDocumentsPerDay'] as num?)?.toInt() ?? 5,
+      maxDevicesAllowed: (map['maxDevicesAllowed'] as num?)?.toInt() ?? 1,
+      isAdFree: map['isAdFree'] as bool? ?? false,
+      hasPremiumTemplates: map['hasPremiumTemplates'] as bool? ?? false,
+      hasAnalytics: map['hasAnalytics'] as bool? ?? false,
     );
   }
 

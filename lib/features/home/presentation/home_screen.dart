@@ -1,3 +1,4 @@
+import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/documents/bloc/document_state.dart';
 
 import '../../ads/ad_banner_widget.dart';
@@ -832,16 +833,11 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             if (todayCount >= maxDocs) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Daily document limit reached. Please upgrade your plan.',
-                  ),
-                  backgroundColor: Colors.orange,
-                ),
-              );
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+              PremiumDialogHelper.showLimitReachedDialog(
+                context: context,
+                title: 'Daily Limit Reached',
+                message:
+                    'Your current plan allows up to $maxDocs document${maxDocs == 1 ? '' : 's'} per day. Upgrade to a premium plan to create unlimited invoices and quotations.',
               );
               return;
             }
