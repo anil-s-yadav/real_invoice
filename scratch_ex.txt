@@ -1,0 +1,4 @@
+class DeviceLimitException implements Exception {
+  final List<DeviceModel> devices;
+  DeviceLimitException(this.devices);
+}
