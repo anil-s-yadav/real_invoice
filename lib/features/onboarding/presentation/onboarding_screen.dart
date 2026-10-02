@@ -39,7 +39,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String _selectedLanguage = 'English';
   String _selectedCountry = 'Indian';
   String _selectedCurrencyCode = 'INR';
-  final String _selectedCurrencySymbol = '₹';
+  String _selectedCurrencySymbol = '\u20B9';
 
   // Step 2, 3, 4: Images
   String? _logoPath;
@@ -55,7 +55,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _gstinController = TextEditingController();
   final _panController = TextEditingController();
   final _websiteController = TextEditingController();
-
 
   @override
   void dispose() {
@@ -439,7 +438,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             onChanged: (val) {
               setState(() {
                 _selectedCountry = val;
-                final country = AppConstants.countries.firstWhere((c) => c['name'] == val);
+                final country = AppConstants.countries.firstWhere(
+                  (c) => c['name'] == val,
+                );
                 _selectedCurrencyCode = country['currency']!;
                 _selectedCurrencySymbol = country['symbol']!;
               });

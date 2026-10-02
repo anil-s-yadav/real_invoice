@@ -14,10 +14,6 @@ class BusinessProfile {
   final String? website;
   final String? gstin;
   final String? pan;
-  final String? bankName;
-  final String? accountNumber;
-  final String? ifscCode;
-  final String? upiId;
   final String? signaturePath;
   final String? stampPath;
   final String defaultTerms;
@@ -39,10 +35,6 @@ class BusinessProfile {
     this.website,
     this.gstin,
     this.pan,
-    this.bankName,
-    this.accountNumber,
-    this.ifscCode,
-    this.upiId,
     this.signaturePath,
     this.stampPath,
     this.defaultTerms =
@@ -68,10 +60,6 @@ class BusinessProfile {
     String? website,
     String? gstin,
     String? pan,
-    String? bankName,
-    String? accountNumber,
-    String? ifscCode,
-    String? upiId,
     String? signaturePath,
     String? stampPath,
     String? defaultTerms,
@@ -93,10 +81,6 @@ class BusinessProfile {
       website: website ?? this.website,
       gstin: gstin ?? this.gstin,
       pan: pan ?? this.pan,
-      bankName: bankName ?? this.bankName,
-      accountNumber: accountNumber ?? this.accountNumber,
-      ifscCode: ifscCode ?? this.ifscCode,
-      upiId: upiId ?? this.upiId,
       signaturePath: signaturePath ?? this.signaturePath,
       stampPath: stampPath ?? this.stampPath,
       defaultTerms: defaultTerms ?? this.defaultTerms,
@@ -125,10 +109,6 @@ class BusinessProfile {
       'website': website,
       'gstin': gstin,
       'pan': pan,
-      'bankName': bankName,
-      'accountNumber': accountNumber,
-      'ifscCode': ifscCode,
-      'upiId': upiId,
       'signaturePath': signaturePath,
       'stampPath': stampPath,
       'defaultTerms': defaultTerms,
@@ -154,10 +134,6 @@ class BusinessProfile {
       website: map['website'] as String?,
       gstin: map['gstin'] as String?,
       pan: map['pan'] as String?,
-      bankName: map['bankName'] as String?,
-      accountNumber: map['accountNumber'] as String?,
-      ifscCode: map['ifscCode'] as String?,
-      upiId: map['upiId'] as String?,
       signaturePath: map['signaturePath'] as String?,
       stampPath: map['stampPath'] as String?,
       defaultTerms:
