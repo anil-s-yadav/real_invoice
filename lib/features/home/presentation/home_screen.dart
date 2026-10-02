@@ -685,7 +685,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             stats == null
                 ? '-'
-                : CurrencyFormatter.formatCompact(stats.unpaidTotal),
+                : CurrencyFormatter.format(stats.unpaidTotal),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 36,
@@ -738,7 +738,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         stats == null
                             ? '-'
-                            : CurrencyFormatter.formatCompact(
+                            : CurrencyFormatter.format(
                                 stats.overdueTotal,
                               ),
                         style: const TextStyle(
@@ -793,7 +793,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         stats == null
                             ? '-'
-                            : CurrencyFormatter.formatCompact(stats.paidTotal),
+                            : CurrencyFormatter.format(stats.paidTotal),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
