@@ -175,7 +175,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         onPressed: () {
           final state = context.read<ProductBloc>().state;
           final subState = context.read<SubscriptionBloc>().state;
-          final maxItems = subState.plan?.maxItemsAllowed ?? 3;
+          final maxItems = subState.effectivePlan.maxItemsAllowed ?? 3;
 
           int currentCount = 0;
           if (state is ProductLoaded) {

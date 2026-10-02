@@ -54,7 +54,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
   void _loadInterstitialAd() {
     final subState = context.read<SubscriptionBloc>().state;
-    if (subState.plan?.isAdFree ?? false) return;
+    if (subState.effectivePlan.isAdFree ?? false) return;
 
     InterstitialAd.load(
       adUnitId: AdHelper.interstitialAdUnitId,

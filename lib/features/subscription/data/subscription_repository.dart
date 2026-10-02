@@ -35,7 +35,19 @@ class SubscriptionRepository {
       if (ref != null) {
         final doc = await ref.get();
         if (doc.exists && doc.data() != null) {
-          final plan = SubscriptionPlanModel.fromMap(doc.data()!, doc.id);
+          SubscriptionPlanModel plan =
+              SubscriptionPlanModel.fromMap(doc.data()!, doc.id);
+
+          // Auto-expire in database if it has physically expired but still says "Active"
+          if (plan.status.trim().toLowerCase() == 'active' &&
+              plan.expiryDate != null &&
+              plan.expiryDate!.isBefore(DateTime.now())) {
+            
+            plan = plan.copyWith(status: 'Expired', autoRenew: false);
+            // Fire-and-forget sync to Firestore so we don't block the UI
+            saveOrUpgradePlan(plan);
+          }
+
           await _cachePlan(plan);
           return plan;
         }
@@ -59,7 +71,16 @@ class SubscriptionRepository {
 
     return ref.snapshots().map((doc) {
       if (doc.exists && doc.data() != null) {
-        final plan = SubscriptionPlanModel.fromMap(doc.data()!, doc.id);
+        SubscriptionPlanModel plan =
+            SubscriptionPlanModel.fromMap(doc.data()!, doc.id);
+
+        if (plan.status.trim().toLowerCase() == 'active' &&
+            plan.expiryDate != null &&
+            plan.expiryDate!.isBefore(DateTime.now())) {
+          plan = plan.copyWith(status: 'Expired', autoRenew: false);
+          saveOrUpgradePlan(plan);
+        }
+
         _cachePlan(plan);
         return plan;
       }

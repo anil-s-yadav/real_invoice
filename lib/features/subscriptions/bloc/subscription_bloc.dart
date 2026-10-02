@@ -27,6 +27,13 @@ abstract class SubscriptionState extends Equatable {
   final bool isEligibleForWelcomeOffer;
   const SubscriptionState({this.plan, this.isEligibleForWelcomeOffer = false});
 
+  SubscriptionPlanModel get effectivePlan {
+    if (plan != null && plan!.isActive) {
+      return plan!;
+    }
+    return SubscriptionPlanModel.defaultFree();
+  }
+
   @override
   List<Object?> get props => [plan, isEligibleForWelcomeOffer];
 }

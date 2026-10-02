@@ -146,7 +146,7 @@ class TemplatePreviewScreen extends StatelessWidget {
             onPressed: isDefault ? null : () {
               if (template.isPremium) {
                 final subState = context.read<SubscriptionBloc>().state;
-                if (!(subState.plan?.hasPremiumTemplates ?? false)) {
+                if (!(subState.effectivePlan.hasPremiumTemplates ?? false)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Premium template. Please upgrade your plan.'),

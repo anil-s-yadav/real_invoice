@@ -59,9 +59,12 @@ class SubscriptionPlanModel {
 
   bool get isFree => planName.trim().toLowerCase() == 'free';
 
-
-  bool get isActive => status.trim().toLowerCase() == 'active';
-
+  bool get isActive {
+    if (status.trim().toLowerCase() != 'active') return false;
+    if (isFree) return true;
+    if (expiryDate == null) return true; // For lifetime plans
+    return expiryDate!.isAfter(DateTime.now());
+  }
   int get daysRemaining {
     if (expiryDate == null) return 0;
     final diff = expiryDate!.difference(DateTime.now()).inDays;

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
@@ -8,6 +10,8 @@ import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 import '../data/subscription_repository.dart';
 import '../domain/subscription_plan_model.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
+import 'payment_success_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final String planName;
@@ -131,13 +135,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     await repo.saveOrUpgradePlan(newPlan);
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Subscription upgraded successfully!'),
-        backgroundColor: Colors.green,
-      ),
+    // Refresh the subscription state globally so everywhere in the app
+    // the UI updates (green checkmarks, unlocked features, etc.)
+    context.read<SubscriptionBloc>().add(const CheckSubscriptionStatusEvent());
+
+    // Instead of a SnackBar and pop, we push the beautiful Success Screen
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => PaymentSuccessScreen(plan: newPlan)),
     );
-    Navigator.of(context).pop();
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -338,13 +343,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         prefillContact = profileState.profile.phone ?? '';
       }
     } catch (_) {}
+    prefillEmail = prefillEmail.trim();
+    prefillContact = prefillContact.trim();
 
-    if (prefillEmail.isEmpty) {
+    if (prefillEmail.isEmpty || prefillContact.isEmpty) {
       try {
-        prefillEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+        final fbUser = FirebaseAuth.instance.currentUser;
+        if (prefillEmail.isEmpty) {
+          prefillEmail = fbUser?.email ?? '';
+        }
+        if (prefillContact.isEmpty) {
+          prefillContact = fbUser?.phoneNumber ?? '';
+        }
       } catch (_) {}
     }
 
+    prefillEmail = prefillEmail.trim();
+    prefillContact = prefillContact.trim();
+
+    if (prefillContact.isEmpty) {
+      prefillContact = '9999999999';
+    } else {
+      // Keep only digits and the '+' sign
+      prefillContact = prefillContact.replaceAll(RegExp(r'[^\d+]'), '');
+
+      // Handle Indian numbers (Razorpay defaults to +91, so passing just 10 digits is best)
+      if (prefillContact.startsWith('+91') && prefillContact.length == 13) {
+        prefillContact = prefillContact.substring(3); // Remove +91
+      } else if (prefillContact.startsWith('91') &&
+          prefillContact.length == 12) {
+        prefillContact = prefillContact.substring(2); // Remove 91
+      } else if (prefillContact.startsWith('0') &&
+          prefillContact.length == 11) {
+        prefillContact = prefillContact.substring(1); // Remove leading 0
+      }
+
+      // For other countries (e.g., +1, +44), Razorpay requires the '+' and country code to
+      // automatically change the country flag in the UI, so we leave them intact.
+    }
+    log(prefillContact);
     final options = {
       'key': 'rzp_test_ThkLyPi706leO9',
       'amount': (totalPayable * 100).toInt(),

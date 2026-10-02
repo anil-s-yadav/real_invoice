@@ -200,7 +200,7 @@ class _ReportsScreenState extends State<ReportsScreen>
       ),
       body: BlocBuilder<SubscriptionBloc, SubscriptionState>(
         builder: (context, subState) {
-          final hasAnalytics = subState.plan?.hasAnalytics ?? false;
+          final hasAnalytics = subState.effectivePlan.hasAnalytics ?? false;
           if (!hasAnalytics) {
             final isDark = Theme.of(context).brightness == Brightness.dark;
             return Center(

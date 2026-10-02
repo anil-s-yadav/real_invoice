@@ -156,44 +156,54 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: [
               // 1. Premium Status Icon
-              IconButton(
-                icon: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    const Icon(
-                      Icons.workspace_premium,
-                      size: 28,
-                      color: AppColors.premiumGold,
-                    ),
-                    // Red dot or Green tick based on premium status
-                    // Hardcoded to false for now to show the red dot prompt
-                    Positioned(
-                      top: -2,
-                      right: -2,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
+              BlocBuilder<SubscriptionBloc, SubscriptionState>(
+                builder: (context, subState) {
+                  final isPremium = subState is PremiumTierState;
+                  return IconButton(
+                    icon: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Icon(
+                          Icons.workspace_premium,
+                          size: 30,
+                          color: AppColors.premiumGold,
                         ),
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.redAccent,
-                            shape: BoxShape.circle,
+                        // Red dot or Green tick based on premium status
+                        Positioned(
+                          top: -1,
+                          right: -1,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: isPremium
+                                ? Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                    size: isPremium ? 16 : 10,
+                                  )
+                                : Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.redAccent,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-                tooltip: 'Premium',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const SubscriptionScreen(),
-                    ),
+                    tooltip: 'Premium',
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SubscriptionScreen(),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -816,7 +826,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: () {
           final docState = context.read<DocumentBloc>().state;
           final subState = context.read<SubscriptionBloc>().state;
-          final maxDocs = subState.plan?.maxDocumentsPerDay ?? 5;
+          final maxDocs = subState.effectivePlan.maxDocumentsPerDay ?? 5;
 
           if (maxDocs != -1) {
             final today = DateTime.now();

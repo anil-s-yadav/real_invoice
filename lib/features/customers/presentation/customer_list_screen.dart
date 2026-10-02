@@ -171,7 +171,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
         onPressed: () {
           final state = context.read<CustomerBloc>().state;
           final subState = context.read<SubscriptionBloc>().state;
-          final maxClients = subState.plan?.maxClientsAllowed ?? 3;
+          final maxClients = subState.effectivePlan.maxClientsAllowed ?? 3;
 
           int currentCount = 0;
           if (state is CustomerLoaded) {

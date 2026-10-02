@@ -579,10 +579,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       builder: (context, subState) {
         final plan = subState.plan ?? SubscriptionPlanModel.defaultFree();
         final isFree = plan.isFree;
+        final isActive = plan.isActive;
         final planTitle = '${plan.planName} Plan';
-        final statusBadge = isFree ? 'FREE' : 'ACTIVE';
+        
+        String statusBadge;
+        if (isFree) {
+          statusBadge = 'FREE';
+        } else if (!isActive) {
+          statusBadge = 'EXPIRED';
+        } else {
+          statusBadge = 'ACTIVE';
+        }
+        
         final expiryText = plan.expiryDate != null
-            ? 'Valid until ${DateFormat('dd MMM yyyy').format(plan.expiryDate!)}'
+            ? (isActive ? 'Valid until ' : 'Expired on ') + DateFormat('dd MMM yyyy').format(plan.expiryDate!)
             : (isFree ? 'Lifetime Free Starter' : 'Active Subscription');
 
         return Material(

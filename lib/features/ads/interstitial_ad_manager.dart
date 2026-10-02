@@ -13,7 +13,7 @@ class InterstitialAdManager {
     if (_isAdLoaded || _isLoading) return;
 
     final subState = context.read<SubscriptionBloc>().state;
-    if (subState.plan?.isAdFree ?? false) return;
+    if (subState.effectivePlan.isAdFree ?? false) return;
 
     _isLoading = true;
     InterstitialAd.load(
@@ -50,7 +50,7 @@ class InterstitialAdManager {
 
   static void showAd(BuildContext context) {
     final subState = context.read<SubscriptionBloc>().state;
-    if (subState.plan?.isAdFree ?? false) return;
+    if (subState.effectivePlan.isAdFree ?? false) return;
 
     if (_isAdLoaded && _interstitialAd != null) {
       _interstitialAd!.show();

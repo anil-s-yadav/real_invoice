@@ -163,31 +163,6 @@ class FirebaseAuthRepository implements AuthRepository {
     if (user == null) return;
 
     try {
-      // 1. Ensure the parent user document exists
-      final userDocRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid);
-      final userDoc = await userDocRef.get();
-      if (!userDoc.exists) {
-        await userDocRef.set({
-          'email': user.email ?? '',
-          'displayName': user.displayName ?? 'Unknown User',
-          'createdAt': FieldValue.serverTimestamp(),
-          'isActive': true,
-        }, SetOptions(merge: true));
-      }
-
-      // 2. Register the device
-      final messaging = FirebaseMessaging.instance;
-      String? token;
-
-      // Request permission for iOS (ignored on Android)
-      if (!kIsWeb && Platform.isIOS) {
-        await messaging.requestPermission();
-      }
-
-      token = await messaging.getToken();
-
       final deviceInfo = DeviceInfoPlugin();
       String deviceModel = 'Unknown Device';
       String platformStr = 'unknown';
@@ -206,22 +181,11 @@ class FirebaseAuthRepository implements AuthRepository {
         platformStr = 'ios';
       }
 
-      // Generate a stable device ID or just use token as doc ID (but token changes)
-      // Better to use a hash of the device name + platform or let Firestore generate it
-      // Let's use a combination of platform and model as a simple stable ID for this example
       final deviceId = _sha256ofString(
         deviceModel + platformStr,
       ).substring(0, 16);
 
-      final device = DeviceModel(
-        deviceId: deviceId,
-        fcmToken: token,
-        deviceModel: deviceModel,
-        lastActive: DateTime.now(),
-        platform: platformStr,
-      );
-
-      // Check device limits
+      // Check device limits FIRST
       if (!force) {
         final subDoc = await FirebaseFirestore.instance
             .collection('users')
@@ -229,7 +193,7 @@ class FirebaseAuthRepository implements AuthRepository {
             .collection('settings')
             .doc('subscription_plan')
             .get();
-            
+
         int maxDevices = 1;
         if (subDoc.exists) {
           final plan = SubscriptionPlanModel.fromMap(subDoc.data()!, subDoc.id);
@@ -241,15 +205,16 @@ class FirebaseAuthRepository implements AuthRepository {
             .doc(user.uid)
             .collection('devices')
             .get();
-            
-        final activeDevices = devicesSnapshot.docs.map((d) => DeviceModel.fromFirestore(d)).toList();
-        
-        // If this exact device is already registered, we can just update its lastActive.
-        // But if it's not, we check limit.
-        final isAlreadyRegistered = activeDevices.any((d) => d.deviceId == deviceId);
-        
+
+        final activeDevices = devicesSnapshot.docs
+            .map((d) => DeviceModel.fromFirestore(d))
+            .toList();
+
+        final isAlreadyRegistered = activeDevices.any(
+          (d) => d.deviceId == deviceId,
+        );
+
         if (!isAlreadyRegistered) {
-          // Exclude expired devices? We can just count them all for now.
           if (maxDevices != -1 && activeDevices.length >= maxDevices) {
             throw DeviceLimitException(activeDevices);
           }
@@ -262,18 +227,60 @@ class FirebaseAuthRepository implements AuthRepository {
             .collection('devices')
             .get();
         for (var doc in devicesSnapshot.docs) {
-           await doc.reference.delete();
+          await doc.reference.delete();
         }
       }
 
+      // Perform slow FCM token fetch and Firestore updates asynchronously
+      _completeDeviceRegistration(user.uid, deviceId, deviceModel, platformStr);
+    } catch (e) {
+      if (e is DeviceLimitException) rethrow;
+    }
+  }
+
+  Future<void> _completeDeviceRegistration(
+    String uid,
+    String deviceId,
+    String deviceModel,
+    String platformStr,
+  ) async {
+    try {
+      final userDocRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid);
+      final userDoc = await userDocRef.get();
+      if (!userDoc.exists) {
+        final fbUser = _firebaseAuth.currentUser;
+        await userDocRef.set({
+          'email': fbUser?.email ?? '',
+          'displayName': fbUser?.displayName ?? 'Unknown User',
+          'createdAt': FieldValue.serverTimestamp(),
+          'isActive': true,
+        }, SetOptions(merge: true));
+      }
+
+      final messaging = FirebaseMessaging.instance;
+      if (!kIsWeb && Platform.isIOS) {
+        await messaging.requestPermission();
+      }
+      final token = await messaging.getToken();
+
+      final device = DeviceModel(
+        deviceId: deviceId,
+        fcmToken: token,
+        deviceModel: deviceModel,
+        lastActive: DateTime.now(),
+        platform: platformStr,
+      );
+
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(uid)
           .collection('devices')
           .doc(deviceId)
           .set(device.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      print('Failed to register device: $e');
+      // Ignored in background
     }
   }
 

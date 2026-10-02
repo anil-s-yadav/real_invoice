@@ -653,51 +653,67 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     height: 54,
-                    child: ElevatedButton(
-                      onPressed: isFreePlan
-                          ? null
-                          : () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CheckoutScreen(
-                                    planName: selectedPlan['name'] as String,
-                                    monthlyPrice:
-                                        selectedPlan['price'] as double,
-                                    hasWelcomeOffer: isEligible,
-                                  ),
-                                ),
-                              );
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: AppColors.surfaceVariant,
-                        disabledForegroundColor: AppColors.textMuted,
-                        elevation: isFreePlan ? 0 : 4,
-                        shadowColor: accentColor.withValues(alpha: 0.35),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            isFreePlan
-                                ? 'Your Current Free Plan'
-                                : 'Continue with ${selectedPlan['name']}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                    child: Builder(
+                      builder: (context) {
+                        final activePlanName =
+                            state.effectivePlan.planName.toLowerCase();
+                        final currentCardPlanName =
+                            (selectedPlan['name'] as String).toLowerCase();
+                        final isCurrentPlan =
+                            activePlanName == currentCardPlanName ||
+                            (activePlanName == 'free' && isFreePlan);
+
+                        return ElevatedButton(
+                          onPressed: isCurrentPlan
+                              ? null
+                              : () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => CheckoutScreen(
+                                        planName:
+                                            selectedPlan['name'] as String,
+                                        monthlyPrice:
+                                            selectedPlan['price'] as double,
+                                        hasWelcomeOffer: isEligible,
+                                      ),
+                                    ),
+                                  );
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: accentColor,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: AppColors.surfaceVariant,
+                            disabledForegroundColor: AppColors.textMuted,
+                            elevation: isCurrentPlan ? 0 : 4,
+                            shadowColor: accentColor.withValues(alpha: 0.35),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          if (!isFreePlan) ...[
-                            const SizedBox(width: 8),
-                            const Icon(Icons.arrow_forward_rounded, size: 18),
-                          ],
-                        ],
-                      ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                isCurrentPlan
+                                    ? 'Your Current Plan'
+                                    : 'Continue with ${selectedPlan['name']}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              if (!isCurrentPlan) ...[
+                                const SizedBox(width: 8),
+                                const Icon(
+                                  Icons.arrow_forward_rounded,
+                                  size: 18,
+                                ),
+                              ],
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
