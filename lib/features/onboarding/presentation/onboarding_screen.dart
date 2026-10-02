@@ -191,7 +191,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _pickImage(int step) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    );
     if (image != null) {
       final bool isSignature = step == 2;
       final title = isSignature ? 'Crop Signature' : 'Crop Image';
@@ -232,6 +237,55 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    if (_isSaving) {
+      return Scaffold(
+        backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkSurface : Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: const CircularProgressIndicator(
+                  strokeWidth: 4,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'Setting up your company...',
+                style: AppTypography.titleLarge.copyWith(
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Uploading images and securing data.\nPlease do not close the app.',
+                textAlign: TextAlign.center,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,

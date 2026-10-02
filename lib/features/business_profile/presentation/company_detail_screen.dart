@@ -90,7 +90,12 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
 
   Future<void> _pickImage(String field) async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    );
     if (image != null) {
       final bool isSignature = field == 'signature';
       final title = isSignature ? 'Crop Signature' : 'Crop Image';
@@ -225,6 +230,54 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isSaving) {
+      return Scaffold(
+        backgroundColor: _isDark ? AppColors.darkCanvas : AppColors.canvas,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: _isDark ? AppColors.darkSurface : Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: const CircularProgressIndicator(
+                  strokeWidth: 4,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'Saving company details...',
+                style: const TextStyle(fontSize: 22).copyWith(
+                  color: _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Uploading images and syncing data.\nPlease do not close the app.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14).copyWith(
+                  color: _isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: _isDark ? AppColors.darkCanvas : AppColors.canvas,
       appBar: AppBar(
