@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../ads/interstitial_ad_manager.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,9 +37,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   // Step 1: Localization
   String _selectedLanguage = 'English';
-  String _selectedCountry = 'India';
+  String _selectedCountry = 'Indian';
   String _selectedCurrencyCode = 'INR';
-  String _selectedCurrencySymbol = '\u20B9';
+  final String _selectedCurrencySymbol = '₹';
 
   // Step 2, 3, 4: Images
   String? _logoPath;
@@ -55,24 +56,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _panController = TextEditingController();
   final _websiteController = TextEditingController();
 
-  final List<String> _languages = [
-    'English',
-    'Spanish',
-    'French',
-    'German',
-    'Hindi',
-    'Arabic',
-  ];
-  final List<Map<String, String>> _countries = [
-    {'name': 'India', 'currency': 'INR', 'symbol': '\u20B9'},
-    {'name': 'United States', 'currency': 'USD', 'symbol': '\$'},
-    {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': '\u00A3'},
-    {'name': 'Australia', 'currency': 'AUD', 'symbol': 'A\$'},
-    {'name': 'Canada', 'currency': 'CAD', 'symbol': 'C\$'},
-    {'name': 'Eurozone', 'currency': 'EUR', 'symbol': '\u20AC'},
-    {'name': 'UAE', 'currency': 'AED', 'symbol': 'AED'},
-    {'name': 'Singapore', 'currency': 'SGD', 'symbol': 'S\$'},
-  ];
 
   @override
   void dispose() {
@@ -438,7 +421,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 8),
           _buildSearchableDropdown(
             value: _selectedLanguage,
-            items: _languages,
+            items: AppConstants.languages,
             onChanged: (val) => setState(() => _selectedLanguage = val),
             icon: Icons.language,
           ),
@@ -452,13 +435,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 8),
           _buildSearchableDropdown(
             value: _selectedCountry,
-            items: _countries.map((c) => c['name']!).toList(),
+            items: AppConstants.countries.map((c) => c['name']!).toList(),
             onChanged: (val) {
               setState(() {
                 _selectedCountry = val;
-                final country = _countries.firstWhere((c) => c['name'] == val);
+                final country = AppConstants.countries.firstWhere((c) => c['name'] == val);
                 _selectedCurrencyCode = country['currency']!;
-  String _selectedCurrencySymbol = '\u20B9';
+                String _selectedCurrencySymbol = '\u20B9';
               });
             },
             icon: Icons.location_on_outlined,

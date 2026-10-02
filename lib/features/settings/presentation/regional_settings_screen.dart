@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
@@ -17,22 +18,10 @@ class RegionalSettingsScreen extends StatefulWidget {
 
 class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
   String _selectedLanguage = 'English';
-  String _selectedCountry = 'India';
+  String _selectedCountry = 'Indiannnn';
   String _selectedCurrencyCode = 'INR';
-  String _selectedCurrencySymbol = '\u20B9';
+  String _selectedCurrencySymbol = '₹';
   bool _isLoading = true;
-
-  final List<String> _languages = ['English', 'Hindi', 'Spanish', 'French'];
-  final List<Map<String, String>> _countries = [
-    {'name': 'India', 'currency': 'INR', 'symbol': '\u20B9'},
-    {'name': 'United States', 'currency': 'USD', 'symbol': '\$'},
-    {'name': 'United Kingdom', 'currency': 'GBP', 'symbol': '\u00A3'},
-    {'name': 'Australia', 'currency': 'AUD', 'symbol': 'A\$'},
-    {'name': 'Canada', 'currency': 'CAD', 'symbol': 'C\$'},
-    {'name': 'Eurozone', 'currency': 'EUR', 'symbol': '\u20AC'},
-    {'name': 'UAE', 'currency': 'AED', 'symbol': 'AED'},
-    {'name': 'Singapore', 'currency': 'SGD', 'symbol': 'S\$'},
-  ];
 
   @override
   void initState() {
@@ -168,10 +157,14 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkSurface : AppColors.surface,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.darkSurface
+              : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkBorder : AppColors.border,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.darkBorder
+                : AppColors.border,
           ),
         ),
         child: Row(
@@ -229,16 +222,20 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Regional Settings',
+                      'Regional Settingstt',
                       style: AppTypography.displayMedium.copyWith(
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Choose your preferred language, operating country, and default currency.',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -254,7 +251,7 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                     const SizedBox(height: 8),
                     _buildSearchableDropdown(
                       value: _selectedLanguage,
-                      items: _languages,
+                      items: AppConstants.languages,
                       onChanged: (val) =>
                           setState(() => _selectedLanguage = val),
                       icon: Icons.language,
@@ -272,15 +269,17 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                     const SizedBox(height: 8),
                     _buildSearchableDropdown(
                       value: _selectedCountry,
-                      items: _countries.map((c) => c['name']!).toList(),
+                      items: AppConstants.countries
+                          .map((c) => c['name']!)
+                          .toList(),
                       onChanged: (val) {
                         setState(() {
                           _selectedCountry = val;
-                          final country = _countries.firstWhere(
+                          final country = AppConstants.countries.firstWhere(
                             (c) => c['name'] == val,
                           );
                           _selectedCurrencyCode = country['currency']!;
-  String _selectedCurrencySymbol = '\u20B9';
+                          String _selectedCurrencySymbol = '\u20B9';
                         });
                       },
                       icon: Icons.location_on_outlined,
@@ -289,10 +288,14 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant,
+                        color: isDark
+                            ? AppColors.darkSurfaceVariant
+                            : AppColors.surfaceVariant,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isDark ? AppColors.darkBorder : AppColors.border,
+                          color: isDark
+                              ? AppColors.darkBorder
+                              : AppColors.border,
                         ),
                       ),
                       child: Row(
@@ -313,7 +316,9 @@ class _RegionalSettingsScreenState extends State<RegionalSettingsScreen> {
                             '$_selectedCurrencyCode ($_selectedCurrencySymbol)',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                              color: isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.textPrimary,
                             ),
                           ),
                         ],
