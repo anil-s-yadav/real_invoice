@@ -85,8 +85,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       maxDevices = 3;
       isAdFree = true;
       hasPremium = true;
-    hasAnalytics = true;
-      } else if (pName == 'gold') {
+      hasAnalytics = true;
+    } else if (pName == 'gold') {
       maxCompanies = 10;
       maxClients = -1;
       maxDocs = -1;
@@ -124,7 +124,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       maxDevicesAllowed: maxDevices,
       isAdFree: isAdFree,
       hasPremiumTemplates: hasPremium,
-          hasAnalytics: hasAnalytics,
+      hasAnalytics: hasAnalytics,
     );
     await repo.saveOrUpgradePlan(newPlan);
     if (!mounted) return;
@@ -835,10 +835,133 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+            _buildTrustBadges(isDark),
+            const SizedBox(height: 32),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTrustBadges(bool isDark) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.shield_outlined, color: Colors.green, size: 20),
+            const SizedBox(width: 6),
+            Text(
+              '100% Safe & Secure Payment',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.grey[400] : Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurfaceVariant : const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+            ),
+          ),
+          child: Column(
+            children: [
+              _TrustItem(
+                icon: Icons.verified_user_outlined,
+                title: 'Industry-Grade Security',
+                subtitle: 'Your payment data is encrypted with 256-bit TLS.',
+                isDark: isDark,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Divider(height: 1, thickness: 1, color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0)),
+              ),
+              _TrustItem(
+                icon: Icons.replay_circle_filled_outlined,
+                title: '7-Day Money-Back Guarantee',
+                subtitle: 'Not 100% satisfied? Get a full refund within 7 days.',
+                isDark: isDark,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Divider(height: 1, thickness: 1, color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0)),
+              ),
+              _TrustItem(
+                icon: Icons.headset_mic_outlined,
+                title: 'Priority Customer Support',
+                subtitle: 'We are here to help you 24/7 with any issues.',
+                isDark: isDark,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TrustItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool isDark;
+
+  const _TrustItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isDark ? AppColors.darkBorder : AppColors.border,
+            ),
+          ),
+          child: Icon(icon, color: AppColors.primary, size: 24),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
