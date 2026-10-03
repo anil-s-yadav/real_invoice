@@ -156,17 +156,12 @@ class PremiumGraphs {
     double bucket90 = 0;
     double bucketOlder = 0;
 
-    for (final bucket in data.agingBuckets) {
-      if (bucket.label == '0-15 Days')
-        bucket15 = bucket.totalAmount;
-      else if (bucket.label == '16-30 Days')
-        bucket30 = bucket.totalAmount;
-      else if (bucket.label == '31-60 Days')
-        bucket60 = bucket.totalAmount;
-      else if (bucket.label == '61-90 Days')
-        bucket90 = bucket.totalAmount;
-      else
-        bucketOlder = bucket.totalAmount;
+    if (data.agingBuckets.length >= 6) {
+      bucket15 = data.agingBuckets[1].totalAmount;
+      bucket30 = data.agingBuckets[2].totalAmount;
+      bucket60 = data.agingBuckets[3].totalAmount;
+      bucket90 = data.agingBuckets[4].totalAmount;
+      bucketOlder = data.agingBuckets[5].totalAmount;
     }
 
     final sections = <PieChartSectionData>[];

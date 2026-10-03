@@ -116,9 +116,6 @@ class ReceivablesAgingTab extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          PremiumGraphs.buildDebtAgingDonutChart(context, isDark, data),
-          const SizedBox(height: 24),
-
           // 2. Debt Aging Buckets
           Text(
             'Accounts Receivable Aging',
@@ -414,8 +411,11 @@ class ReceivablesAgingTab extends StatelessWidget {
                 ),
               );
             }),
+            const SizedBox(height: 24),
+            PremiumGraphs.buildDebtAgingDonutChart(context, isDark, data),
         ],
       ),
     );
   }
 }
+

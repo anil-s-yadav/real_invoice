@@ -19,152 +19,17 @@ class ItemsAndClientsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PremiumGraphs.buildNewVsReturningChart(context, isDark, data),
-          const SizedBox(height: 24),
-
-          // Top Products & Services Leaderboard
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Top Products & Services',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: isDark
-                      ? AppColors.darkTextPrimary
-                      : AppColors.textPrimary,
-                ),
-              ),
-              Text(
-                'By Revenue',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.textSecondary,
-                ),
-              ),
-            ],
+          // 4. Quotation Funnel & Conversion Rate
+          Text(
+            'Quotation Pipeline & Win Rate',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 12),
-
-          if (data.topProducts.isEmpty)
-            _buildEmptyCard('No products billed in this period', isDark)
-          else
-            AppCard(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: List.generate(data.topProducts.length, (index) {
-                  final p = data.topProducts[index];
-                  final isLast = index == data.topProducts.length - 1;
-
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 22,
-                              height: 22,
-                              decoration: BoxDecoration(
-                                color: index == 0
-                                    ? AppColors.primary
-                                    : (isDark
-                                          ? AppColors.darkSurfaceVariant
-                                          : const Color(0xFFF1F5F9)),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${index + 1}',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: index == 0
-                                        ? Colors.white
-                                        : (isDark
-                                              ? AppColors.darkTextSecondary
-                                              : AppColors.textSecondary),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    p.title,
-                                    style: const TextStyle(
-                                      fontSize: 13.5,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    '${p.totalQuantity.toStringAsFixed(p.totalQuantity.truncateToDouble() == p.totalQuantity ? 0 : 1)} ${p.unit} sold',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: isDark
-                                          ? AppColors.darkTextMuted
-                                          : AppColors.textMuted,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  CurrencyFormatter.format(p.totalRevenue),
-                                  style: const TextStyle(
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                Text(
-                                  '${p.percentage.toStringAsFixed(1)}% of total',
-                                  style: const TextStyle(
-                                    fontSize: 10.5,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: LinearProgressIndicator(
-                            value: (p.percentage / 100.0).clamp(0.0, 1.0),
-                            backgroundColor: isDark
-                                ? AppColors.darkSurfaceVariant
-                                : const Color(0xFFF1F5F9),
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              index == 0
-                                  ? AppColors.primary
-                                  : AppColors.primaryLight.withValues(
-                                      alpha: 0.9,
-                                    ),
-                            ),
-                            minHeight: 5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-              ),
-            ),
+          _buildQuotationFunnelCard(context, isDark),
           const SizedBox(height: 24),
 
           // 3. Top Clients by LTV & Performance
@@ -317,7 +182,153 @@ class ItemsAndClientsTab extends StatelessWidget {
             ),
           const SizedBox(height: 24),
 
-          PremiumGraphs.buildQuotationFunnelGraphic(context, isDark, data),
+          // Top Products & Services Leaderboard
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Top Products & Services',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                'By Revenue',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          if (data.topProducts.isEmpty)
+            _buildEmptyCard('No products billed in this period', isDark)
+          else
+            AppCard(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: List.generate(data.topProducts.length, (index) {
+                  final p = data.topProducts[index];
+                  final isLast = index == data.topProducts.length - 1;
+
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                color: index == 0
+                                    ? AppColors.primary
+                                    : (isDark
+                                          ? AppColors.darkSurfaceVariant
+                                          : const Color(0xFFF1F5F9)),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${index + 1}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: index == 0
+                                        ? Colors.white
+                                        : (isDark
+                                              ? AppColors.darkTextSecondary
+                                              : AppColors.textSecondary),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    p.title,
+                                    style: const TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    '${p.totalQuantity.toStringAsFixed(p.totalQuantity.truncateToDouble() == p.totalQuantity ? 0 : 1)} ${p.unit} sold',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: isDark
+                                          ? AppColors.darkTextMuted
+                                          : AppColors.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  CurrencyFormatter.format(p.totalRevenue),
+                                  style: const TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                Text(
+                                  '${p.percentage.toStringAsFixed(1)}% of total',
+                                  style: const TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: LinearProgressIndicator(
+                            value: (p.percentage / 100.0).clamp(0.0, 1.0),
+                            backgroundColor: isDark
+                                ? AppColors.darkSurfaceVariant
+                                : const Color(0xFFF1F5F9),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              index == 0
+                                  ? AppColors.primary
+                                  : AppColors.primaryLight.withValues(
+                                      alpha: 0.9,
+                                    ),
+                            ),
+                            minHeight: 5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ),
+            ),
+          const SizedBox(height: 24),
+
+          PremiumGraphs.buildNewVsReturningChart(context, isDark, data),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -477,4 +488,3 @@ class ItemsAndClientsTab extends StatelessWidget {
     );
   }
 }
-
