@@ -18,6 +18,7 @@ import '../../business_profile/bloc/business_profile_state.dart';
 import '../../navigation/main_nav_scaffold.dart';
 import '../../business_profile/domain/business_profile_model.dart';
 import '../../business_profile/data/business_profile_repository.dart';
+import '../../../core/services/analytics_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final bool isAddingNewCompany;
@@ -168,6 +169,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         // Await the repository directly so it finishes before we navigate
         final repo = context.read<BusinessProfileRepository>();
         await repo.saveProfile(profile);
+        AnalyticsService.logBusinessCreated(profile.id);
 
         if (mounted) {
           // Tell the bloc to load this specific profile

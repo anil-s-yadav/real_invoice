@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import '../../../core/services/analytics_service.dart';
 import '../domain/auth_user_model.dart';
 import '../domain/device_model.dart';
 import '../../subscription/domain/subscription_plan_model.dart';
@@ -84,6 +85,9 @@ class FirebaseAuthRepository implements AuthRepository {
       final userCredential = await _firebaseAuth.signInWithCredential(
         credential,
       );
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        AnalyticsService.logSignup('google');
+      }
       final user = _mapFirebaseUser(userCredential.user);
       if (user == null) throw Exception('Sign-in failed.');
       return user;
@@ -115,6 +119,9 @@ class FirebaseAuthRepository implements AuthRepository {
     final userCredential = await _firebaseAuth.signInWithCredential(
       oauthCredential,
     );
+    if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+      AnalyticsService.logSignup('apple');
+    }
 
     // Apple only returns name on first sign-in; update profile if available
     final fbUser = userCredential.user;

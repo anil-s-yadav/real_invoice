@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'features/business_profile/bloc/business_profile_state.dart';
 import 'core/bloc/app_bloc_observer.dart';
 import 'core/theme/app_theme.dart';
@@ -21,6 +22,8 @@ import 'features/documents/data/document_repository.dart';
 import 'features/home/bloc/home_bloc.dart';
 import 'features/home/bloc/home_event.dart';
 import 'features/navigation/main_nav_scaffold.dart';
+import 'features/notifications/data/notification_repository.dart';
+import 'features/notifications/bloc/notification_bloc.dart';
 import 'features/products/bloc/product_bloc.dart';
 import 'features/products/bloc/product_event.dart';
 import 'features/products/data/product_repository.dart';
@@ -110,6 +113,7 @@ class InvozRoot extends StatelessWidget {
         RepositoryProvider(create: (_) => CustomerRepository()),
         RepositoryProvider(create: (_) => ProductRepository()),
         RepositoryProvider(create: (_) => DocumentRepository()),
+        RepositoryProvider(create: (_) => NotificationRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -148,6 +152,11 @@ class InvozRoot extends StatelessWidget {
                 ReportsBloc(documentRepository: ctx.read<DocumentRepository>()),
           ),
           BlocProvider(create: (_) => OnboardingCubit()),
+          BlocProvider(
+            create: (ctx) => NotificationBloc(
+              repository: ctx.read<NotificationRepository>(),
+            ),
+          ),
         ],
         child: BlocListener<AuthBloc, AuthState>(
           listener: (context, state) {
@@ -162,6 +171,7 @@ class InvozRoot extends StatelessWidget {
               context.read<SubscriptionBloc>().add(
                 const ObserveSubscriptionEvent(),
               );
+              context.read<NotificationBloc>().add(SetupNotificationsEvent());
             }
           },
           child: BlocListener<BusinessProfileBloc, BusinessProfileState>(
@@ -255,6 +265,9 @@ class InvozApp extends StatelessWidget {
                       themeMode: themeMode,
                       theme: AppTheme.lightTheme,
                       darkTheme: AppTheme.darkTheme,
+                      navigatorObservers: [
+                        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+                      ],
                       home: homeWidget,
                     );
                   },

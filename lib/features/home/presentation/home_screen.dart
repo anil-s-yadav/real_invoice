@@ -23,6 +23,8 @@ import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
 import '../../subscription/presentation/subscription_screen.dart';
+import '../../notifications/bloc/notification_bloc.dart';
+import '../../notifications/presentation/notification_screen.dart';
 import '../../settings/presentation/user_profile_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../auth/bloc/auth_bloc.dart';
@@ -104,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Scaffold(
-          endDrawer: _buildNotificationsDrawer(context, isDark),
           appBar: AppBar(
             title: Row(
               children: [
@@ -209,26 +210,36 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // 2. Notifications Icon
               Builder(
-                builder: (ctx) => IconButton(
-                  icon: const Badge(
-                    backgroundColor: Colors.redAccent,
-                    label: Text(
-                      '2',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                builder: (ctx) => BlocBuilder<NotificationBloc, NotificationState>(
+                  builder: (context, notifState) {
+                    final int unreadCount = notifState is NotificationLoaded ? notifState.unreadCount : 0;
+                    
+                    return IconButton(
+                      icon: Badge(
+                        isLabelVisible: unreadCount > 0,
+                        backgroundColor: Colors.redAccent,
+                        label: Text(
+                          unreadCount > 99 ? '99+' : unreadCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.notifications_outlined,
+                          size: 30,
+                          color: AppColors.primary,
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      Icons.notifications_outlined,
-                      size: 30,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  tooltip: 'Notifications',
-                  onPressed: () {
-                    Scaffold.of(ctx).openEndDrawer();
+                      tooltip: 'Notifications',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const NotificationScreen()),
+                        );
+                      },
+                    );
                   },
                 ),
               ),
@@ -1026,150 +1037,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNotificationsDrawer(BuildContext context, bool isDark) {
-    return Drawer(
-      width: double.infinity,
-      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Notifications',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDark
-                          ? AppColors.darkTextPrimary
-                          : AppColors.textPrimary,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            ),
-            Divider(
-              height: 1,
-              color: isDark ? AppColors.darkBorder : AppColors.border,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AdBannerWidget(),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _buildNotificationItem(
-                    isDark,
-                    title: 'Welcome to Invoz!',
-                    message:
-                        'Set up your business profile to start generating professional invoices instantly.',
-                    time: 'Just now',
-                    icon: Icons.celebration,
-                    color: Colors.blueAccent,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildNotificationItem(
-                    isDark,
-                    title: 'Claim Your Premium',
-                    message:
-                        'Don\'t miss out on your 1 Year Free Premium offer. Tap to claim it now.',
-                    time: '1 hr ago',
-                    icon: Icons.workspace_premium,
-                    color: AppColors.premiumGold,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotificationItem(
-    bool isDark, {
-    required String title,
-    required String message,
-    required String time,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceVariant : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.borderStrong,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  time,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : Colors.grey.shade500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

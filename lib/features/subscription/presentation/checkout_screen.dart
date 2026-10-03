@@ -11,6 +11,7 @@ import '../../business_profile/bloc/business_profile_state.dart';
 import '../data/subscription_repository.dart';
 import '../domain/subscription_plan_model.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
+import '../../../core/services/analytics_service.dart';
 import 'payment_success_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -135,9 +136,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     await repo.saveOrUpgradePlan(newPlan);
     if (!mounted) return;
 
-    // Refresh the subscription state globally so everywhere in the app
-    // the UI updates (green checkmarks, unlocked features, etc.)
     context.read<SubscriptionBloc>().add(const CheckSubscriptionStatusEvent());
+
+    AnalyticsService.logPurchaseCompleted(newPlan.planName, totalPayable);
 
     // Instead of a SnackBar and pop, we push the beautiful Success Screen
     Navigator.of(context).pushReplacement(

@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/document_repository.dart';
 import '../domain/document_model.dart';
 import 'document_event.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/services/analytics_service.dart';
 import 'document_state.dart';
 
 class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
@@ -49,6 +51,25 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
   ) async {
     try {
       await repository.saveDocument(event.document);
+      
+      // Log Analytics
+      if (event.document.docType == DocumentType.invoice) {
+        AnalyticsService.logInvoiceCreated(event.document.totalAmount);
+      } else if (event.document.docType == DocumentType.quotation) {
+        AnalyticsService.logQuotationCreated(event.document.totalAmount);
+      } else if (event.document.docType == DocumentType.receipt) {
+        AnalyticsService.logReceiptCreated(event.document.totalAmount);
+      }
+      
+      // Optional: Check if first invoice
+      if (event.document.docType == DocumentType.invoice) {
+        final prefs = await SharedPreferences.getInstance();
+        if (prefs.getBool('has_created_first_invoice') != true) {
+          await prefs.setBool('has_created_first_invoice', true);
+          AnalyticsService.logFirstInvoiceCreated();
+        }
+      }
+
       final currentLoaded = state is DocumentLoaded
           ? state as DocumentLoaded
           : null;

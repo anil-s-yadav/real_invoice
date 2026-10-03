@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import 'package:printing/printing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/services/analytics_service.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_typography.dart';
@@ -209,6 +211,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                             _currentTemplateId = t.id;
                             _document = _document.copyWith(templateId: t.id);
                           });
+                          AnalyticsService.logTemplateSelected(t.id);
                           context.read<DocumentBloc>().add(
                             SaveDocumentEvent(_document),
                           );
@@ -644,6 +647,16 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       vertical: 10,
                     ),
                     useActions: true,
+                    onShared: (context) {
+                      AnalyticsService.logInvoiceShared();
+                      SharedPreferences.getInstance().then((prefs) {
+                        if (prefs.getBool('has_created_first_invoice') == true &&
+                            prefs.getBool('has_shared_first_invoice') != true) {
+                          prefs.setBool('has_shared_first_invoice', true);
+                          AnalyticsService.logFirstInvoiceShared();
+                        }
+                      });
+                    },
                     canChangeOrientation: false,
                     canChangePageFormat: true,
                     canDebug: false,

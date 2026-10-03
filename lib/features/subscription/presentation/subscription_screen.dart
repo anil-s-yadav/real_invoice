@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/analytics_service.dart';
 import 'checkout_screen.dart';
 
 class SubscriptionScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logPricingViewed();
     _pageController = PageController(
       initialPage: _selectedPlanIndex,
       viewportFraction: 0.86,
@@ -667,6 +669,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           onPressed: isCurrentPlan
                               ? null
                               : () {
+                                  AnalyticsService.logPurchaseStarted(selectedPlan['name'] as String);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
