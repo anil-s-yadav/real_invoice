@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:invoz/features/business_profile/bloc/business_profile_state.dart';
+import 'features/business_profile/bloc/business_profile_state.dart';
 import 'core/bloc/app_bloc_observer.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
