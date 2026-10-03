@@ -28,7 +28,7 @@ class LoadAnalyticsEvent extends ReportsEvent {
   final String? businessGstin;
 
   const LoadAnalyticsEvent({
-    this.preset = TimeFilterPreset.thisYear,
+    this.preset = TimeFilterPreset.thisMonth,
     this.customStartDate,
     this.customEndDate,
     this.businessGstin,
@@ -114,7 +114,11 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
     LoadAnalyticsEvent event,
     Emitter<ReportsState> emit,
   ) async {
-    emit(const ReportsLoading());
+    // Only show loading if we don't have data yet to prevent UI flickering when changing filters
+    if (state is! ReportsLoaded) {
+      emit(const ReportsLoading());
+    }
+    
     try {
       final now = DateTime.now();
       DateTime startDate;
@@ -130,8 +134,19 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
         endDate = _getEndOfPeriod(event.preset, now);
       }
 
-      final stats = await documentRepository.getSummaryStats();
-      final allDocs = await documentRepository.getAllDocuments();
+      SummaryStats stats;
+      List<DocumentModel> allDocs;
+
+      if (state is ReportsLoaded) {
+        // Option 1 Caching: Reuse in-memory Dart objects for lightning-fast filter changes
+        // This avoids parsing thousands of JSON documents from SQLite on every tap
+        final currentState = state as ReportsLoaded;
+        stats = currentState.stats;
+        allDocs = currentState.documents;
+      } else {
+        stats = await documentRepository.getSummaryStats();
+        allDocs = await documentRepository.getAllDocuments();
+      }
 
       final data = AnalyticsData.compute(
         allDocuments: allDocs,
@@ -155,9 +170,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
         final quarterMonth = ((now.month - 1) ~/ 3) * 3 + 1;
         return DateTime(now.year, quarterMonth, 1);
       case TimeFilterPreset.thisYear:
-        return now.month >= 4
-            ? DateTime(now.year, 4, 1)
-            : DateTime(now.year - 1, 4, 1);
+        return DateTime(now.year, 1, 1);
       case TimeFilterPreset.allTime:
         return DateTime(2000, 1, 1);
       case TimeFilterPreset.custom:
@@ -173,8 +186,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
         final quarterEndMonth = ((now.month - 1) ~/ 3) * 3 + 3;
         return DateTime(now.year, quarterEndMonth + 1, 0, 23, 59, 59);
       case TimeFilterPreset.thisYear:
-        final fyStartYear = now.month >= 4 ? now.year : now.year - 1;
-        return DateTime(fyStartYear + 1, 3, 31, 23, 59, 59);
+        return DateTime(now.year, 12, 31, 23, 59, 59);
       case TimeFilterPreset.allTime:
         return DateTime(2100, 1, 1);
       case TimeFilterPreset.custom:

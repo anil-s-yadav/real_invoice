@@ -3,6 +3,7 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/widgets/app_card.dart';
 import '../../../../../core/utils/currency_formatter.dart';
 import '../../../domain/analytics_data_models.dart';
+import '../premium_graphs.dart';
 
 class TaxAndGstTab extends StatelessWidget {
   final AnalyticsData data;
@@ -18,6 +19,9 @@ class TaxAndGstTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          PremiumGraphs.buildTaxMonthlyTrend(context, isDark, data),
+          const SizedBox(height: 24),
+
           // 1. Tax KPIs Row
           Row(
             children: [

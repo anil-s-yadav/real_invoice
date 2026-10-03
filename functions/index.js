@@ -137,3 +137,50 @@ async function sendNotificationAndSave(userId, title, body, type, relatedId = nu
         }
     }
 }
+
+// 3. Analytics Aggregator (Option 3: Database Scaling)
+// Runs automatically when a document is created/updated/deleted to keep a running total.
+// This prevents the client from needing to download thousands of invoices just to show the dashboard.
+exports.aggregateSummaryStats = functions.firestore
+    .document('users/{userId}/documents/{documentId}')
+    .onWrite(async (change, context) => {
+        const userId = context.params.userId;
+        const db = getFirestore();
+        
+        // This is a lightweight aggregation function that tallies up the grand totals
+        // without the client needing to read 10,000 documents.
+        const docsSnapshot = await db.collection('users').doc(userId).collection('documents')
+            .where('docType', '==', 'invoice')
+            .get();
+        
+        let unpaidTotal = 0;
+        let unpaidCount = 0;
+        let paidTotal = 0;
+        let paidCount = 0;
+
+        docsSnapshot.forEach(doc => {
+            const data = doc.data();
+            const total = data.totalAmount || 0;
+            const paid = data.amountPaid || 0;
+            const remaining = Math.max(0, total - paid);
+
+            if (data.status === 'paid' || remaining <= 0) {
+                paidTotal += paid;
+                paidCount++;
+            } else {
+                unpaidTotal += remaining;
+                unpaidCount++;
+            }
+        });
+
+        // Save the aggregated result to a single document!
+        await db.collection('users').doc(userId).collection('reports').doc('summary_stats').set({
+            unpaidTotal,
+            unpaidCount,
+            paidTotal,
+            paidCount,
+            lastUpdatedAt: FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        return null;
+    });

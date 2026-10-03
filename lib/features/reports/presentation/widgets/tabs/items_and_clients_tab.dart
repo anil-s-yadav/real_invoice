@@ -3,6 +3,7 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/widgets/app_card.dart';
 import '../../../../../core/utils/currency_formatter.dart';
 import '../../../domain/analytics_data_models.dart';
+import '../premium_graphs.dart';
 
 class ItemsAndClientsTab extends StatelessWidget {
   final AnalyticsData data;
@@ -18,11 +19,10 @@ class ItemsAndClientsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Client Concentration Risk Card
-          _buildConcentrationRiskCard(context, isDark),
+          PremiumGraphs.buildNewVsReturningChart(context, isDark, data),
           const SizedBox(height: 24),
 
-          // 2. Top Products & Services Leaderboard
+          // Top Products & Services Leaderboard
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -317,91 +317,7 @@ class ItemsAndClientsTab extends StatelessWidget {
             ),
           const SizedBox(height: 24),
 
-          // 4. Quotation Funnel & Conversion Rate
-          Text(
-            'Quotation Pipeline & Win Rate',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildQuotationFunnelCard(context, isDark),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildConcentrationRiskCard(BuildContext context, bool isDark) {
-    final concentration = data.top3ClientConcentration;
-    final isHighRisk = concentration >= 60.0;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isHighRisk
-            ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB))
-            : (isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5)),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isHighRisk
-              ? (isDark ? const Color(0xFFB45309) : const Color(0xFFFDE68A))
-              : (isDark ? const Color(0xFF047857) : const Color(0xFFA7F3D0)),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            isHighRisk
-                ? Icons.warning_amber_rounded
-                : Icons.verified_user_rounded,
-            color: isHighRisk
-                ? const Color(0xFFD97706)
-                : AppColors.statusPaidText,
-            size: 22,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isHighRisk
-                      ? 'Client Concentration Notice'
-                      : 'Healthy Revenue Diversification',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: isHighRisk
-                        ? (isDark
-                              ? Colors.amber.shade200
-                              : const Color(0xFF92400E))
-                        : (isDark
-                              ? const Color(0xFFA7F3D0)
-                              : const Color(0xFF065F46)),
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  isHighRisk
-                      ? 'Top 3 clients account for ${concentration.toStringAsFixed(1)}% of your total revenue. Diversifying client acquisition will improve business resilience.'
-                      : 'Your revenue is well distributed across multiple clients, keeping business risk low.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isHighRisk
-                        ? (isDark
-                              ? Colors.amber.shade100
-                              : const Color(0xFFB45309))
-                        : (isDark
-                              ? const Color(0xFF6EE7B7)
-                              : const Color(0xFF047857)),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          PremiumGraphs.buildQuotationFunnelGraphic(context, isDark, data),
         ],
       ),
     );
@@ -561,3 +477,4 @@ class ItemsAndClientsTab extends StatelessWidget {
     );
   }
 }
+

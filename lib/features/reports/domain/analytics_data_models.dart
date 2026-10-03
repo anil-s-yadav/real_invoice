@@ -5,7 +5,7 @@ import '../../documents/domain/document_model.dart';
 enum TimeFilterPreset {
   thisMonth('This Month'),
   thisQuarter('This Quarter'),
-  thisYear('This Fiscal Year'),
+  thisYear('This Year'),
   allTime('All Time'),
   custom('Custom');
 
@@ -157,8 +157,11 @@ class AnalyticsData {
 
   // Charts data
   final List<CashFlowSpot> cashFlowSpots;
-  final Map<String, double>
-  paymentMethodsBreakdown; // "UPI": 50000, "Bank": 30000
+  final List<double> lastYearBilledSpots;
+  final List<double> newClientRevenueSpots;
+  final List<double> returningClientRevenueSpots;
+  final List<double> taxMonthlySpots;
+  final Map<String, double> paymentMethodsBreakdown;
 
   // Receivables & Debt Aging
   final List<AgingBucket> agingBuckets;
@@ -192,6 +195,10 @@ class AnalyticsData {
     required this.averageInvoiceValue,
     required this.averageCollectionDays,
     required this.cashFlowSpots,
+    required this.lastYearBilledSpots,
+    required this.newClientRevenueSpots,
+    required this.returningClientRevenueSpots,
+    required this.taxMonthlySpots,
     required this.paymentMethodsBreakdown,
     required this.agingBuckets,
     required this.topDebtors,
@@ -270,16 +277,89 @@ class AnalyticsData {
     final Map<String, double> paymentMethodsBreakdown = {};
     final List<int> daysToCollectList = [];
 
-    // Monthly data spots for 12 months of the active year (or period)
-    final billedMonthly = List.generate(12, (_) => 0.0);
-    final collectedMonthly = List.generate(12, (_) => 0.0);
+    final isAllTime = preset == TimeFilterPreset.allTime;
+    final targetYear = isAllTime ? now.year : endDate.year;
+
+    // Monthly data spots for 12 months (or last 12 years if allTime)
+    final billedSpots = List.generate(12, (_) => 0.0);
+    final collectedSpots = List.generate(12, (_) => 0.0);
+    final lastYearBilledSpots = List.generate(12, (_) => 0.0);
+    final newClientRevenueSpots = List.generate(12, (_) => 0.0);
+    final returningClientRevenueSpots = List.generate(12, (_) => 0.0);
+    final taxMonthlySpots = List.generate(12, (_) => 0.0);
+    final spotLabels = List.generate(12, (_) => '');
+
+    // Map to track the very first invoice date for each customer (for New vs Returning logic)
+    final Map<String, DateTime> customerFirstInvoiceDate = {};
+    for (final doc in allDocuments) {
+      if (doc.docType == DocumentType.invoice || doc.docType == DocumentType.receipt) {
+        final custName = doc.customerSnapshot?.name ?? 'Unknown';
+        if (!customerFirstInvoiceDate.containsKey(custName) ||
+            doc.issueDate.isBefore(customerFirstInvoiceDate[custName]!)) {
+          customerFirstInvoiceDate[custName] = doc.issueDate;
+        }
+      }
+    }
+
+    if (isAllTime) {
+      for (int i = 0; i < 12; i++) {
+        spotLabels[i] = (targetYear - 11 + i).toString().substring(
+          2,
+        ); // "22", "23" etc
+      }
+    } else {
+      const monthNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      for (int i = 0; i < 12; i++) {
+        spotLabels[i] = monthNames[i];
+      }
+    }
 
     for (final doc in allDocuments) {
       if (doc.docType == DocumentType.invoice ||
           doc.docType == DocumentType.receipt) {
-        // Track billed monthly for the target year
-        if (doc.issueDate.year == endDate.year) {
-          billedMonthly[doc.issueDate.month - 1] += doc.totalAmount;
+        // Track billed, taxes, and new vs returning
+        final custName = doc.customerSnapshot?.name ?? 'Unknown';
+        final firstInvoiceDate = customerFirstInvoiceDate[custName];
+        final isNewClientThisDoc = firstInvoiceDate != null &&
+            firstInvoiceDate.year == doc.issueDate.year &&
+            firstInvoiceDate.month == doc.issueDate.month;
+
+        if (isAllTime) {
+          final yearIdx = doc.issueDate.year - (targetYear - 11);
+          if (yearIdx >= 0 && yearIdx < 12) {
+            billedSpots[yearIdx] += doc.totalAmount;
+            taxMonthlySpots[yearIdx] += doc.totalTaxAmount;
+            if (isNewClientThisDoc) {
+              newClientRevenueSpots[yearIdx] += doc.totalAmount;
+            } else {
+              returningClientRevenueSpots[yearIdx] += doc.totalAmount;
+            }
+          }
+        } else {
+          if (doc.issueDate.year == targetYear) {
+            billedSpots[doc.issueDate.month - 1] += doc.totalAmount;
+            taxMonthlySpots[doc.issueDate.month - 1] += doc.totalTaxAmount;
+            if (isNewClientThisDoc) {
+              newClientRevenueSpots[doc.issueDate.month - 1] += doc.totalAmount;
+            } else {
+              returningClientRevenueSpots[doc.issueDate.month - 1] += doc.totalAmount;
+            }
+          } else if (doc.issueDate.year == targetYear - 1) {
+            lastYearBilledSpots[doc.issueDate.month - 1] += doc.totalAmount;
+          }
         }
 
         // Process payments
@@ -302,8 +382,14 @@ class AnalyticsData {
             }
           }
 
-          if (payment.paymentDate.year == endDate.year) {
-            collectedMonthly[payment.paymentDate.month - 1] += payment.amount;
+          if (isAllTime) {
+            final yearIdx = payment.paymentDate.year - (targetYear - 11);
+            if (yearIdx >= 0 && yearIdx < 12)
+              collectedSpots[yearIdx] += payment.amount;
+          } else {
+            if (payment.paymentDate.year == targetYear) {
+              collectedSpots[payment.paymentDate.month - 1] += payment.amount;
+            }
           }
         }
       }
@@ -321,26 +407,12 @@ class AnalyticsData {
               .round()
         : 14;
 
-    const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
     final cashFlowSpots = List.generate(12, (index) {
       return CashFlowSpot(
         monthIndex: index,
-        label: monthNames[index],
-        billedAmount: billedMonthly[index],
-        collectedAmount: collectedMonthly[index],
+        label: spotLabels[index],
+        billedAmount: billedSpots[index],
+        collectedAmount: collectedSpots[index],
       );
     });
 
@@ -703,6 +775,10 @@ class AnalyticsData {
       averageInvoiceValue: averageInvoiceValue,
       averageCollectionDays: averageCollectionDays,
       cashFlowSpots: cashFlowSpots,
+      lastYearBilledSpots: lastYearBilledSpots,
+      newClientRevenueSpots: newClientRevenueSpots,
+      returningClientRevenueSpots: returningClientRevenueSpots,
+      taxMonthlySpots: taxMonthlySpots,
       paymentMethodsBreakdown: paymentMethodsBreakdown,
       agingBuckets: agingBuckets,
       topDebtors: topDebtors,

@@ -4,6 +4,7 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/widgets/app_card.dart';
 import '../../../../../core/utils/currency_formatter.dart';
 import '../../../domain/analytics_data_models.dart';
+import '../premium_graphs.dart';
 
 class OverviewCashflowTab extends StatefulWidget {
   final AnalyticsData data;
@@ -237,31 +238,17 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                         reservedSize: 22,
                         interval: 1,
                         getTitlesWidget: (value, meta) {
-                          const months = [
-                            'J',
-                            'F',
-                            'M',
-                            'A',
-                            'M',
-                            'J',
-                            'J',
-                            'A',
-                            'S',
-                            'O',
-                            'N',
-                            'D',
-                          ];
                           final idx = value.toInt();
-                          if (idx >= 0 && idx < 12) {
+                          if (idx >= 0 && idx < data.cashFlowSpots.length) {
                             return Padding(
                               padding: const EdgeInsets.only(top: 4),
                               child: Text(
-                                months[idx],
+                                data.cashFlowSpots[idx].label,
                                 style: TextStyle(
                                   color: isDark
                                       ? AppColors.darkTextSecondary
                                       : AppColors.textSecondary,
-                                  fontSize: 11,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -331,6 +318,10 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
           ),
           const SizedBox(height: 24),
 
+          // YoY Growth Premium Graph
+          PremiumGraphs.buildYoYGrowthChart(context, isDark, data),
+          const SizedBox(height: 24),
+
           // 4. Payment Methods Breakdown
           Text(
             'Payment Methods Mix',
@@ -385,13 +376,17 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.5,
-              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+              ),
             ),
           ),
           const SizedBox(height: 4),

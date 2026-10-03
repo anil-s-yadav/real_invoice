@@ -23,7 +23,7 @@ class ReportsScreen extends StatefulWidget {
 class _ReportsScreenState extends State<ReportsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  TimeFilterPreset _selectedPreset = TimeFilterPreset.thisYear;
+  TimeFilterPreset _selectedPreset = TimeFilterPreset.thisMonth;
   DateTime? _customStartDate;
   DateTime? _customEndDate;
 

@@ -698,14 +698,18 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            stats == null ? '-' : CurrencyFormatter.format(stats.unpaidTotal),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 36,
-              fontWeight: FontWeight.w300,
-              letterSpacing: -1.0,
-              height: 1.1,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              stats == null ? '-' : CurrencyFormatter.format(stats.unpaidTotal),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 36,
+                fontWeight: FontWeight.w300,
+                letterSpacing: -1.0,
+                height: 1.1,
+              ),
             ),
           ),
           const SizedBox(height: 16),

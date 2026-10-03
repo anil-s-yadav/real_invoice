@@ -29,17 +29,14 @@ class CurrencyFormatter {
     }
   }
 
-  /// Compact representation for dashboard cards, e.g. \u20B9 1.25L or \u20B9 45K
+  /// Compact representation is disabled based on user preference for full amounts.
   static String formatCompact(double amount, {String symbol = '\u20B9'}) {
-    if (amount >= 10000000) {
-      return '$symbol ${(amount / 10000000).toStringAsFixed(2)} Cr';
-    } else if (amount >= 100000) {
-      return '$symbol ${(amount / 100000).toStringAsFixed(2)} L';
-    } else if (amount >= 1000) {
-      return '$symbol ${(amount / 1000).toStringAsFixed(1)} k';
-    } else {
-      return format(amount, symbol: symbol, decimalDigits: 0);
-    }
+    // Return full formatted amount without decimals for large numbers, or standard for small
+    return format(
+      amount,
+      symbol: symbol,
+      decimalDigits: amount % 1 == 0 ? 0 : 2,
+    );
   }
 
   /// Converts number to words in Indian Rupees (standard Indian invoice requirement)

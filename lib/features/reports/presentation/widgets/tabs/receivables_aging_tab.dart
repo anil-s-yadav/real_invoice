@@ -4,6 +4,7 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/widgets/app_card.dart';
 import '../../../../../core/utils/currency_formatter.dart';
 import '../../../domain/analytics_data_models.dart';
+import '../premium_graphs.dart';
 
 class ReceivablesAgingTab extends StatelessWidget {
   final AnalyticsData data;
@@ -113,6 +114,9 @@ class ReceivablesAgingTab extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+
+          PremiumGraphs.buildDebtAgingDonutChart(context, isDark, data),
           const SizedBox(height: 24),
 
           // 2. Debt Aging Buckets
