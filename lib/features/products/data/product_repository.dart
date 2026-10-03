@@ -6,18 +6,11 @@ import '../domain/product_model.dart';
 import 'package:uuid/uuid.dart';
 
 class ProductRepository {
-
-
   String get _userId {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('User not authenticated');
     return user.uid;
   }
-
-
-
-
-
 
   Future<CollectionReference<Map<String, dynamic>>> _getProductsRef() async {
     return FirebaseFirestore.instance
@@ -30,19 +23,27 @@ class ProductRepository {
     try {
       final ref = await _getProductsRef();
       final query = ref.orderBy('title');
-      
+
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
       try {
-        querySnapshot = await query.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        querySnapshot = await query.get(
+          GetOptions(source: forceSync ? Source.server : Source.cache),
+        );
         if (querySnapshot.docs.isEmpty && !forceSync) {
-          querySnapshot = await query.get(const GetOptions(source: Source.server));
+          querySnapshot = await query.get(
+            const GetOptions(source: Source.server),
+          );
         }
       } catch (_) {
         if (forceSync) rethrow;
-        querySnapshot = await query.get(const GetOptions(source: Source.server));
+        querySnapshot = await query.get(
+          const GetOptions(source: Source.server),
+        );
       }
-      
-      return querySnapshot.docs.map((doc) => ProductItem.fromMap(doc.data())).toList();
+
+      return querySnapshot.docs
+          .map((doc) => ProductItem.fromMap(doc.data()))
+          .toList();
     } catch (e) {
       debugPrint('Error getting products: $e');
       if (forceSync) rethrow;
@@ -53,7 +54,7 @@ class ProductRepository {
   Future<List<ProductItem>> searchProducts(String query) async {
     final products = await getAllProducts();
     if (query.isEmpty) return products;
-    
+
     final q = query.toLowerCase();
     return products.where((p) {
       return p.title.toLowerCase().contains(q) ||
@@ -75,10 +76,9 @@ class ProductRepository {
         ? product.copyWith(id: const Uuid().v4())
         : product;
 
-    await ref.doc(productToSave.id).set(
-      productToSave.toMap(),
-      SetOptions(merge: true),
-    );
+    await ref
+        .doc(productToSave.id)
+        .set(productToSave.toMap(), SetOptions(merge: true));
   }
 
   Future<void> deleteProduct(String id) async {

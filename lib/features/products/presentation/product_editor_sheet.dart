@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
+import 'package:invoz/features/products/bloc/product_state.dart';
 import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
@@ -12,20 +14,29 @@ import '../../../core/widgets/app_text_field.dart';
 import '../bloc/product_bloc.dart';
 import '../bloc/product_event.dart';
 import '../domain/product_model.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
 
 class ProductEditorSheet extends StatefulWidget {
   final ProductItem? initialProduct;
+  final bool saveToDb;
 
-  const ProductEditorSheet({super.key, this.initialProduct});
+  const ProductEditorSheet({
+    super.key,
+    this.initialProduct,
+    this.saveToDb = true,
+  });
 
   static Future<ProductItem?> show(
     BuildContext context, {
     ProductItem? product,
+    bool saveToDb = true,
   }) {
     return AppBottomSheet.show<ProductItem>(
       context: context,
-      title: product != null ? 'Edit Item / Service' : 'New Item / Service',
-      child: ProductEditorSheet(initialProduct: product),
+      title: saveToDb
+          ? (product != null ? 'Edit Item / Service' : 'New Item / Service')
+          : 'Enter Item Details',
+      child: ProductEditorSheet(initialProduct: product, saveToDb: saveToDb),
     );
   }
 
@@ -114,7 +125,37 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
       createdAt: widget.initialProduct?.createdAt ?? DateTime.now(),
     );
 
-    context.read<ProductBloc>().add(SaveProductEvent(product));
+    if (widget.saveToDb) {
+      if (widget.initialProduct == null) {
+        final subState = context.read<SubscriptionBloc>().state;
+        final maxItems = subState.effectivePlan.maxItemsAllowed;
+
+        int currentCount = 0;
+        final state = context.read<ProductBloc>().state;
+        if (state is ProductLoaded) {
+          currentCount = state.products.length;
+        } else if (state is ProductInitial) {
+          context.read<ProductBloc>().add(const LoadProductsEvent());
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Loading item limits... Try again in a moment.'),
+            ),
+          );
+          return;
+        }
+
+        if (maxItems != -1 && currentCount >= maxItems) {
+          PremiumDialogHelper.showLimitReachedDialog(
+            context: context,
+            title: 'Catalog Limit Reached',
+            message:
+                'Your current plan allows up to $maxItems item${maxItems == 1 ? '' : 's'}. Upgrade to a premium plan to add unlimited items.',
+          );
+          return;
+        }
+      }
+      context.read<ProductBloc>().add(SaveProductEvent(product));
+    }
 
     if (mounted) {
       InterstitialAdManager.showAd(context);

@@ -111,8 +111,9 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                               ? 'No items found in catalog.'
                               : 'No items match your search.',
                           style: AppTypography.bodyMedium.copyWith(
-                            color: Theme.of(context).brightness == Brightness.dark 
-                                ? AppColors.darkTextSecondary 
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? AppColors.darkTextSecondary
                                 : AppColors.textSecondary,
                           ),
                         ),
@@ -128,17 +129,22 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                       final product = filtered[index];
                       final isSelected =
                           widget.selectedProduct?.id == product.id;
-                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
 
                       return AppCard(
                         padding: EdgeInsets.zero,
                         backgroundColor: isSelected
-                            ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.05)
+                            ? AppColors.primary.withValues(
+                                alpha: isDark ? 0.15 : 0.05,
+                              )
                             : null,
                         border: Border.all(
                           color: isSelected
                               ? AppColors.primary
-                              : (isDark ? AppColors.darkBorder : AppColors.border),
+                              : (isDark
+                                    ? AppColors.darkBorder
+                                    : AppColors.border),
                         ),
                         child: InkWell(
                           onTap: () => Navigator.of(context).pop(product),
@@ -155,14 +161,18 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                                         ? AppColors.primary.withValues(
                                             alpha: 0.1,
                                           )
-                                        : (isDark ? AppColors.darkSurface : AppColors.surfaceVariant),
+                                        : (isDark
+                                              ? AppColors.darkSurface
+                                              : AppColors.surfaceVariant),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
                                     Icons.inventory_2_outlined,
                                     color: isSelected
                                         ? AppColors.primary
-                                        : (isDark ? AppColors.darkTextSecondary : AppColors.textMuted),
+                                        : (isDark
+                                              ? AppColors.darkTextSecondary
+                                              : AppColors.textMuted),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -177,14 +187,20 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                                             .copyWith(
                                               color: isSelected
                                                   ? AppColors.primary
-                                                  : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                                                  : (isDark
+                                                        ? AppColors
+                                                              .darkTextPrimary
+                                                        : AppColors
+                                                              .textPrimary),
                                             ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         '${CurrencyFormatter.format(product.unitPrice)} / ${product.unit}',
                                         style: TextStyle(
-                                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                          color: isDark
+                                              ? AppColors.darkTextSecondary
+                                              : AppColors.textSecondary,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),

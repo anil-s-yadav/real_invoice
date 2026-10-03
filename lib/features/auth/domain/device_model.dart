@@ -21,7 +21,8 @@ class DeviceModel {
       deviceId: doc.id,
       fcmToken: data['fcmToken'] as String?,
       deviceModel: data['deviceModel'] as String? ?? 'Unknown Device',
-      lastActive: (data['lastActive'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastActive:
+          (data['lastActive'] as Timestamp?)?.toDate() ?? DateTime.now(),
       platform: data['platform'] as String? ?? 'unknown',
     );
   }

@@ -266,7 +266,9 @@ class InvozApp extends StatelessWidget {
                       theme: AppTheme.lightTheme,
                       darkTheme: AppTheme.darkTheme,
                       navigatorObservers: [
-                        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+                        FirebaseAnalyticsObserver(
+                          analytics: FirebaseAnalytics.instance,
+                        ),
                       ],
                       home: homeWidget,
                     );

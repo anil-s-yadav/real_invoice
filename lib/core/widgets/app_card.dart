@@ -24,8 +24,8 @@ class AppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final radius = borderRadius ?? AppDimensions.roundedLg;
-    final bg = backgroundColor ??
-        (isDark ? AppColors.darkSurface : AppColors.surface);
+    final bg =
+        backgroundColor ?? (isDark ? AppColors.darkSurface : AppColors.surface);
 
     final borderSide = border != null
         ? border!.top

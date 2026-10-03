@@ -65,17 +65,30 @@ class SignInScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          context.read<AuthBloc>().add(ForceLoginOnDeviceEvent(state.user));
+                          context.read<AuthBloc>().add(
+                            ForceLoginOnDeviceEvent(state.user),
+                          );
                         },
-                        child: const Text('Logout Other Devices & Login Here', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'Logout Other Devices & Login Here',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     TextButton(
                       onPressed: () {
-                        context.read<AuthBloc>().add(const SignOutRequestedEvent());
+                        context.read<AuthBloc>().add(
+                          const SignOutRequestedEvent(),
+                        );
                       },
-                      child: const Text('Cancel & Sign Out', style: TextStyle(color: Colors.grey)),
+                      child: const Text(
+                        'Cancel & Sign Out',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                     ),
                   ],
                 ),

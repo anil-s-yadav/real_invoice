@@ -174,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           top: -1,
                           right: -1,
                           child: Container(
-                            padding: const EdgeInsets.all(2),
+                            padding: const EdgeInsets.all(1),
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
@@ -210,38 +210,43 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // 2. Notifications Icon
               Builder(
-                builder: (ctx) => BlocBuilder<NotificationBloc, NotificationState>(
-                  builder: (context, notifState) {
-                    final int unreadCount = notifState is NotificationLoaded ? notifState.unreadCount : 0;
-                    
-                    return IconButton(
-                      icon: Badge(
-                        isLabelVisible: unreadCount > 0,
-                        backgroundColor: Colors.redAccent,
-                        label: Text(
-                          unreadCount > 99 ? '99+' : unreadCount.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                builder: (ctx) =>
+                    BlocBuilder<NotificationBloc, NotificationState>(
+                      builder: (context, notifState) {
+                        final int unreadCount = notifState is NotificationLoaded
+                            ? notifState.unreadCount
+                            : 0;
+
+                        return IconButton(
+                          icon: Badge(
+                            isLabelVisible: unreadCount > 0,
+                            backgroundColor: Colors.redAccent,
+                            label: Text(
+                              unreadCount > 99 ? '99+' : unreadCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.notifications_outlined,
+                              size: 30,
+                              color: AppColors.primary,
+                            ),
                           ),
-                        ),
-                        child: const Icon(
-                          Icons.notifications_outlined,
-                          size: 30,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      tooltip: 'Notifications',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const NotificationScreen()),
+                          tooltip: 'Notifications',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const NotificationScreen(),
+                              ),
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                ),
+                    ),
               ),
               SizedBox(width: 8),
               // 3. User Profile Avatar
@@ -694,9 +699,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            stats == null
-                ? '-'
-                : CurrencyFormatter.format(stats.unpaidTotal),
+            stats == null ? '-' : CurrencyFormatter.format(stats.unpaidTotal),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 36,
@@ -749,9 +752,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         stats == null
                             ? '-'
-                            : CurrencyFormatter.format(
-                                stats.overdueTotal,
-                              ),
+                            : CurrencyFormatter.format(stats.overdueTotal),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -1036,5 +1037,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-
 }

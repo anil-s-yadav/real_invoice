@@ -136,7 +136,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     await repo.saveOrUpgradePlan(newPlan);
     if (!mounted) return;
 
-    context.read<SubscriptionBloc>().add(const CheckSubscriptionStatusEvent());
+    context.read<SubscriptionBloc>().add(ActivateSubscriptionEvent(newPlan));
 
     AnalyticsService.logPurchaseCompleted(newPlan.planName, totalPayable);
 

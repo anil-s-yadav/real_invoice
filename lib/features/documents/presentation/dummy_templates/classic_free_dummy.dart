@@ -33,7 +33,12 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 10),
-                  buildDummyText('Tesla Inc.', size: 18, bold: true, color: primarySlate),
+                  buildDummyText(
+                    'Tesla Inc.',
+                    size: 18,
+                    bold: true,
+                    color: primarySlate,
+                  ),
                   const SizedBox(height: 4),
                   buildDummyText(
                     'teslacom@gmail.com  •  +1 987-654-3210\nRoad no. 397, West City, NY - 10001\nGSTIN: 27AABCU9603R1ZM',
@@ -59,7 +64,10 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: badgeBg,
                       borderRadius: BorderRadius.circular(6),
@@ -76,8 +84,17 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      buildDummyText('Issue Date: ', size: 10, color: mutedSlate),
-                      buildDummyText('28 Sep 2026', size: 10, bold: true, color: primarySlate),
+                      buildDummyText(
+                        'Issue Date: ',
+                        size: 10,
+                        color: mutedSlate,
+                      ),
+                      buildDummyText(
+                        '28 Sep 2026',
+                        size: 10,
+                        bold: true,
+                        color: primarySlate,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 3),
@@ -85,7 +102,12 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       buildDummyText('Due Date: ', size: 10, color: mutedSlate),
-                      buildDummyText('13 Oct 2026', size: 10, bold: true, color: primarySlate),
+                      buildDummyText(
+                        '13 Oct 2026',
+                        size: 10,
+                        bold: true,
+                        color: primarySlate,
+                      ),
                     ],
                   ),
                 ],
@@ -106,12 +128,30 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildDummyText('BILLED TO', size: 9, bold: true, color: mutedSlate),
+                buildDummyText(
+                  'BILLED TO',
+                  size: 9,
+                  bold: true,
+                  color: mutedSlate,
+                ),
                 const SizedBox(height: 4),
-                buildDummyText('Georgo graph LTD', size: 13, bold: true, color: primarySlate),
+                buildDummyText(
+                  'Georgo graph LTD',
+                  size: 13,
+                  bold: true,
+                  color: primarySlate,
+                ),
                 const SizedBox(height: 2),
-                buildDummyText('vajsisi@shjs.com  •  +1 987-654-3210', size: 9.5, color: secondarySlate),
-                buildDummyText('742 Evergreen Terrace, Brooklyn, NY 11201', size: 9.5, color: secondarySlate),
+                buildDummyText(
+                  'vajsisi@shjs.com  •  +1 987-654-3210',
+                  size: 9.5,
+                  color: secondarySlate,
+                ),
+                buildDummyText(
+                  '742 Evergreen Terrace, Brooklyn, NY 11201',
+                  size: 9.5,
+                  color: secondarySlate,
+                ),
               ],
             ),
             Container(
@@ -124,9 +164,19 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  buildDummyText('TOTAL DUE', size: 8.5, bold: true, color: mutedSlate),
+                  buildDummyText(
+                    'TOTAL DUE',
+                    size: 8.5,
+                    bold: true,
+                    color: mutedSlate,
+                  ),
                   const SizedBox(height: 2),
-                  buildDummyText('Rs. 1,120.00', size: 15, bold: true, color: primarySlate),
+                  buildDummyText(
+                    'Rs. 1,120.00',
+                    size: 15,
+                    bold: true,
+                    color: primarySlate,
+                  ),
                 ],
               ),
             ),
@@ -147,34 +197,59 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
             children: [
               Expanded(
                 flex: 4,
-                child: buildDummyText('DESCRIPTION', bold: true, size: 9, color: secondarySlate),
+                child: buildDummyText(
+                  'DESCRIPTION',
+                  bold: true,
+                  size: 9,
+                  color: secondarySlate,
+                ),
               ),
               Expanded(
                 flex: 1,
                 child: Align(
                   alignment: Alignment.center,
-                  child: buildDummyText('QTY', bold: true, size: 9, color: secondarySlate),
+                  child: buildDummyText(
+                    'QTY',
+                    bold: true,
+                    size: 9,
+                    color: secondarySlate,
+                  ),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: buildDummyText('UNIT PRICE', bold: true, size: 9, color: secondarySlate),
+                  child: buildDummyText(
+                    'UNIT PRICE',
+                    bold: true,
+                    size: 9,
+                    color: secondarySlate,
+                  ),
                 ),
               ),
               Expanded(
                 flex: 1,
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: buildDummyText('TAX', bold: true, size: 9, color: secondarySlate),
+                  child: buildDummyText(
+                    'TAX',
+                    bold: true,
+                    size: 9,
+                    color: secondarySlate,
+                  ),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: buildDummyText('AMOUNT', bold: true, size: 9, color: secondarySlate),
+                  child: buildDummyText(
+                    'AMOUNT',
+                    bold: true,
+                    size: 9,
+                    color: secondarySlate,
+                  ),
                 ),
               ),
             ],
@@ -194,9 +269,18 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    buildDummyText('Premium Protective Helmet', bold: true, size: 11, color: primarySlate),
+                    buildDummyText(
+                      'Premium Protective Helmet',
+                      bold: true,
+                      size: 11,
+                      color: primarySlate,
+                    ),
                     const SizedBox(height: 2),
-                    buildDummyText('Matte finish, ISI certified', size: 9, color: const Color(0xFF94A3B8)),
+                    buildDummyText(
+                      'Matte finish, ISI certified',
+                      size: 9,
+                      color: const Color(0xFF94A3B8),
+                    ),
                   ],
                 ),
               ),
@@ -211,21 +295,34 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                 flex: 2,
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: buildDummyText('Rs. 1,000.00', size: 11, color: primarySlate),
+                  child: buildDummyText(
+                    'Rs. 1,000.00',
+                    size: 11,
+                    color: primarySlate,
+                  ),
                 ),
               ),
               Expanded(
                 flex: 1,
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: buildDummyText('12.0%', size: 11, color: secondarySlate),
+                  child: buildDummyText(
+                    '12.0%',
+                    size: 11,
+                    color: secondarySlate,
+                  ),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: buildDummyText('Rs. 1,120.00', bold: true, size: 11, color: primarySlate),
+                  child: buildDummyText(
+                    'Rs. 1,120.00',
+                    bold: true,
+                    size: 11,
+                    color: primarySlate,
+                  ),
                 ),
               ),
             ],
@@ -250,16 +347,32 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    buildDummyText('Subtotal', size: 10.5, color: secondarySlate),
-                    buildDummyText('Rs. 1,000.00', size: 10.5, color: primarySlate),
+                    buildDummyText(
+                      'Subtotal',
+                      size: 10.5,
+                      color: secondarySlate,
+                    ),
+                    buildDummyText(
+                      'Rs. 1,000.00',
+                      size: 10.5,
+                      color: primarySlate,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    buildDummyText('Tax (12%)', size: 10.5, color: secondarySlate),
-                    buildDummyText('Rs. 120.00', size: 10.5, color: primarySlate),
+                    buildDummyText(
+                      'Tax (12%)',
+                      size: 10.5,
+                      color: secondarySlate,
+                    ),
+                    buildDummyText(
+                      'Rs. 120.00',
+                      size: 10.5,
+                      color: primarySlate,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -268,8 +381,18 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    buildDummyText('Total', bold: true, size: 13, color: primarySlate),
-                    buildDummyText('Rs. 1,120.00', bold: true, size: 14, color: primarySlate),
+                    buildDummyText(
+                      'Total',
+                      bold: true,
+                      size: 13,
+                      color: primarySlate,
+                    ),
+                    buildDummyText(
+                      'Rs. 1,120.00',
+                      bold: true,
+                      size: 14,
+                      color: primarySlate,
+                    ),
                   ],
                 ),
               ],
@@ -285,16 +408,23 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
           decoration: const BoxDecoration(
             color: bgLight,
             borderRadius: BorderRadius.all(Radius.circular(6)),
-            border: Border(
-              left: BorderSide(color: mutedSlate, width: 3),
-            ),
+            border: Border(left: BorderSide(color: mutedSlate, width: 3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildDummyText('Notes & Terms', bold: true, size: 9.5, color: primarySlate),
+              buildDummyText(
+                'Notes & Terms',
+                bold: true,
+                size: 9.5,
+                color: primarySlate,
+              ),
               const SizedBox(height: 2),
-              buildDummyText('Thank you for your business! Payment is due as specified above.', size: 9.5, color: secondarySlate),
+              buildDummyText(
+                'Thank you for your business! Payment is due as specified above.',
+                size: 9.5,
+                color: secondarySlate,
+              ),
             ],
           ),
         ),
@@ -306,7 +436,10 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              child: buildDummyPaymentDetails(type: documentType, primary: primarySlate),
+              child: buildDummyPaymentDetails(
+                type: documentType,
+                primary: primarySlate,
+              ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -316,9 +449,18 @@ Widget buildClassicFreeDummy(DocumentType documentType) {
                   width: 80,
                   height: 32,
                 ),
-                Container(width: 120, height: 1.5, color: const Color(0xFF94A3B8)),
+                Container(
+                  width: 120,
+                  height: 1.5,
+                  color: const Color(0xFF94A3B8),
+                ),
                 const SizedBox(height: 4),
-                buildDummyText('Authorized Signature', bold: true, color: mutedSlate, size: 9),
+                buildDummyText(
+                  'Authorized Signature',
+                  bold: true,
+                  color: mutedSlate,
+                  size: 9,
+                ),
               ],
             ),
           ],

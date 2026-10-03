@@ -63,8 +63,8 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   final SubscriptionRepository _repository;
 
   SubscriptionBloc({SubscriptionRepository? repository})
-      : _repository = repository ?? SubscriptionRepository(),
-        super(const FreeTierState()) {
+    : _repository = repository ?? SubscriptionRepository(),
+      super(const FreeTierState()) {
     on<CheckSubscriptionStatusEvent>(_onCheckStatus);
     on<ObserveSubscriptionEvent>(_onObserveStatus);
     on<ActivateSubscriptionEvent>(_onActivatePlan);
@@ -86,12 +86,15 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   ) async {
     // Check initial eligibility
     final isEligible = await _checkEligibility();
-    
+
     await emit.forEach<SubscriptionPlanModel>(
       _repository.currentPlanStream(),
       onData: (plan) {
         if (plan.isFree || !plan.isActive) {
-          return FreeTierState(plan: plan, isEligibleForWelcomeOffer: isEligible);
+          return FreeTierState(
+            plan: plan,
+            isEligibleForWelcomeOffer: isEligible,
+          );
         } else {
           return PremiumTierState(
             expiryDate: plan.expiryDate,
@@ -113,7 +116,11 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     }
   }
 
-  void _emitPlanState(SubscriptionPlanModel plan, bool isEligible, Emitter<SubscriptionState> emit) {
+  void _emitPlanState(
+    SubscriptionPlanModel plan,
+    bool isEligible,
+    Emitter<SubscriptionState> emit,
+  ) {
     if (plan.isFree || !plan.isActive) {
       emit(FreeTierState(plan: plan, isEligibleForWelcomeOffer: isEligible));
     } else {

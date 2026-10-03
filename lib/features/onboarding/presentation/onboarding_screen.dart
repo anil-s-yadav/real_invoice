@@ -174,7 +174,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         if (mounted) {
           // Tell the bloc to load this specific profile
           context.read<BusinessProfileBloc>().add(
-            const LoadBusinessProfileEvent(),
+            LoadBusinessProfileEvent(profile.id),
           );
         }
       }
@@ -241,7 +241,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     if (_isSaving) {
       return Scaffold(
         backgroundColor: isDark ? AppColors.darkCanvas : AppColors.canvas,
@@ -271,7 +271,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Text(
                 'Setting up your company...',
                 style: AppTypography.titleLarge.copyWith(
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -280,7 +282,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 'Uploading images and securing data.\nPlease do not close the app.',
                 textAlign: TextAlign.center,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                   height: 1.5,
                 ),
               ),

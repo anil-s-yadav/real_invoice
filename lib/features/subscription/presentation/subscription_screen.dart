@@ -657,8 +657,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     height: 54,
                     child: Builder(
                       builder: (context) {
-                        final activePlanName =
-                            state.effectivePlan.planName.toLowerCase();
+                        final activePlanName = state.effectivePlan.planName
+                            .toLowerCase();
                         final currentCardPlanName =
                             (selectedPlan['name'] as String).toLowerCase();
                         final isCurrentPlan =
@@ -669,7 +669,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           onPressed: isCurrentPlan
                               ? null
                               : () {
-                                  AnalyticsService.logPurchaseStarted(selectedPlan['name'] as String);
+                                  AnalyticsService.logPurchaseStarted(
+                                    selectedPlan['name'] as String,
+                                  );
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

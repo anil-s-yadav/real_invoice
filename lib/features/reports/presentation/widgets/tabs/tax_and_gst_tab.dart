@@ -35,7 +35,9 @@ class TaxAndGstTab extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                             ),
                           ),
                           Container(
@@ -59,7 +61,9 @@ class TaxAndGstTab extends StatelessWidget {
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -67,7 +71,9 @@ class TaxAndGstTab extends StatelessWidget {
                         'Net base turnover',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                          color: isDark
+                              ? AppColors.darkTextMuted
+                              : AppColors.textMuted,
                         ),
                       ),
                     ],
@@ -89,13 +95,17 @@ class TaxAndGstTab extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                             ),
                           ),
                           Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                              color: const Color(
+                                0xFF10B981,
+                              ).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Icon(
@@ -113,7 +123,9 @@ class TaxAndGstTab extends StatelessWidget {
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -121,7 +133,9 @@ class TaxAndGstTab extends StatelessWidget {
                         'GST liability collected',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                          color: isDark
+                              ? AppColors.darkTextMuted
+                              : AppColors.textMuted,
                         ),
                       ),
                     ],
@@ -154,7 +168,9 @@ class TaxAndGstTab extends StatelessWidget {
                         'Intra-State (CGST + SGST)',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -170,7 +186,9 @@ class TaxAndGstTab extends StatelessWidget {
                         'CGST: ${CurrencyFormatter.formatCompact(data.localTaxAmount / 2)} | SGST: ${CurrencyFormatter.formatCompact(data.localTaxAmount / 2)}',
                         style: TextStyle(
                           fontSize: 10.5,
-                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                          color: isDark
+                              ? AppColors.darkTextMuted
+                              : AppColors.textMuted,
                         ),
                       ),
                     ],
@@ -190,7 +208,9 @@ class TaxAndGstTab extends StatelessWidget {
                         'Inter-State (IGST)',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -206,7 +226,9 @@ class TaxAndGstTab extends StatelessWidget {
                         'Integrated Tax on cross-border',
                         style: TextStyle(
                           fontSize: 10.5,
-                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                          color: isDark
+                              ? AppColors.darkTextMuted
+                              : AppColors.textMuted,
                         ),
                       ),
                     ],
@@ -240,7 +262,10 @@ class TaxAndGstTab extends StatelessWidget {
                         width: 70,
                         child: Text(
                           'Slab Rate',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       Expanded(
@@ -249,7 +274,9 @@ class TaxAndGstTab extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
                           ),
                           textAlign: TextAlign.right,
                         ),
@@ -260,7 +287,9 @@ class TaxAndGstTab extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
                           ),
                           textAlign: TextAlign.right,
                         ),
@@ -281,7 +310,10 @@ class TaxAndGstTab extends StatelessWidget {
                         SizedBox(
                           width: 70,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
@@ -332,7 +364,9 @@ class TaxAndGstTab extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
               Text(
@@ -362,7 +396,10 @@ class TaxAndGstTab extends StatelessWidget {
                           width: 90,
                           child: Text(
                             'HSN / SAC',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         Expanded(
@@ -371,7 +408,9 @@ class TaxAndGstTab extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                             ),
                             textAlign: TextAlign.right,
                           ),
@@ -382,7 +421,9 @@ class TaxAndGstTab extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                             ),
                             textAlign: TextAlign.right,
                           ),
@@ -415,7 +456,9 @@ class TaxAndGstTab extends StatelessWidget {
                                   '${hsn.itemCount} items',
                                   style: TextStyle(
                                     fontSize: 10.5,
-                                    color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                                    color: isDark
+                                        ? AppColors.darkTextMuted
+                                        : AppColors.textMuted,
                                   ),
                                 ),
                               ],
@@ -458,15 +501,28 @@ class TaxAndGstTab extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.discount_outlined, size: 16, color: Colors.orange.shade700),
+                          Icon(
+                            Icons.discount_outlined,
+                            size: 16,
+                            color: Colors.orange.shade700,
+                          ),
                           const SizedBox(width: 6),
-                          const Text('Discounts Given', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                          const Text(
+                            'Discounts Given',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 6),
                       Text(
                         CurrencyFormatter.format(data.totalDiscountsGiven),
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -481,15 +537,28 @@ class TaxAndGstTab extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.local_shipping_outlined, size: 16, color: Colors.blue),
+                          const Icon(
+                            Icons.local_shipping_outlined,
+                            size: 16,
+                            color: Colors.blue,
+                          ),
                           const SizedBox(width: 6),
-                          const Text('Shipping Billed', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                          const Text(
+                            'Shipping Billed',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 6),
                       Text(
                         CurrencyFormatter.format(data.totalShippingBilled),
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -510,7 +579,9 @@ class TaxAndGstTab extends StatelessWidget {
           msg,
           style: TextStyle(
             fontSize: 13,
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
           ),
         ),
       ),

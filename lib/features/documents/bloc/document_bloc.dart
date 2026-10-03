@@ -51,7 +51,7 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
   ) async {
     try {
       await repository.saveDocument(event.document);
-      
+
       // Log Analytics
       if (event.document.docType == DocumentType.invoice) {
         AnalyticsService.logInvoiceCreated(event.document.totalAmount);
@@ -60,7 +60,7 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
       } else if (event.document.docType == DocumentType.receipt) {
         AnalyticsService.logReceiptCreated(event.document.totalAmount);
       }
-      
+
       // Optional: Check if first invoice
       if (event.document.docType == DocumentType.invoice) {
         final prefs = await SharedPreferences.getInstance();

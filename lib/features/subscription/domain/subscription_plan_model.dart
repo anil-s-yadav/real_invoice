@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 class SubscriptionPlanModel {
   final String id;
   final String planName;
@@ -62,7 +63,9 @@ class SubscriptionPlanModel {
   bool get isActive {
     if (status.trim().toLowerCase() != 'active') return false;
     if (isFree) return true;
-    if (expiryDate == null) return true; // For lifetime plans
+    if (expiryDate == null && durationMonths == -1)
+      return true; // For lifetime plans
+    if (expiryDate == null) return false; // Corrupt expiry date on paid plan
     return expiryDate!.isAfter(DateTime.now());
   }
 
@@ -132,10 +135,11 @@ class SubscriptionPlanModel {
       'finalAmount': finalAmount,
       'status': status,
       'transactionId': transactionId,
+      'orderId': orderId,
+      'paymentSignature': paymentSignature,
       'paymentMethod': paymentMethod,
       'startDate': Timestamp.fromDate(startDate),
-      'expiryDate':
-          expiryDate != null ? Timestamp.fromDate(expiryDate!) : null,
+      'expiryDate': expiryDate != null ? Timestamp.fromDate(expiryDate!) : null,
       'autoRenew': autoRenew,
       'isWelcomeOffer': isWelcomeOffer,
       'createdAt': Timestamp.fromDate(createdAt),
@@ -173,7 +177,9 @@ class SubscriptionPlanModel {
     final now = DateTime.now();
 
     return SubscriptionPlanModel(
-      id: docId ?? (map['id'] as String? ?? 'sub_${now.millisecondsSinceEpoch}'),
+      id:
+          docId ??
+          (map['id'] as String? ?? 'sub_${now.millisecondsSinceEpoch}'),
       planName: map['planName'] as String? ?? 'Free',
       price: (map['price'] as num?)?.toDouble() ?? 0.0,
       durationMonths: (map['durationMonths'] as num?)?.toInt() ?? 12,
@@ -184,6 +190,8 @@ class SubscriptionPlanModel {
       finalAmount: (map['finalAmount'] as num?)?.toDouble() ?? 0.0,
       status: map['status'] as String? ?? 'Active',
       transactionId: map['transactionId'] as String? ?? 'TXN_LOCAL',
+      orderId: map['orderId'] as String?,
+      paymentSignature: map['paymentSignature'] as String?,
       paymentMethod: map['paymentMethod'] as String? ?? 'UPI',
       startDate: parseTimestamp(map['startDate'], now),
       expiryDate: parseNullableTimestamp(map['expiryDate']),
@@ -212,12 +220,22 @@ class SubscriptionPlanModel {
     double? finalAmount,
     String? status,
     String? transactionId,
+    String? orderId,
+    String? paymentSignature,
     String? paymentMethod,
     DateTime? startDate,
     DateTime? expiryDate,
     bool? autoRenew,
     bool? isWelcomeOffer,
     DateTime? createdAt,
+    int? maxCompaniesAllowed,
+    int? maxClientsAllowed,
+    int? maxItemsAllowed,
+    int? maxDocumentsPerDay,
+    int? maxDevicesAllowed,
+    bool? isAdFree,
+    bool? hasPremiumTemplates,
+    bool? hasAnalytics,
   }) {
     return SubscriptionPlanModel(
       id: id ?? this.id,
@@ -230,12 +248,22 @@ class SubscriptionPlanModel {
       finalAmount: finalAmount ?? this.finalAmount,
       status: status ?? this.status,
       transactionId: transactionId ?? this.transactionId,
+      orderId: orderId ?? this.orderId,
+      paymentSignature: paymentSignature ?? this.paymentSignature,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       startDate: startDate ?? this.startDate,
       expiryDate: expiryDate ?? this.expiryDate,
       autoRenew: autoRenew ?? this.autoRenew,
       isWelcomeOffer: isWelcomeOffer ?? this.isWelcomeOffer,
       createdAt: createdAt ?? this.createdAt,
+      maxCompaniesAllowed: maxCompaniesAllowed ?? this.maxCompaniesAllowed,
+      maxClientsAllowed: maxClientsAllowed ?? this.maxClientsAllowed,
+      maxItemsAllowed: maxItemsAllowed ?? this.maxItemsAllowed,
+      maxDocumentsPerDay: maxDocumentsPerDay ?? this.maxDocumentsPerDay,
+      maxDevicesAllowed: maxDevicesAllowed ?? this.maxDevicesAllowed,
+      isAdFree: isAdFree ?? this.isAdFree,
+      hasPremiumTemplates: hasPremiumTemplates ?? this.hasPremiumTemplates,
+      hasAnalytics: hasAnalytics ?? this.hasAnalytics,
     );
   }
 }

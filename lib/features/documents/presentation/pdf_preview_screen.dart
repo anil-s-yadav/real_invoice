@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import 'package:printing/printing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,12 +49,27 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   }
 
   Future<void> _handleConvertProformaToInvoice() async {
+    final subState = context.read<SubscriptionBloc>().state;
+    final maxDocs = subState.effectivePlan.maxDocumentsPerDay;
     final repo = context.read<DocumentRepository>();
+    int todayCount = await repo.getTodayDocumentCount();
+    if (!mounted) return;
+
+    if (maxDocs != -1 && todayCount >= maxDocs) {
+      PremiumDialogHelper.showLimitReachedDialog(
+        context: context,
+        title: 'Daily Limit Reached',
+        message:
+            'Your current plan allows up to $maxDocs document${maxDocs == 1 ? '' : 's'} per day. Upgrade to a premium plan for unlimited documents.',
+      );
+      return;
+    }
+
     final invoice = await repo.convertProformaToInvoice(_document.id);
 
     if (mounted) {
-      final currentLoaded =
-          context.read<DocumentBloc>().state as DocumentLoaded?;
+      final docState = context.read<DocumentBloc>().state;
+      final currentLoaded = docState is DocumentLoaded ? docState : null;
       context.read<DocumentBloc>().add(
         LoadDocumentsEvent(
           type: currentLoaded?.typeFilter,
@@ -78,12 +94,27 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   }
 
   Future<void> _handleConvertToInvoice() async {
+    final subState = context.read<SubscriptionBloc>().state;
+    final maxDocs = subState.effectivePlan.maxDocumentsPerDay;
     final repo = context.read<DocumentRepository>();
+    int todayCount = await repo.getTodayDocumentCount();
+    if (!mounted) return;
+
+    if (maxDocs != -1 && todayCount >= maxDocs) {
+      PremiumDialogHelper.showLimitReachedDialog(
+        context: context,
+        title: 'Daily Limit Reached',
+        message:
+            'Your current plan allows up to $maxDocs document${maxDocs == 1 ? '' : 's'} per day. Upgrade to a premium plan for unlimited documents.',
+      );
+      return;
+    }
+
     final invoice = await repo.convertQuotationToInvoice(_document.id);
 
     if (mounted) {
-      final currentLoaded =
-          context.read<DocumentBloc>().state as DocumentLoaded?;
+      final docState = context.read<DocumentBloc>().state;
+      final currentLoaded = docState is DocumentLoaded ? docState : null;
       context.read<DocumentBloc>().add(
         LoadDocumentsEvent(
           type: currentLoaded?.typeFilter,
@@ -191,17 +222,25 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       onTap: () {
                         if (!isSelected) {
                           if (t.isPremium) {
-                            final subState = context.read<SubscriptionBloc>().state;
+                            final subState = context
+                                .read<SubscriptionBloc>()
+                                .state;
                             if (!subState.effectivePlan.hasPremiumTemplates) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Premium template. Please upgrade your plan.'),
+                                  content: Text(
+                                    'Premium template. Please upgrade your plan.',
+                                  ),
                                   backgroundColor: Colors.orange,
                                 ),
                               );
-                              Navigator.pop(bottomSheetContext); // Close the sheet
+                              Navigator.pop(
+                                bottomSheetContext,
+                              ); // Close the sheet
                               Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+                                MaterialPageRoute(
+                                  builder: (_) => const SubscriptionScreen(),
+                                ),
                               );
                               return;
                             }
@@ -426,6 +465,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                             context.read<DocumentBloc>().add(
                               SaveDocumentEvent(updated),
                             );
+                            context.read<HomeBloc>().add(
+                              const LoadHomeDataEvent(),
+                            );
                           },
                           child: const Text(
                             'Yes',
@@ -443,6 +485,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                             setState(() => _document = updated);
                             context.read<DocumentBloc>().add(
                               SaveDocumentEvent(updated),
+                            );
+                            context.read<HomeBloc>().add(
+                              const LoadHomeDataEvent(),
                             );
                           },
                           child: const Text(
@@ -633,15 +678,33 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 Expanded(
                   child: PdfPreview(
                     build: (format) async {
-                        final repo = PaymentDetailRepository();
-                        final payments = await repo.getAllPayments();
-                        return DocumentPdfGenerator.generate(
-                          document: _document,
-                          profile: profile,
-                          payments: payments,
-                          templateId: _currentTemplateId,
+                      final repo = PaymentDetailRepository();
+                      final payments = await repo.getAllPayments();
+
+                      final subState = context.read<SubscriptionBloc>().state;
+                      final hasPremium =
+                          subState.effectivePlan.hasPremiumTemplates;
+
+                      String actualTemplateId = _currentTemplateId;
+                      if (!hasPremium) {
+                        final info = TemplateRegistry.getById(
+                          _currentTemplateId,
                         );
-                      },
+                        if (info.isPremium) {
+                          // Fallback to first non-premium template
+                          actualTemplateId = TemplateRegistry.allTemplates
+                              .firstWhere((t) => !t.isPremium)
+                              .id;
+                        }
+                      }
+
+                      return DocumentPdfGenerator.generate(
+                        document: _document,
+                        profile: profile,
+                        payments: payments,
+                        templateId: actualTemplateId,
+                      );
+                    },
                     previewPageMargin: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 10,
@@ -650,7 +713,8 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                     onShared: (context) {
                       AnalyticsService.logInvoiceShared();
                       SharedPreferences.getInstance().then((prefs) {
-                        if (prefs.getBool('has_created_first_invoice') == true &&
+                        if (prefs.getBool('has_created_first_invoice') ==
+                                true &&
                             prefs.getBool('has_shared_first_invoice') != true) {
                           prefs.setBool('has_shared_first_invoice', true);
                           AnalyticsService.logFirstInvoiceShared();

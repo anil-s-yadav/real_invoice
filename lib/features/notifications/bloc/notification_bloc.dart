@@ -37,7 +37,7 @@ class MarkAllNotificationsAsReadEvent extends NotificationEvent {}
 // States
 abstract class NotificationState extends Equatable {
   const NotificationState();
-  
+
   @override
   List<Object?> get props => [];
 }
@@ -86,19 +86,15 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     add(LoadNotificationsEvent());
   }
 
-  void _onLoadNotifications(
+  Future<void> _onLoadNotifications(
     LoadNotificationsEvent event,
     Emitter<NotificationState> emit,
-  ) {
+  ) async {
     emit(NotificationLoading());
-    _notificationsSubscription?.cancel();
-    _notificationsSubscription = repository.getNotificationsStream().listen(
-      (notifications) {
-        add(NotificationsUpdatedEvent(notifications));
-      },
-      onError: (error) {
-        emit(NotificationError(error.toString()));
-      },
+    await emit.forEach<List<AppNotification>>(
+      repository.getNotificationsStream(),
+      onData: (notifications) => NotificationLoaded(notifications),
+      onError: (error, _) => NotificationError(error.toString()),
     );
   }
 

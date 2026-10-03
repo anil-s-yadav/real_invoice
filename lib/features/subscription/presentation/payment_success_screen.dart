@@ -52,11 +52,17 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Format limits
-    final clientsLimit = widget.plan.maxClientsAllowed == -1 ? 'Unlimited' : widget.plan.maxClientsAllowed.toString();
-    final docsLimit = widget.plan.maxDocumentsPerDay == -1 ? 'Unlimited' : widget.plan.maxDocumentsPerDay.toString();
-    final devicesLimit = widget.plan.maxDevicesAllowed == -1 ? 'Unlimited' : widget.plan.maxDevicesAllowed.toString();
+    final clientsLimit = widget.plan.maxClientsAllowed == -1
+        ? 'Unlimited'
+        : widget.plan.maxClientsAllowed.toString();
+    final docsLimit = widget.plan.maxDocumentsPerDay == -1
+        ? 'Unlimited'
+        : widget.plan.maxDocumentsPerDay.toString();
+    final devicesLimit = widget.plan.maxDevicesAllowed == -1
+        ? 'Unlimited'
+        : widget.plan.maxDevicesAllowed.toString();
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkCanvas : Colors.white,
@@ -143,7 +149,9 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
                       onPressed: () {
                         // Pop everything and go to Home
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (_) => const MainNavScaffold()),
+                          MaterialPageRoute(
+                            builder: (_) => const MainNavScaffold(),
+                          ),
                           (route) => false,
                         );
                       },

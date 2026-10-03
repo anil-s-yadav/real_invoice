@@ -7,7 +7,9 @@ class AppColors {
 
   // Primary Indigo Brand
   static const Color primary = Color(0xFF4F46E5);
-  static const Color primaryDark = Color(0xFF818CF8); // Bright vibrant indigo: high-contrast and clearly visible in dark mode
+  static const Color primaryDark = Color(
+    0xFF818CF8,
+  ); // Bright vibrant indigo: high-contrast and clearly visible in dark mode
   static const Color primaryDeep = Color(0xFF3730A3);
   static const Color primaryLight = Color(0xFFEEF2FF);
   static const Color primaryHover = Color(0xFF4338CA);
@@ -86,36 +88,36 @@ class AppColors {
 
   static Color surfaceVariantColor(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? darkSurfaceVariant
-          : surfaceVariant;
+      ? darkSurfaceVariant
+      : surfaceVariant;
 
   static Color borderColor(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark ? darkBorder : border;
 
   static Color borderSubtleColor(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? darkBorderSubtle
-          : borderSubtle;
+      ? darkBorderSubtle
+      : borderSubtle;
 
   static Color textPrimaryColor(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? darkTextPrimary
-          : textPrimary;
+      ? darkTextPrimary
+      : textPrimary;
 
   static Color textSecondaryColor(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? darkTextSecondary
-          : textSecondary;
+      ? darkTextSecondary
+      : textSecondary;
 
   static Color textMutedColor(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? darkTextMuted
-          : textMuted;
+      ? darkTextMuted
+      : textMuted;
 
   static Color primaryTextColor(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF818CF8)
-          : primary;
+      ? const Color(0xFF818CF8)
+      : primary;
 }
 
 extension AppThemeX on BuildContext {
@@ -136,4 +138,3 @@ extension AppThemeX on BuildContext {
   Color get primaryTextColor =>
       isDark ? const Color(0xFF818CF8) : AppColors.primary;
 }
-

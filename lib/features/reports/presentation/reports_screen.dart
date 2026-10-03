@@ -42,7 +42,9 @@ class _ReportsScreenState extends State<ReportsScreen>
 
   void _loadData() {
     final profileState = context.read<BusinessProfileBloc>().state;
-    final gstin = profileState is BusinessProfileLoaded ? profileState.profile.gstin : null;
+    final gstin = profileState is BusinessProfileLoaded
+        ? profileState.profile.gstin
+        : null;
 
     context.read<ReportsBloc>().add(
       LoadAnalyticsEvent(
@@ -146,10 +148,14 @@ class _ReportsScreenState extends State<ReportsScreen>
                 margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurfaceVariant : const Color(0xFFF1F5F9),
+                  color: isDark
+                      ? AppColors.darkSurfaceVariant
+                      : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : const Color(0xFFE2E8F0),
                     width: 0.8,
                   ),
                 ),
@@ -159,12 +165,16 @@ class _ReportsScreenState extends State<ReportsScreen>
                     color: isDark ? AppColors.darkSurface : Colors.white,
                     borderRadius: BorderRadius.circular(9),
                     border: Border.all(
-                      color: isDark ? AppColors.darkBorder : AppColors.border.withValues(alpha: 0.4),
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.border.withValues(alpha: 0.4),
                       width: 0.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.2 : 0.06,
+                        ),
                         blurRadius: 4,
                         offset: const Offset(0, 1.5),
                       ),
@@ -174,8 +184,12 @@ class _ReportsScreenState extends State<ReportsScreen>
                   dividerColor: Colors.transparent,
                   splashFactory: NoSplash.splashFactory,
                   overlayColor: WidgetStateProperty.all(Colors.transparent),
-                  labelColor: isDark ? AppColors.primaryLight : AppColors.primary,
-                  unselectedLabelColor: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  labelColor: isDark
+                      ? AppColors.primaryLight
+                      : AppColors.primary,
+                  unselectedLabelColor: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                   labelStyle: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -227,7 +241,9 @@ class _ReportsScreenState extends State<ReportsScreen>
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -236,7 +252,9 @@ class _ReportsScreenState extends State<ReportsScreen>
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                         height: 1.4,
                       ),
                     ),
@@ -248,7 +266,9 @@ class _ReportsScreenState extends State<ReportsScreen>
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const SubscriptionScreen(),
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -274,63 +294,67 @@ class _ReportsScreenState extends State<ReportsScreen>
           }
 
           return BlocBuilder<ReportsBloc, ReportsState>(
-        builder: (context, state) {
-          if (state is ReportsLoading || state is ReportsInitial) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
-          } else if (state is ReportsLoaded) {
-            return TabBarView(
-              controller: _tabController,
-              children: [
-                OverviewCashflowTab(data: state.data),
-                ReceivablesAgingTab(data: state.data),
-                ItemsAndClientsTab(data: state.data),
-                TaxAndGstTab(data: state.data),
-              ],
-            );
-          } else if (state is ReportsError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline_rounded,
-                    size: 42,
-                    color: Color(0xFFEF4444),
+            builder: (context, state) {
+              if (state is ReportsLoading || state is ReportsInitial) {
+                return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                );
+              } else if (state is ReportsLoaded) {
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    OverviewCashflowTab(data: state.data),
+                    ReceivablesAgingTab(data: state.data),
+                    ItemsAndClientsTab(data: state.data),
+                    TaxAndGstTab(data: state.data),
+                  ],
+                );
+              } else if (state is ReportsError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        size: 42,
+                        color: Color(0xFFEF4444),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Failed to calculate analytics',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        state.message,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadData,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Try Again'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Failed to calculate analytics',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    state.message,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _loadData,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Try Again'),
-                  ),
-                ],
-              ),
-            );
-          }
-          return const SizedBox.shrink();
+                );
+              }
+              return const SizedBox.shrink();
             },
           );
         },

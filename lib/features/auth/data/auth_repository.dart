@@ -192,9 +192,7 @@ class FirebaseAuthRepository implements AuthRepository {
         deviceIdInput = iosInfo.identifierForVendor ?? iosInfo.name;
       }
 
-      final deviceId = _sha256ofString(
-        deviceIdInput,
-      ).substring(0, 16);
+      final deviceId = _sha256ofString(deviceIdInput).substring(0, 16);
 
       // Check device limits FIRST
       if (!force) {

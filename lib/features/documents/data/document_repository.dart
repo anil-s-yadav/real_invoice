@@ -28,7 +28,6 @@ class SummaryStats {
 }
 
 class DocumentRepository {
-
   final _uuid = const Uuid();
 
   String get _userId {
@@ -64,13 +63,27 @@ class DocumentRepository {
         query = query.where('status', isEqualTo: status.name);
       }
       if (startDate != null) {
-        query = query.where('issueDate', isGreaterThanOrEqualTo: startDate.toIso8601String());
+        query = query.where(
+          'issueDate',
+          isGreaterThanOrEqualTo: startDate.toIso8601String(),
+        );
       }
       if (endDate != null) {
-        final endOfDay = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999);
-        query = query.where('issueDate', isLessThanOrEqualTo: endOfDay.toIso8601String());
+        final endOfDay = DateTime(
+          endDate.year,
+          endDate.month,
+          endDate.day,
+          23,
+          59,
+          59,
+          999,
+        );
+        query = query.where(
+          'issueDate',
+          isLessThanOrEqualTo: endOfDay.toIso8601String(),
+        );
       }
-      
+
       query = query.orderBy('issueDate', descending: true);
       if (limit != null) {
         query = query.limit(limit);
@@ -78,7 +91,9 @@ class DocumentRepository {
 
       QuerySnapshot<Map<String, dynamic>> snapshot;
       try {
-        snapshot = await query.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        snapshot = await query.get(
+          GetOptions(source: forceSync ? Source.server : Source.cache),
+        );
         if (snapshot.docs.isEmpty && !forceSync) {
           snapshot = await query.get(const GetOptions(source: Source.server));
         }
@@ -86,14 +101,16 @@ class DocumentRepository {
         if (forceSync) rethrow;
         snapshot = await query.get(const GetOptions(source: Source.server));
       }
-      var docs = snapshot.docs.map((doc) => DocumentModel.fromMap(doc.data())).toList();
+      var docs = snapshot.docs
+          .map((doc) => DocumentModel.fromMap(doc.data()))
+          .toList();
 
       if (searchQuery != null && searchQuery.trim().isNotEmpty) {
         final q = searchQuery.trim().toLowerCase();
         docs = docs.where((doc) {
           return doc.docNumber.toLowerCase().contains(q) ||
-                 (doc.customerSnapshot?.name.toLowerCase().contains(q) ?? false) ||
-                 (doc.notes?.toLowerCase().contains(q) ?? false);
+              (doc.customerSnapshot?.name.toLowerCase().contains(q) ?? false) ||
+              (doc.notes?.toLowerCase().contains(q) ?? false);
         }).toList();
       }
 
@@ -110,6 +127,19 @@ class DocumentRepository {
     final doc = await ref.doc(id).get();
     if (!doc.exists) return null;
     return DocumentModel.fromMap(doc.data()!);
+  }
+
+  Future<int> getTodayDocumentCount() async {
+    final ref = await _getDocumentsRef();
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day).toIso8601String();
+
+    final snap = await ref
+        .where('createdAt', isGreaterThanOrEqualTo: startOfDay)
+        .count()
+        .get();
+
+    return snap.count ?? 0;
   }
 
   Future<void> saveDocument(DocumentModel document) async {
@@ -156,8 +186,12 @@ class DocumentRepository {
       createdAt: now,
     );
 
-    final updatedPayments = List<PaymentRecord>.from(document.payments)..add(payment);
-    final totalPaid = updatedPayments.fold<double>(0.0, (total, p) => total + p.amount);
+    final updatedPayments = List<PaymentRecord>.from(document.payments)
+      ..add(payment);
+    final totalPaid = updatedPayments.fold<double>(
+      0.0,
+      (total, p) => total + p.amount,
+    );
 
     DocumentStatus newStatus;
     if (totalPaid >= document.totalAmount && document.totalAmount > 0) {
@@ -181,7 +215,7 @@ class DocumentRepository {
     final customPrefix = await settingsRepo.getPrefixForType(type);
     final includeYear = await settingsRepo.getIncludeYear();
     final padding = await settingsRepo.getPaddingDigits();
-    
+
     final currentYear = DateTime.now().year;
     final prefix = includeYear ? '$customPrefix$currentYear-' : customPrefix;
 
@@ -200,7 +234,8 @@ class DocumentRepository {
         return '$prefix${1.toString().padLeft(padding, '0')}';
       }
 
-      final lastNumberStr = querySnapshot.docs.first.data()['docNumber'] as String;
+      final lastNumberStr =
+          querySnapshot.docs.first.data()['docNumber'] as String;
       final suffix = lastNumberStr.replaceFirst(prefix, '');
       final number = int.tryParse(suffix) ?? 0;
       final nextNumber = (number + 1).toString().padLeft(padding, '0');
@@ -370,7 +405,7 @@ class DocumentRepository {
     try {
       final ref = await _getDocumentsRef();
       final query = ref.where('docType', isEqualTo: DocumentType.invoice.name);
-      
+
       QuerySnapshot<Map<String, dynamic>> snapshot;
       try {
         snapshot = await query.get(const GetOptions(source: Source.cache));
@@ -380,7 +415,7 @@ class DocumentRepository {
       } catch (_) {
         snapshot = await query.get(const GetOptions(source: Source.server));
       }
-      
+
       double unpaidTotal = 0;
       int unpaidCount = 0;
       double overdueTotal = 0;

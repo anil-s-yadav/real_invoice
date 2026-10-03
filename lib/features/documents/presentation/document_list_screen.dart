@@ -1,4 +1,4 @@
-
+import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 
 import '../data/document_repository.dart';
@@ -17,6 +17,7 @@ import '../bloc/document_bloc.dart';
 import '../bloc/document_event.dart';
 import '../bloc/document_state.dart';
 import '../domain/document_model.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
 import 'document_editor_screen.dart';
 import 'pdf_preview_screen.dart';
 import 'widgets/payment_entry_sheet.dart';
@@ -273,7 +274,7 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                             );
                           },
                         );
-                        if (picked != null) {
+                        if (picked != null && mounted) {
                           _applyFilter(
                             dateRangeType: DateFilterRange.custom,
                             customStartDate: picked.start,
@@ -818,7 +819,7 @@ class DocumentListScreenState extends State<DocumentListScreen> {
                           description: hasFilters
                               ? 'Try adjusting filters.'
                               : 'Create your first invoice or quotation.',
-                          );
+                        );
                       }
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(
@@ -1126,12 +1127,29 @@ class _DocumentListItemCard extends StatelessWidget {
           } else if (val == 'payment') {
             await PaymentEntrySheet.show(context, document: document);
           } else if (val == 'convert') {
+            final subState = context.read<SubscriptionBloc>().state;
+            final maxDocs = subState.effectivePlan.maxDocumentsPerDay;
+            final repo = context.read<DocumentRepository>();
+            int todayCount = await repo.getTodayDocumentCount();
+            if (!context.mounted) return;
+
+            if (maxDocs != -1 && todayCount >= maxDocs) {
+              PremiumDialogHelper.showLimitReachedDialog(
+                context: context,
+                title: 'Daily Limit Reached',
+                message:
+                    'Your current plan allows up to $maxDocs document${maxDocs == 1 ? '' : 's'} per day. Upgrade to a premium plan for unlimited documents.',
+              );
+              return;
+            }
+
             if (document.docType == DocumentType.proforma) {
-              final repo = context.read<DocumentRepository>();
               await repo.convertProformaToInvoice(document.id);
               if (!context.mounted) return;
-              final currentLoaded =
-                  context.read<DocumentBloc>().state as DocumentLoaded?;
+              final docState = context.read<DocumentBloc>().state;
+              final currentLoaded = docState is DocumentLoaded
+                  ? docState
+                  : null;
               context.read<DocumentBloc>().add(
                 LoadDocumentsEvent(
                   type: currentLoaded?.typeFilter,
@@ -1154,8 +1172,9 @@ class _DocumentListItemCard extends StatelessWidget {
               DocumentStatus.accepted,
             );
             if (!context.mounted) return;
-            final currentLoaded =
-                context.read<DocumentBloc>().state as DocumentLoaded?;
+            final docState = context.read<DocumentBloc>().state;
+            final currentLoaded = docState is DocumentLoaded ? docState : null;
+            context.read<HomeBloc>().add(const LoadHomeDataEvent());
             context.read<DocumentBloc>().add(
               LoadDocumentsEvent(
                 type: currentLoaded?.typeFilter,

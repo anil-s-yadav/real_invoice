@@ -9,17 +9,17 @@ class DummyTemplateWidget extends StatelessWidget {
   final String templateId;
   final DocumentType documentType;
 
-  const DummyTemplateWidget({super.key, required this.templateId, this.documentType = DocumentType.invoice});
+  const DummyTemplateWidget({
+    super.key,
+    required this.templateId,
+    this.documentType = DocumentType.invoice,
+  });
 
   @override
   Widget build(BuildContext context) {
     return FittedBox(
       fit: BoxFit.contain,
-      child: SizedBox(
-        width: 595,
-        height: 842,
-        child: _buildTemplate(),
-      ),
+      child: SizedBox(width: 595, height: 842, child: _buildTemplate()),
     );
   }
 

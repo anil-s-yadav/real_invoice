@@ -20,7 +20,11 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
   @override
   void initState() {
     super.initState();
-    _loadAd();
+    // Only load the ad if the user is not ad-free
+    final subState = context.read<SubscriptionBloc>().state;
+    if (!subState.effectivePlan.isAdFree) {
+      _loadAd();
+    }
   }
 
   void _loadAd() {
@@ -30,9 +34,11 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) {
-          setState(() {
-            _isAdLoaded = true;
-          });
+          if (mounted) {
+            setState(() {
+              _isAdLoaded = true;
+            });
+          }
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();

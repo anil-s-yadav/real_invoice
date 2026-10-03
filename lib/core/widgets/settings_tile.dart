@@ -26,9 +26,12 @@ class SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final subtitleColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final titleColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
+    final subtitleColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.textSecondary;
     final chevronColor = isDark ? AppColors.darkTextMuted : AppColors.textMuted;
 
     return InkWell(
@@ -63,10 +66,7 @@ class SettingsTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      style: TextStyle(
-                        color: subtitleColor,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: subtitleColor, fontSize: 12),
                     ),
                   ],
                 ],
@@ -75,11 +75,7 @@ class SettingsTile extends StatelessWidget {
             if (trailing != null)
               trailing!
             else
-              Icon(
-                Icons.chevron_right,
-                color: chevronColor,
-                size: 20,
-              ),
+              Icon(Icons.chevron_right, color: chevronColor, size: 20),
           ],
         ),
       ),

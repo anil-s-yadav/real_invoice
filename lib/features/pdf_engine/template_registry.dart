@@ -40,7 +40,8 @@ class TemplateRegistry {
     TemplateInfo(
       id: freeClassic,
       name: 'Classic Free',
-      description: 'A clean, professional standard layout that covers all basics.',
+      description:
+          'A clean, professional standard layout that covers all basics.',
       icon: Icons.article_outlined,
       accentColor: AppColors.textPrimary,
       thumbnailAssetPath: 'assets/images/templates/free_template_thumb.png',
@@ -50,7 +51,8 @@ class TemplateRegistry {
     TemplateInfo(
       id: premiumModern,
       name: 'Modern Pro',
-      description: 'Sleek, colored headers with premium typography and card styling.',
+      description:
+          'Sleek, colored headers with premium typography and card styling.',
       icon: Icons.auto_awesome,
       accentColor: AppColors.primary,
       thumbnailAssetPath: 'assets/images/templates/paid_template_thumb.png',
@@ -65,7 +67,8 @@ class TemplateRegistry {
     TemplateInfo(
       id: elegantCenter,
       name: 'Elegant Center',
-      description: 'A beautiful centered layout with clean borders and modern typography.',
+      description:
+          'A beautiful centered layout with clean borders and modern typography.',
       icon: Icons.format_align_center,
       accentColor: Color(0xFF0D47A1),
       thumbnailAssetPath: 'assets/images/templates/elegant_center_thumb.png',

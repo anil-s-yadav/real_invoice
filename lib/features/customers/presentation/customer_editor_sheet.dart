@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
+import 'package:invoz/features/customers/bloc/customer_state.dart';
 import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
@@ -11,6 +13,7 @@ import '../../../core/widgets/app_text_field.dart';
 import '../bloc/customer_bloc.dart';
 import '../bloc/customer_event.dart';
 import '../domain/customer_model.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
 
 class CustomerEditorSheet extends StatefulWidget {
   final Customer? initialCustomer;
@@ -117,7 +120,38 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
       createdAt: widget.initialCustomer?.createdAt ?? DateTime.now(),
     );
 
-    context.read<CustomerBloc>().add(SaveCustomerEvent(customer));
+    if (widget.saveToDb) {
+      if (widget.initialCustomer == null) {
+        final subState = context.read<SubscriptionBloc>().state;
+        final maxClients = subState.effectivePlan.maxClientsAllowed;
+
+        int currentCount = 0;
+        final state = context.read<CustomerBloc>().state;
+        if (state is CustomerLoaded) {
+          currentCount = state.customers.length;
+        } else if (state is CustomerInitial) {
+          // If bloc isn't loaded yet, try to load it and block save for now
+          context.read<CustomerBloc>().add(const LoadCustomersEvent());
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Loading client limits... Try again in a moment.'),
+            ),
+          );
+          return;
+        }
+
+        if (maxClients != -1 && currentCount >= maxClients) {
+          PremiumDialogHelper.showLimitReachedDialog(
+            context: context,
+            title: 'Client Limit Reached',
+            message:
+                'Your current plan allows up to $maxClients client${maxClients == 1 ? '' : 's'}. Upgrade to a premium plan to add unlimited clients.',
+          );
+          return;
+        }
+      }
+      context.read<CustomerBloc>().add(SaveCustomerEvent(customer));
+    }
 
     if (mounted) {
       InterstitialAdManager.showAd(context);

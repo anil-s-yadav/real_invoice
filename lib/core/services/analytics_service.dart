@@ -69,7 +69,7 @@ class AnalyticsService {
       value: 0,
       currency: 'INR',
       items: [
-        AnalyticsEventItem(itemName: planName, itemCategory: 'subscription')
+        AnalyticsEventItem(itemName: planName, itemCategory: 'subscription'),
       ],
     );
     await _analytics.logEvent(
@@ -78,12 +78,15 @@ class AnalyticsService {
     );
   }
 
-  static Future<void> logPurchaseCompleted(String planName, double value) async {
+  static Future<void> logPurchaseCompleted(
+    String planName,
+    double value,
+  ) async {
     await _analytics.logPurchase(
       currency: 'INR',
       value: value,
       items: [
-        AnalyticsEventItem(itemName: planName, itemCategory: 'subscription')
+        AnalyticsEventItem(itemName: planName, itemCategory: 'subscription'),
       ],
     );
     await _analytics.logEvent(

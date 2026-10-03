@@ -92,8 +92,6 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;

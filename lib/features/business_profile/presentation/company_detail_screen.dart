@@ -10,6 +10,8 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../bloc/business_profile_bloc.dart';
 import '../bloc/business_profile_event.dart';
+import '../../home/bloc/home_bloc.dart';
+import '../../home/bloc/home_event.dart';
 import '../data/business_profile_repository.dart';
 import '../domain/business_profile_model.dart';
 
@@ -140,7 +142,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
 
   Future<void> _handleUpdate() async {
     if (_isSaving) return;
-    
+
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -181,9 +183,12 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
 
       final repo = context.read<BusinessProfileRepository>();
       await repo.saveProfile(updated);
-      
+
       if (mounted) {
-        context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
+        context.read<BusinessProfileBloc>().add(
+          const LoadBusinessProfileEvent(),
+        );
+        context.read<HomeBloc>().add(const LoadHomeDataEvent());
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Company updated successfully'),
@@ -210,9 +215,10 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
       final repo = context.read<BusinessProfileRepository>();
       await repo.deleteProfile(_profile.id);
       if (mounted) {
-        context
-            .read<BusinessProfileBloc>()
-            .add(const LoadBusinessProfileEvent());
+        context.read<BusinessProfileBloc>().add(
+          const LoadBusinessProfileEvent(),
+        );
+        context.read<HomeBloc>().add(const LoadHomeDataEvent());
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Company deleted'),
@@ -259,7 +265,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
               Text(
                 'Saving company details...',
                 style: const TextStyle(fontSize: 22).copyWith(
-                  color: _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: _isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -268,7 +276,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                 'Uploading images and syncing data.\nPlease do not close the app.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14).copyWith(
-                  color: _isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  color: _isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -287,13 +297,10 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         title: Text(
           _nameController.text.isEmpty
               ? (_profile.businessName.isEmpty
-                  ? 'Company Details'
-                  : _profile.businessName)
+                    ? 'Company Details'
+                    : _profile.businessName)
               : _nameController.text,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: _textPrimary,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: _textPrimary),
         ),
         actions: [
           IconButton(
@@ -402,7 +409,6 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
             ),
 
             const SizedBox(height: 24),
-
 
             // Invoice Defaults
             _buildSectionTitle(
@@ -537,10 +543,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                                 imageUrl: imagePath,
                                 fit: BoxFit.contain,
                               )
-                            : Image.file(
-                                File(imagePath),
-                                fit: BoxFit.contain,
-                              ),
+                            : Image.file(File(imagePath), fit: BoxFit.contain),
                       )
                     : Icon(
                         Icons.add_photo_alternate_outlined,
@@ -553,7 +556,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 6),
               decoration: BoxDecoration(
-                color: _isDark ? AppColors.darkSurfaceVariant : AppColors.canvas,
+                color: _isDark
+                    ? AppColors.darkSurfaceVariant
+                    : AppColors.canvas,
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(11),
                 ),

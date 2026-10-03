@@ -254,29 +254,39 @@ class DocumentModel {
     List<PaymentRecord> payments = const [],
   }) {
     Customer? snapshot;
-    final customerRaw = map['customerSnapshot'] as String?;
-    if (customerRaw != null && customerRaw.isNotEmpty) {
+    final customerRaw = map['customerSnapshot'];
+    if (customerRaw is String && customerRaw.isNotEmpty) {
       try {
         snapshot = Customer.fromMap(
-          jsonDecode(customerRaw) as Map<String, dynamic>,
+          Map<String, dynamic>.from(jsonDecode(customerRaw) as Map),
         );
+      } catch (_) {}
+    } else if (customerRaw is Map) {
+      try {
+        snapshot = Customer.fromMap(Map<String, dynamic>.from(customerRaw));
       } catch (_) {}
     }
 
     List<DocumentItem> parsedItems = items;
-    if (parsedItems.isEmpty && map['items'] != null) {
+    if (parsedItems.isEmpty && map['items'] is List) {
       final List<dynamic> itemsData = map['items'] as List<dynamic>;
-      parsedItems = itemsData.map((e) => DocumentItem.fromMap(e as Map<String, dynamic>)).toList();
+      parsedItems = itemsData
+          .map((e) => DocumentItem.fromMap(Map<String, dynamic>.from(e as Map)))
+          .toList();
     }
 
     List<PaymentRecord> parsedPayments = payments;
-    if (parsedPayments.isEmpty && map['payments'] != null) {
+    if (parsedPayments.isEmpty && map['payments'] is List) {
       final List<dynamic> paymentsData = map['payments'] as List<dynamic>;
-      parsedPayments = paymentsData.map((e) => PaymentRecord.fromMap(e as Map<String, dynamic>)).toList();
+      parsedPayments = paymentsData
+          .map(
+            (e) => PaymentRecord.fromMap(Map<String, dynamic>.from(e as Map)),
+          )
+          .toList();
     }
 
     return DocumentModel(
-      id: map['id'] as String,
+      id: map['id'] as String? ?? '',
       docNumber: map['docNumber'] as String? ?? 'INV-0001',
       docType: DocumentType.values.firstWhere(
         (e) => e.name == map['docType'],
@@ -305,7 +315,9 @@ class DocumentModel {
       poNumber: map['poNumber'] as String?,
       subject: map['subject'] as String?,
       shippingCharges: (map['shippingCharges'] as num?)?.toDouble() ?? 0.0,
-      includePaymentDetails: (map['includePaymentDetails'] as int? ?? 1) == 1,
+      includePaymentDetails:
+          map['includePaymentDetails'] == 1 ||
+          map['includePaymentDetails'] == true,
       selectedBankDetailId: map['selectedBankDetailId'] as String?,
       selectedUpiDetailId: map['selectedUpiDetailId'] as String?,
       templateId: map['templateId'] as String? ?? 'modern_crimson',

@@ -1,12 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
-enum NotificationType {
-  subscription,
-  invoice,
-  document,
-  system,
-}
+enum NotificationType { subscription, invoice, document, system }
 
 class AppNotification extends Equatable {
   final String id;
@@ -77,12 +72,12 @@ class AppNotification extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        body,
-        type,
-        relatedId,
-        isRead,
-        createdAt,
-      ];
+    id,
+    title,
+    body,
+    type,
+    relatedId,
+    isRead,
+    createdAt,
+  ];
 }

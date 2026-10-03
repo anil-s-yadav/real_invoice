@@ -132,8 +132,9 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
         children: [
           // Invoice Summary Card
           AppCard(
-            backgroundColor:
-                isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant,
+            backgroundColor: isDark
+                ? AppColors.darkSurfaceVariant
+                : AppColors.surfaceVariant,
             padding: const EdgeInsets.all(AppDimensions.md),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -160,7 +161,9 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
                     Text(
                       CurrencyFormatter.format(widget.document.balanceDue),
                       style: AppTypography.moneyMedium.copyWith(
-                        color: isDark ? AppColors.primaryLight : AppColors.primaryDark,
+                        color: isDark
+                            ? AppColors.primaryLight
+                            : AppColors.primaryDark,
                       ),
                     ),
                   ],
@@ -213,14 +216,15 @@ class _PaymentEntrySheetState extends State<PaymentEntrySheet> {
                     selectedColor: isDark
                         ? AppColors.primary.withValues(alpha: 0.25)
                         : AppColors.primaryLight,
-                    backgroundColor:
-                        isDark ? AppColors.darkSurface : AppColors.surface,
+                    backgroundColor: isDark
+                        ? AppColors.darkSurface
+                        : AppColors.surface,
                     labelStyle: TextStyle(
                       color: isSelected
                           ? AppColors.primary
                           : (isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.textSecondary),
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary),
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.normal,

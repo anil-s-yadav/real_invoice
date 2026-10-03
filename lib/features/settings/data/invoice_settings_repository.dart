@@ -37,7 +37,7 @@ class InvoiceSettingsRepository {
   Future<Map<String, dynamic>> _getSettingsMap() async {
     final ref = _settingsRef;
     if (ref == null) return {};
-    
+
     try {
       final doc = await ref.get();
       if (doc.exists) {
@@ -52,7 +52,7 @@ class InvoiceSettingsRepository {
   Future<void> _updateSetting(String key, dynamic value) async {
     final ref = _settingsRef;
     if (ref == null) return;
-    
+
     try {
       await ref.set({key: value}, SetOptions(merge: true));
     } catch (e) {
@@ -110,7 +110,6 @@ class InvoiceSettingsRepository {
     await _updateSetting(_keyPaddingDigits, value);
   }
 
-
   DocumentReference<Map<String, dynamic>>? get _taxSettingsRef {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return null;
@@ -146,7 +145,7 @@ class InvoiceSettingsRepository {
   }
 
   // Tax & Discount preferences
-Future<double> getDefaultTaxRate() async {
+  Future<double> getDefaultTaxRate() async {
     final data = await _getTaxSettingsMap();
     final value = data[_keyDefaultTaxRate];
     if (value is num) return value.toDouble();

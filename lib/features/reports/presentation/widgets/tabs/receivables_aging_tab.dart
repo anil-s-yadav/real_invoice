@@ -83,7 +83,10 @@ class ReceivablesAgingTab extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
@@ -132,7 +135,9 @@ class ReceivablesAgingTab extends StatelessWidget {
                   child: SizedBox(
                     height: 10,
                     child: Row(
-                      children: List.generate(data.agingBuckets.length, (index) {
+                      children: List.generate(data.agingBuckets.length, (
+                        index,
+                      ) {
                         final b = data.agingBuckets[index];
                         final flex = (b.percentage * 10).round();
                         if (flex <= 0) return const SizedBox.shrink();
@@ -160,7 +165,10 @@ class ReceivablesAgingTab extends StatelessWidget {
                             Container(
                               width: 8,
                               height: 8,
-                              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                              decoration: BoxDecoration(
+                                color: color,
+                                shape: BoxShape.circle,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -169,7 +177,9 @@ class ReceivablesAgingTab extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
-                                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                  color: isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary,
                                 ),
                               ),
                             ),
@@ -177,7 +187,9 @@ class ReceivablesAgingTab extends StatelessWidget {
                               '${bucket.invoiceCount} inv • ',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                                color: isDark
+                                    ? AppColors.darkTextMuted
+                                    : AppColors.textMuted,
                               ),
                             ),
                             Text(
@@ -194,7 +206,9 @@ class ReceivablesAgingTab extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
                             value: (bucket.percentage / 100.0).clamp(0.0, 1.0),
-                            backgroundColor: isDark ? AppColors.darkSurfaceVariant : const Color(0xFFF1F5F9),
+                            backgroundColor: isDark
+                                ? AppColors.darkSurfaceVariant
+                                : const Color(0xFFF1F5F9),
                             valueColor: AlwaysStoppedAnimation<Color>(color),
                             minHeight: 5,
                           ),
@@ -217,7 +231,9 @@ class ReceivablesAgingTab extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
               if (data.topDebtors.isNotEmpty)
@@ -226,7 +242,9 @@ class ReceivablesAgingTab extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
             ],
@@ -257,7 +275,9 @@ class ReceivablesAgingTab extends StatelessWidget {
                       'No overdue balances pending from any customer.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -302,7 +322,10 @@ class ReceivablesAgingTab extends StatelessWidget {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 1.5,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFEE2E2),
                                     borderRadius: BorderRadius.circular(4),
@@ -321,7 +344,9 @@ class ReceivablesAgingTab extends StatelessWidget {
                                   '• ${debtor.invoiceCount} invoices',
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                                    color: isDark
+                                        ? AppColors.darkTextMuted
+                                        : AppColors.textMuted,
                                   ),
                                 ),
                               ],
@@ -344,12 +369,18 @@ class ReceivablesAgingTab extends StatelessWidget {
                           if (debtor.phone != null && debtor.phone!.isNotEmpty)
                             InkWell(
                               onTap: () async {
-                                final cleanPhone = debtor.phone!.replaceAll(RegExp(r'\D'), '');
+                                final cleanPhone = debtor.phone!.replaceAll(
+                                  RegExp(r'\D'),
+                                  '',
+                                );
                                 final url = Uri.parse(
                                   'https://wa.me/$cleanPhone?text=Hi%20${Uri.encodeComponent(debtor.customerName)},%20gentle%20reminder%20regarding%20the%20outstanding%20balance%20of%20${debtor.totalOverdue}%20on%20your%20invoice.',
                                 );
                                 if (await canLaunchUrl(url)) {
-                                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                                  await launchUrl(
+                                    url,
+                                    mode: LaunchMode.externalApplication,
+                                  );
                                 }
                               },
                               child: Row(

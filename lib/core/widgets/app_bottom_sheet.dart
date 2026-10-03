@@ -24,10 +24,12 @@ class AppBottomSheet {
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final border = isDark ? AppColors.darkBorder : AppColors.border;
-        final borderStrong =
-            isDark ? AppColors.darkBorder : AppColors.borderStrong;
-        final textSecondary =
-            isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+        final borderStrong = isDark
+            ? AppColors.darkBorder
+            : AppColors.borderStrong;
+        final textSecondary = isDark
+            ? AppColors.darkTextSecondary
+            : AppColors.textSecondary;
 
         return Padding(
           padding: EdgeInsets.only(

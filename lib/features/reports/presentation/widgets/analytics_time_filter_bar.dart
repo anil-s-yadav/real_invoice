@@ -29,37 +29,48 @@ class AnalyticsTimeFilterBar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
-          ...TimeFilterPreset.values.where((p) => p != TimeFilterPreset.custom).map((preset) {
-            final isSelected = selectedPreset == preset;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
-              child: FilterChip(
-                label: Text(preset.label),
-                selected: isSelected,
-                showCheckmark: false,
-                labelStyle: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected
-                      ? Colors.white
-                      : (isDark ? AppColors.darkTextSecondary : AppColors.textPrimary),
-                ),
-                backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-                selectedColor: AppColors.primary,
-                side: BorderSide(
-                  color: isSelected
-                      ? AppColors.primary
-                      : (isDark ? AppColors.darkBorder : AppColors.border),
-                  width: 1,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                onSelected: (_) => onPresetSelected(preset),
-              ),
-            );
-          }),
+          ...TimeFilterPreset.values
+              .where((p) => p != TimeFilterPreset.custom)
+              .map((preset) {
+                final isSelected = selectedPreset == preset;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
+                  child: FilterChip(
+                    label: Text(preset.label),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    labelStyle: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? Colors.white
+                          : (isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textPrimary),
+                    ),
+                    backgroundColor: isDark
+                        ? AppColors.darkSurface
+                        : Colors.white,
+                    selectedColor: AppColors.primary,
+                    side: BorderSide(
+                      color: isSelected
+                          ? AppColors.primary
+                          : (isDark ? AppColors.darkBorder : AppColors.border),
+                      width: 1,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    onSelected: (_) => onPresetSelected(preset),
+                  ),
+                );
+              }),
           Padding(
             padding: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
             child: ActionChip(
@@ -82,7 +93,9 @@ class AnalyticsTimeFilterBar extends StatelessWidget {
                     : FontWeight.w500,
                 color: selectedPreset == TimeFilterPreset.custom
                     ? Colors.white
-                    : (isDark ? AppColors.darkTextSecondary : AppColors.textPrimary),
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textPrimary),
               ),
               backgroundColor: selectedPreset == TimeFilterPreset.custom
                   ? AppColors.primary

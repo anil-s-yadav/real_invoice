@@ -23,13 +23,16 @@ class EmptyStateView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceVariant =
-        isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant;
+    final surfaceVariant = isDark
+        ? AppColors.darkSurfaceVariant
+        : AppColors.surfaceVariant;
     final border = isDark ? AppColors.darkBorder : AppColors.border;
-    final textPrimary =
-        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final textSecondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final textPrimary = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
+    final textSecondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.textSecondary;
 
     return Center(
       child: Padding(
@@ -63,9 +66,7 @@ class EmptyStateView extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 320),
               child: Text(
                 description,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: textSecondary,
-                ),
+                style: AppTypography.bodyMedium.copyWith(color: textSecondary),
                 textAlign: TextAlign.center,
               ),
             ),

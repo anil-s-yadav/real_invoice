@@ -26,11 +26,16 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
     double maxMonthVal = 1000.0;
     for (final spot in data.cashFlowSpots) {
       if (spot.billedAmount > maxMonthVal) maxMonthVal = spot.billedAmount;
-      if (spot.collectedAmount > maxMonthVal) maxMonthVal = spot.collectedAmount;
+      if (spot.collectedAmount > maxMonthVal)
+        maxMonthVal = spot.collectedAmount;
     }
 
-    final billedSpots = data.cashFlowSpots.map((s) => FlSpot(s.monthIndex.toDouble(), s.billedAmount)).toList();
-    final collectedSpots = data.cashFlowSpots.map((s) => FlSpot(s.monthIndex.toDouble(), s.collectedAmount)).toList();
+    final billedSpots = data.cashFlowSpots
+        .map((s) => FlSpot(s.monthIndex.toDouble(), s.billedAmount))
+        .toList();
+    final collectedSpots = data.cashFlowSpots
+        .map((s) => FlSpot(s.monthIndex.toDouble(), s.collectedAmount))
+        .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -77,7 +82,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                       ? '${CurrencyFormatter.formatCompact(data.totalOverdue)} overdue'
                       : 'All within due date',
                   icon: Icons.pending_actions_rounded,
-                  iconColor: data.totalOverdue > 0 ? const Color(0xFFEF4444) : const Color(0xFFF59E0B),
+                  iconColor: data.totalOverdue > 0
+                      ? const Color(0xFFEF4444)
+                      : const Color(0xFFF59E0B),
                   isDark: isDark,
                 ),
               ),
@@ -86,7 +93,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                 child: _buildMetricCard(
                   context,
                   title: 'Avg. Invoice Value',
-                  value: CurrencyFormatter.formatCompact(data.averageInvoiceValue),
+                  value: CurrencyFormatter.formatCompact(
+                    data.averageInvoiceValue,
+                  ),
                   subtitle: 'Across current period',
                   icon: Icons.bar_chart_rounded,
                   iconColor: const Color(0xFF8B5CF6),
@@ -130,7 +139,10 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                           ),
                           const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: data.averageCollectionDays <= 15
                                   ? AppColors.statusPaidBg
@@ -138,7 +150,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              data.averageCollectionDays <= 15 ? 'Healthy' : 'Moderate',
+                              data.averageCollectionDays <= 15
+                                  ? 'Healthy'
+                                  : 'Moderate',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -155,7 +169,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                         'Clients take an average of ${data.averageCollectionDays} days from billing to clear payments.',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -175,7 +191,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
               Row(
@@ -197,7 +215,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    horizontalInterval: maxMonthVal / 4 > 0 ? maxMonthVal / 4 : 1,
+                    horizontalInterval: maxMonthVal / 4 > 0
+                        ? maxMonthVal / 4
+                        : 1,
                     getDrawingHorizontalLine: (value) => FlLine(
                       color: isDark ? AppColors.darkBorder : AppColors.border,
                       strokeWidth: 0.8,
@@ -205,15 +225,32 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                     ),
                   ),
                   titlesData: FlTitlesData(
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 22,
                         interval: 1,
                         getTitlesWidget: (value, meta) {
-                          const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+                          const months = [
+                            'J',
+                            'F',
+                            'M',
+                            'A',
+                            'M',
+                            'J',
+                            'J',
+                            'A',
+                            'S',
+                            'O',
+                            'N',
+                            'D',
+                          ];
                           final idx = value.toInt();
                           if (idx >= 0 && idx < 12) {
                             return Padding(
@@ -221,7 +258,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                               child: Text(
                                 months[idx],
                                 style: TextStyle(
-                                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -242,7 +281,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                           return Text(
                             CurrencyFormatter.formatCompact(value),
                             style: TextStyle(
-                              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                               fontSize: 10,
                             ),
                           );
@@ -267,7 +308,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                       dotData: const FlDotData(show: false),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08),
+                        color: AppColors.primary.withValues(
+                          alpha: isDark ? 0.15 : 0.08,
+                        ),
                       ),
                     ),
                     // Collected Line
@@ -326,7 +369,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                 ),
               ),
               Container(
@@ -403,7 +448,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                 'No payments recorded in this period',
                 style: TextStyle(
                   fontSize: 13,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                 ),
               ),
             ],
@@ -459,13 +506,19 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
               Expanded(
                 child: Text(
                   entry.key,
-                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               Text(
                 CurrencyFormatter.formatCompact(entry.value),
-                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -491,7 +544,8 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                         _touchedPieIndex = -1;
                         return;
                       }
-                      _touchedPieIndex = pieResponse.touchedSection!.touchedSectionIndex;
+                      _touchedPieIndex =
+                          pieResponse.touchedSection!.touchedSectionIndex;
                     });
                   },
                 ),

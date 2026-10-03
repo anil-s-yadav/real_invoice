@@ -22,16 +22,24 @@ class PaymentDetailRepository {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
       try {
-        querySnapshot = await _paymentsRef.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        querySnapshot = await _paymentsRef.get(
+          GetOptions(source: forceSync ? Source.server : Source.cache),
+        );
         if (querySnapshot.docs.isEmpty && !forceSync) {
-          querySnapshot = await _paymentsRef.get(const GetOptions(source: Source.server));
+          querySnapshot = await _paymentsRef.get(
+            const GetOptions(source: Source.server),
+          );
         }
       } catch (_) {
         if (forceSync) rethrow;
-        querySnapshot = await _paymentsRef.get(const GetOptions(source: Source.server));
+        querySnapshot = await _paymentsRef.get(
+          const GetOptions(source: Source.server),
+        );
       }
-      
-      return querySnapshot.docs.map((doc) => PaymentDetail.fromMap(doc.data())).toList();
+
+      return querySnapshot.docs
+          .map((doc) => PaymentDetail.fromMap(doc.data()))
+          .toList();
     } catch (e) {
       debugPrint('Error getting payments: ');
       if (forceSync) rethrow;
@@ -50,10 +58,9 @@ class PaymentDetailRepository {
           )
         : payment;
 
-    await _paymentsRef.doc(paymentToSave.id).set(
-      paymentToSave.toMap(),
-      SetOptions(merge: true),
-    );
+    await _paymentsRef
+        .doc(paymentToSave.id)
+        .set(paymentToSave.toMap(), SetOptions(merge: true));
   }
 
   Future<void> deletePayment(String id) async {

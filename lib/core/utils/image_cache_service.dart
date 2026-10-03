@@ -65,7 +65,9 @@ class ImageCacheService {
 
     // Download and cache
     try {
-      final response = await http.get(Uri.parse(pathOrUrl)).timeout(const Duration(seconds: 5));
+      final response = await http
+          .get(Uri.parse(pathOrUrl))
+          .timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
         final cacheDir = await _getCacheDir();
         final ext = _extractExtension(pathOrUrl);

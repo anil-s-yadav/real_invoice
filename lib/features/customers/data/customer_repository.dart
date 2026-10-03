@@ -22,20 +22,28 @@ class CustomerRepository {
     try {
       final ref = await _getCustomersRef();
       final query = ref.orderBy('name');
-      
+
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
       try {
-        querySnapshot = await query.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        querySnapshot = await query.get(
+          GetOptions(source: forceSync ? Source.server : Source.cache),
+        );
         if (querySnapshot.docs.isEmpty && !forceSync) {
           // Fallback to server if cache is empty (first load)
-          querySnapshot = await query.get(const GetOptions(source: Source.server));
+          querySnapshot = await query.get(
+            const GetOptions(source: Source.server),
+          );
         }
       } catch (_) {
         if (forceSync) rethrow;
-        querySnapshot = await query.get(const GetOptions(source: Source.server));
+        querySnapshot = await query.get(
+          const GetOptions(source: Source.server),
+        );
       }
-      
-      return querySnapshot.docs.map((doc) => Customer.fromMap(doc.data())).toList();
+
+      return querySnapshot.docs
+          .map((doc) => Customer.fromMap(doc.data()))
+          .toList();
     } catch (e) {
       debugPrint('Error getting customers: $e');
       if (forceSync) rethrow;
@@ -46,7 +54,7 @@ class CustomerRepository {
   Future<List<Customer>> searchCustomers(String query) async {
     final customers = await getAllCustomers();
     if (query.isEmpty) return customers;
-    
+
     final q = query.toLowerCase();
     return customers.where((c) {
       return c.name.toLowerCase().contains(q) ||
@@ -62,10 +70,9 @@ class CustomerRepository {
         ? customer.copyWith(id: const Uuid().v4())
         : customer;
 
-    await ref.doc(customerToSave.id).set(
-      customerToSave.toMap(),
-      SetOptions(merge: true),
-    );
+    await ref
+        .doc(customerToSave.id)
+        .set(customerToSave.toMap(), SetOptions(merge: true));
 
     return customerToSave;
   }

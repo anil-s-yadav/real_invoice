@@ -35,7 +35,12 @@ class LoadAnalyticsEvent extends ReportsEvent {
   });
 
   @override
-  List<Object?> get props => [preset, customStartDate, customEndDate, businessGstin];
+  List<Object?> get props => [
+    preset,
+    customStartDate,
+    customEndDate,
+    businessGstin,
+  ];
 }
 
 abstract class ReportsState extends Equatable {

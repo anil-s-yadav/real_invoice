@@ -15,7 +15,7 @@ enum TimeFilterPreset {
 
 class CashFlowSpot {
   final int monthIndex; // 0 to 11, or day/period index
-  final String label;   // e.g. "Jan", "Feb"
+  final String label; // e.g. "Jan", "Feb"
   final double billedAmount;
   final double collectedAmount;
 
@@ -28,10 +28,10 @@ class CashFlowSpot {
 }
 
 class AgingBucket {
-  final String label;       // e.g. "Current", "1-15 Days", "16-30 Days", etc.
+  final String label; // e.g. "Current", "1-15 Days", "16-30 Days", etc.
   final double totalAmount;
   final int invoiceCount;
-  final double percentage;  // 0.0 to 100.0
+  final double percentage; // 0.0 to 100.0
 
   const AgingBucket({
     required this.label,
@@ -126,9 +126,9 @@ class QuotationFunnel {
   final int acceptedCount;
   final int pendingCount;
   final int lostCount;
-  final double winRate;         // %
-  final double pipelineValue;   // Total value of pending quotations
-  final double wonValue;        // Total value of accepted quotations
+  final double winRate; // %
+  final double pipelineValue; // Total value of pending quotations
+  final double wonValue; // Total value of accepted quotations
 
   const QuotationFunnel({
     required this.totalQuotations,
@@ -157,7 +157,8 @@ class AnalyticsData {
 
   // Charts data
   final List<CashFlowSpot> cashFlowSpots;
-  final Map<String, double> paymentMethodsBreakdown; // "UPI": 50000, "Bank": 30000
+  final Map<String, double>
+  paymentMethodsBreakdown; // "UPI": 50000, "Bank": 30000
 
   // Receivables & Debt Aging
   final List<AgingBucket> agingBuckets;
@@ -173,7 +174,7 @@ class AnalyticsData {
   final double totalTaxableValue;
   final double totalTaxCollected;
   final List<TaxSlabSummary> taxSlabs;
-  final double localTaxAmount;      // CGST + SGST (intra-state)
+  final double localTaxAmount; // CGST + SGST (intra-state)
   final double interstateTaxAmount; // IGST (inter-state)
   final List<HsnSummary> hsnSummaries;
   final double totalDiscountsGiven;
@@ -221,10 +222,12 @@ class AnalyticsData {
 
     // Filter invoices in the selected period (by issueDate)
     final invoicesInPeriod = allDocuments.where((doc) {
-      if (doc.docType != DocumentType.invoice && doc.docType != DocumentType.receipt) {
+      if (doc.docType != DocumentType.invoice &&
+          doc.docType != DocumentType.receipt) {
         return false;
       }
-      return !doc.issueDate.isBefore(startDate) && !doc.issueDate.isAfter(endDate);
+      return !doc.issueDate.isBefore(startDate) &&
+          !doc.issueDate.isAfter(endDate);
     }).toList();
 
     // Quotations in period
@@ -250,14 +253,17 @@ class AnalyticsData {
           (doc.balanceDue > 0 && doc.dueDate.isBefore(today))) {
         totalOverdue += doc.balanceDue;
       }
-      totalDiscountsGiven += (doc.itemDiscountsTotal + doc.overallDiscountAmount);
+      totalDiscountsGiven +=
+          (doc.itemDiscountsTotal + doc.overallDiscountAmount);
       totalShippingBilled += doc.shippingCharges;
       totalTaxableValue += doc.taxableAmount;
       totalTaxCollected += doc.totalTaxAmount;
     }
 
     final totalInvoiceCount = invoicesInPeriod.length;
-    final averageInvoiceValue = totalInvoiceCount > 0 ? totalInvoiced / totalInvoiceCount : 0.0;
+    final averageInvoiceValue = totalInvoiceCount > 0
+        ? totalInvoiced / totalInvoiceCount
+        : 0.0;
 
     // 2. Cash Collected (Actual payments received inside the date window)
     double totalCollected = 0.0;
@@ -269,7 +275,8 @@ class AnalyticsData {
     final collectedMonthly = List.generate(12, (_) => 0.0);
 
     for (final doc in allDocuments) {
-      if (doc.docType == DocumentType.invoice || doc.docType == DocumentType.receipt) {
+      if (doc.docType == DocumentType.invoice ||
+          doc.docType == DocumentType.receipt) {
         // Track billed monthly for the target year
         if (doc.issueDate.year == endDate.year) {
           billedMonthly[doc.issueDate.month - 1] += doc.totalAmount;
@@ -277,13 +284,19 @@ class AnalyticsData {
 
         // Process payments
         for (final payment in doc.payments) {
-          if (!payment.paymentDate.isBefore(startDate) && !payment.paymentDate.isAfter(endDate)) {
+          if (!payment.paymentDate.isBefore(startDate) &&
+              !payment.paymentDate.isAfter(endDate)) {
             totalCollected += payment.amount;
-            final method = payment.paymentMethod.isNotEmpty ? payment.paymentMethod : 'Other';
-            paymentMethodsBreakdown[method] = (paymentMethodsBreakdown[method] ?? 0.0) + payment.amount;
+            final method = payment.paymentMethod.isNotEmpty
+                ? payment.paymentMethod
+                : 'Other';
+            paymentMethodsBreakdown[method] =
+                (paymentMethodsBreakdown[method] ?? 0.0) + payment.amount;
 
             // Track DSO
-            final daysDiff = payment.paymentDate.difference(doc.issueDate).inDays;
+            final daysDiff = payment.paymentDate
+                .difference(doc.issueDate)
+                .inDays;
             if (daysDiff >= 0) {
               daysToCollectList.add(daysDiff);
             }
@@ -304,10 +317,24 @@ class AnalyticsData {
     }
 
     final averageCollectionDays = daysToCollectList.isNotEmpty
-        ? (daysToCollectList.reduce((a, b) => a + b) / daysToCollectList.length).round()
+        ? (daysToCollectList.reduce((a, b) => a + b) / daysToCollectList.length)
+              .round()
         : 14;
 
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final cashFlowSpots = List.generate(12, (index) {
       return CashFlowSpot(
         monthIndex: index,
@@ -332,10 +359,15 @@ class AnalyticsData {
     final Map<String, List<DocumentModel>> clientOverdueMap = {};
 
     for (final doc in allDocuments) {
-      if ((doc.docType == DocumentType.invoice || doc.docType == DocumentType.proforma) &&
+      if ((doc.docType == DocumentType.invoice ||
+              doc.docType == DocumentType.proforma) &&
           doc.balanceDue > 0 &&
           doc.status != DocumentStatus.cancelled) {
-        final daysPastDue = today.difference(DateTime(doc.dueDate.year, doc.dueDate.month, doc.dueDate.day)).inDays;
+        final daysPastDue = today
+            .difference(
+              DateTime(doc.dueDate.year, doc.dueDate.month, doc.dueDate.day),
+            )
+            .inDays;
 
         if (daysPastDue <= 0) {
           bucketCurrent += doc.balanceDue;
@@ -361,15 +393,46 @@ class AnalyticsData {
       }
     }
 
-    final allAgingTotal = bucketCurrent + bucket1To15 + bucket16To30 + bucket31To60 + bucket60Plus;
-    double pct(double val) => allAgingTotal > 0 ? (val / allAgingTotal * 100.0) : 0.0;
+    final allAgingTotal =
+        bucketCurrent +
+        bucket1To15 +
+        bucket16To30 +
+        bucket31To60 +
+        bucket60Plus;
+    double pct(double val) =>
+        allAgingTotal > 0 ? (val / allAgingTotal * 100.0) : 0.0;
 
     final agingBuckets = [
-      AgingBucket(label: 'Not Due (Current)', totalAmount: bucketCurrent, invoiceCount: countCurrent, percentage: pct(bucketCurrent)),
-      AgingBucket(label: '1–15 Days Overdue', totalAmount: bucket1To15, invoiceCount: count1To15, percentage: pct(bucket1To15)),
-      AgingBucket(label: '16–30 Days Overdue', totalAmount: bucket16To30, invoiceCount: count16To30, percentage: pct(bucket16To30)),
-      AgingBucket(label: '31–60 Days Overdue', totalAmount: bucket31To60, invoiceCount: count31To60, percentage: pct(bucket31To60)),
-      AgingBucket(label: '60+ Days (Critical)', totalAmount: bucket60Plus, invoiceCount: count60Plus, percentage: pct(bucket60Plus)),
+      AgingBucket(
+        label: 'Not Due (Current)',
+        totalAmount: bucketCurrent,
+        invoiceCount: countCurrent,
+        percentage: pct(bucketCurrent),
+      ),
+      AgingBucket(
+        label: '1–15 Days Overdue',
+        totalAmount: bucket1To15,
+        invoiceCount: count1To15,
+        percentage: pct(bucket1To15),
+      ),
+      AgingBucket(
+        label: '16–30 Days Overdue',
+        totalAmount: bucket16To30,
+        invoiceCount: count16To30,
+        percentage: pct(bucket16To30),
+      ),
+      AgingBucket(
+        label: '31–60 Days Overdue',
+        totalAmount: bucket31To60,
+        invoiceCount: count31To60,
+        percentage: pct(bucket31To60),
+      ),
+      AgingBucket(
+        label: '60+ Days (Critical)',
+        totalAmount: bucket60Plus,
+        invoiceCount: count60Plus,
+        percentage: pct(bucket60Plus),
+      ),
     ];
 
     // Top Debtors
@@ -386,14 +449,16 @@ class AnalyticsData {
         }
       }
       final days = max(0, today.difference(oldest).inDays);
-      topDebtors.add(OverdueDebtor(
-        customerName: name,
-        phone: phone,
-        totalOverdue: overdueSum,
-        overdueDays: days,
-        oldestDueDate: oldest,
-        invoiceCount: docs.length,
-      ));
+      topDebtors.add(
+        OverdueDebtor(
+          customerName: name,
+          phone: phone,
+          totalOverdue: overdueSum,
+          overdueDays: days,
+          oldestDueDate: oldest,
+          invoiceCount: docs.length,
+        ),
+      );
     });
     topDebtors.sort((a, b) => b.totalOverdue.compareTo(a.totalOverdue));
 
@@ -429,7 +494,9 @@ class AnalyticsData {
       ..sort((a, b) => b.totalRevenue.compareTo(a.totalRevenue));
 
     final topProducts = sortedProducts.take(5).map((p) {
-      final percentage = totalInvoiced > 0 ? (p.totalRevenue / totalInvoiced * 100.0) : 0.0;
+      final percentage = totalInvoiced > 0
+          ? (p.totalRevenue / totalInvoiced * 100.0)
+          : 0.0;
       return ProductPerformance(
         title: p.title,
         unit: p.unit,
@@ -451,7 +518,9 @@ class AnalyticsData {
           invoiceCount: 1,
           balanceDue: doc.balanceDue,
           percentage: 0.0,
-          reliability: doc.balanceDue <= 0 ? 'Prompt' : (doc.dueDate.isBefore(today) ? 'Slow' : 'Average'),
+          reliability: doc.balanceDue <= 0
+              ? 'Prompt'
+              : (doc.dueDate.isBefore(today) ? 'Slow' : 'Average'),
         );
       } else {
         clientMap[name] = ClientPerformance(
@@ -469,7 +538,9 @@ class AnalyticsData {
       ..sort((a, b) => b.totalRevenue.compareTo(a.totalRevenue));
 
     final topClients = sortedClients.take(5).map((c) {
-      final percentage = totalInvoiced > 0 ? (c.totalRevenue / totalInvoiced * 100.0) : 0.0;
+      final percentage = totalInvoiced > 0
+          ? (c.totalRevenue / totalInvoiced * 100.0)
+          : 0.0;
       return ClientPerformance(
         name: c.name,
         totalRevenue: c.totalRevenue,
@@ -484,7 +555,9 @@ class AnalyticsData {
     for (int i = 0; i < min(3, topClients.length); i++) {
       top3Sum += topClients[i].totalRevenue;
     }
-    final top3ClientConcentration = totalInvoiced > 0 ? (top3Sum / totalInvoiced * 100.0) : 0.0;
+    final top3ClientConcentration = totalInvoiced > 0
+        ? (top3Sum / totalInvoiced * 100.0)
+        : 0.0;
 
     // 6. Quotation Funnel
     int quoteAccepted = 0;
@@ -506,7 +579,9 @@ class AnalyticsData {
     }
 
     final totalQuotes = quotationsInPeriod.length;
-    final winRate = totalQuotes > 0 ? (quoteAccepted / totalQuotes * 100.0) : 0.0;
+    final winRate = totalQuotes > 0
+        ? (quoteAccepted / totalQuotes * 100.0)
+        : 0.0;
 
     final quotationFunnel = QuotationFunnel(
       totalQuotations: totalQuotes,
@@ -519,23 +594,38 @@ class AnalyticsData {
     );
 
     // 7. Tax & GST Slab Distribution
-    final Map<double, double> slabTaxable = {0.0: 0.0, 5.0: 0.0, 12.0: 0.0, 18.0: 0.0, 28.0: 0.0};
-    final Map<double, double> slabTax = {0.0: 0.0, 5.0: 0.0, 12.0: 0.0, 18.0: 0.0, 28.0: 0.0};
+    final Map<double, double> slabTaxable = {
+      0.0: 0.0,
+      5.0: 0.0,
+      12.0: 0.0,
+      18.0: 0.0,
+      28.0: 0.0,
+    };
+    final Map<double, double> slabTax = {
+      0.0: 0.0,
+      5.0: 0.0,
+      12.0: 0.0,
+      18.0: 0.0,
+      28.0: 0.0,
+    };
     final Map<String, HsnSummary> hsnMap = {};
 
     double localTax = 0.0;
     double interstateTax = 0.0;
-    final businessStateCode = (businessGstin != null && businessGstin.length >= 2)
+    final businessStateCode =
+        (businessGstin != null && businessGstin.length >= 2)
         ? businessGstin.substring(0, 2)
         : null;
 
     for (final doc in invoicesInPeriod) {
       final customerGstin = doc.customerSnapshot?.gstin;
-      final customerStateCode = (customerGstin != null && customerGstin.length >= 2)
+      final customerStateCode =
+          (customerGstin != null && customerGstin.length >= 2)
           ? customerGstin.substring(0, 2)
           : null;
 
-      final isInterstate = businessStateCode != null &&
+      final isInterstate =
+          businessStateCode != null &&
           customerStateCode != null &&
           businessStateCode != customerStateCode;
 
@@ -561,11 +651,14 @@ class AnalyticsData {
           matchedSlab = 28.0;
         }
 
-        slabTaxable[matchedSlab] = (slabTaxable[matchedSlab] ?? 0.0) + item.taxableAmount;
+        slabTaxable[matchedSlab] =
+            (slabTaxable[matchedSlab] ?? 0.0) + item.taxableAmount;
         slabTax[matchedSlab] = (slabTax[matchedSlab] ?? 0.0) + item.taxAmount;
 
         // HSN / SAC summary
-        final hsnCode = item.hsnSacCode?.trim().isNotEmpty == true ? item.hsnSacCode!.trim() : 'General';
+        final hsnCode = item.hsnSacCode?.trim().isNotEmpty == true
+            ? item.hsnSacCode!.trim()
+            : 'General';
         final existingHsn = hsnMap[hsnCode];
         if (existingHsn == null) {
           hsnMap[hsnCode] = HsnSummary(

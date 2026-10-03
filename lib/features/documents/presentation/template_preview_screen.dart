@@ -119,7 +119,10 @@ class TemplatePreviewScreen extends StatelessWidget {
                         ],
                       ),
                       child: ClipRect(
-                        child: DummyTemplateWidget(templateId: template.id, documentType: documentType),
+                        child: DummyTemplateWidget(
+                          templateId: template.id,
+                          documentType: documentType,
+                        ),
                       ),
                     ),
                   ),
@@ -143,30 +146,38 @@ class TemplatePreviewScreen extends StatelessWidget {
             ],
           ),
           child: ElevatedButton(
-            onPressed: isDefault ? null : () {
-              if (template.isPremium) {
-                final subState = context.read<SubscriptionBloc>().state;
-                if (!subState.effectivePlan.hasPremiumTemplates) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Premium template. Please upgrade your plan.'),
-                      backgroundColor: Colors.orange,
-                    ),
-                  );
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
-                  );
-                  return;
-                }
-              }
-              onSetDefault();
-              Navigator.of(context).pop();
-            },
+            onPressed: isDefault
+                ? null
+                : () {
+                    if (template.isPremium) {
+                      final subState = context.read<SubscriptionBloc>().state;
+                      if (!subState.effectivePlan.hasPremiumTemplates) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Premium template. Please upgrade your plan.',
+                            ),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SubscriptionScreen(),
+                          ),
+                        );
+                        return;
+                      }
+                    }
+                    onSetDefault();
+                    Navigator.of(context).pop();
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: isDefault ? Colors.grey : AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: Text(
               isDefault ? 'Already Default Template' : 'Set as Default',

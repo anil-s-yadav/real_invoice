@@ -42,38 +42,54 @@ class BusinessProfileRepository {
     }
 
     final targetId = id ?? await getActiveProfileId();
-    
+
     try {
       DocumentSnapshot<Map<String, dynamic>> doc;
       try {
-        doc = await _companiesRef.doc(targetId).get(const GetOptions(source: Source.cache));
+        doc = await _companiesRef
+            .doc(targetId)
+            .get(const GetOptions(source: Source.cache));
         if (!doc.exists) {
-          doc = await _companiesRef.doc(targetId).get(const GetOptions(source: Source.server));
+          doc = await _companiesRef
+              .doc(targetId)
+              .get(const GetOptions(source: Source.server));
         }
       } catch (_) {
-        doc = await _companiesRef.doc(targetId).get(const GetOptions(source: Source.server));
+        doc = await _companiesRef
+            .doc(targetId)
+            .get(const GetOptions(source: Source.server));
       }
 
       if (!doc.exists) {
         return BusinessProfile(id: targetId);
       }
-      
+
       final profile = BusinessProfile.fromMap(doc.data()!);
-      
+
       // Cache remote images locally in background
       if (profile.logoPath != null && profile.logoPath!.startsWith('http')) {
-        ImageCacheService.cacheImage(pathOrUrl: profile.logoPath, cacheKey: 'logo_').then((localPath) {
+        ImageCacheService.cacheImage(
+          pathOrUrl: profile.logoPath,
+          cacheKey: 'logo_',
+        ).then((localPath) {
           if (localPath != null && localPath != profile.logoPath) {
             // We don't need to save back to Firestore, just having it cached is enough
             // because our PDF generator and UI will use the ImageCacheService as well.
           }
         });
       }
-      if (profile.signaturePath != null && profile.signaturePath!.startsWith('http')) {
-        ImageCacheService.cacheImage(pathOrUrl: profile.signaturePath, cacheKey: 'signature_');
+      if (profile.signaturePath != null &&
+          profile.signaturePath!.startsWith('http')) {
+        ImageCacheService.cacheImage(
+          pathOrUrl: profile.signaturePath,
+          cacheKey: 'signature_',
+        );
       }
       if (profile.stampPath != null && profile.stampPath!.startsWith('http')) {
-        ImageCacheService.cacheImage(pathOrUrl: profile.stampPath, cacheKey: 'stamp_');
+        ImageCacheService.cacheImage(
+          pathOrUrl: profile.stampPath,
+          cacheKey: 'stamp_',
+        );
       }
 
       return profile;
@@ -87,13 +103,19 @@ class BusinessProfileRepository {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
       try {
-        querySnapshot = await _companiesRef.get(GetOptions(source: forceSync ? Source.server : Source.cache));
+        querySnapshot = await _companiesRef.get(
+          GetOptions(source: forceSync ? Source.server : Source.cache),
+        );
         if (querySnapshot.docs.isEmpty && !forceSync) {
-          querySnapshot = await _companiesRef.get(const GetOptions(source: Source.server));
+          querySnapshot = await _companiesRef.get(
+            const GetOptions(source: Source.server),
+          );
         }
       } catch (_) {
         if (forceSync) rethrow;
-        querySnapshot = await _companiesRef.get(const GetOptions(source: Source.server));
+        querySnapshot = await _companiesRef.get(
+          const GetOptions(source: Source.server),
+        );
       }
       return querySnapshot.docs
           .map((doc) => BusinessProfile.fromMap(doc.data()))
@@ -109,15 +131,23 @@ class BusinessProfileRepository {
     final existingProfiles = await getAllProfiles();
     final isFirstProfile = existingProfiles.isEmpty;
     final profileToSaveId = profile.id.isEmpty ? const Uuid().v4() : profile.id;
-    
+
     // Upload assets to Firebase Storage if they are local files
     String? logoPath = profile.logoPath;
     String? signaturePath = profile.signaturePath;
     String? stampPath = profile.stampPath;
 
     logoPath = await _uploadAssetIfLocal(logoPath, profileToSaveId, 'logo.png');
-    signaturePath = await _uploadAssetIfLocal(signaturePath, profileToSaveId, 'signature.png');
-    stampPath = await _uploadAssetIfLocal(stampPath, profileToSaveId, 'stamp.png');
+    signaturePath = await _uploadAssetIfLocal(
+      signaturePath,
+      profileToSaveId,
+      'signature.png',
+    );
+    stampPath = await _uploadAssetIfLocal(
+      stampPath,
+      profileToSaveId,
+      'stamp.png',
+    );
 
     final profileToSave = profile.copyWith(
       id: profileToSaveId,
@@ -126,10 +156,9 @@ class BusinessProfileRepository {
       stampPath: stampPath,
     );
 
-    await _companiesRef.doc(profileToSave.id).set(
-      profileToSave.toMap(),
-      SetOptions(merge: true),
-    );
+    await _companiesRef
+        .doc(profileToSave.id)
+        .set(profileToSave.toMap(), SetOptions(merge: true));
 
     if (isFirstProfile) {
       await setActiveProfileId(profileToSave.id);
@@ -138,7 +167,11 @@ class BusinessProfileRepository {
     return profileToSave;
   }
 
-  Future<String?> _uploadAssetIfLocal(String? pathOrUrl, String companyId, String fileName) async {
+  Future<String?> _uploadAssetIfLocal(
+    String? pathOrUrl,
+    String companyId,
+    String fileName,
+  ) async {
     if (pathOrUrl == null || pathOrUrl.isEmpty) return null;
     if (pathOrUrl.startsWith('http')) return pathOrUrl; // Already uploaded
 
@@ -146,9 +179,9 @@ class BusinessProfileRepository {
       final file = File(pathOrUrl);
       if (!await file.exists()) return pathOrUrl;
 
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('users/$_userId/companies/$companyId/assets/$fileName');
+      final ref = FirebaseStorage.instance.ref().child(
+        'users/$_userId/companies/$companyId/assets/$fileName',
+      );
 
       await ref.putFile(file);
       return await ref.getDownloadURL();

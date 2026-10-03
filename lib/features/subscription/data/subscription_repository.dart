@@ -35,14 +35,15 @@ class SubscriptionRepository {
       if (ref != null) {
         final doc = await ref.get();
         if (doc.exists && doc.data() != null) {
-          SubscriptionPlanModel plan =
-              SubscriptionPlanModel.fromMap(doc.data()!, doc.id);
+          SubscriptionPlanModel plan = SubscriptionPlanModel.fromMap(
+            doc.data()!,
+            doc.id,
+          );
 
           // Auto-expire in database if it has physically expired but still says "Active"
           if (plan.status.trim().toLowerCase() == 'active' &&
               plan.expiryDate != null &&
               plan.expiryDate!.isBefore(DateTime.now())) {
-            
             plan = plan.copyWith(status: 'Expired', autoRenew: false);
             // Fire-and-forget sync to Firestore so we don't block the UI
             saveOrUpgradePlan(plan);
@@ -71,8 +72,10 @@ class SubscriptionRepository {
 
     return ref.snapshots().map((doc) {
       if (doc.exists && doc.data() != null) {
-        SubscriptionPlanModel plan =
-            SubscriptionPlanModel.fromMap(doc.data()!, doc.id);
+        SubscriptionPlanModel plan = SubscriptionPlanModel.fromMap(
+          doc.data()!,
+          doc.id,
+        );
 
         if (plan.status.trim().toLowerCase() == 'active' &&
             plan.expiryDate != null &&
@@ -93,8 +96,7 @@ class SubscriptionRepository {
     try {
       final ref = _planHistoryRef;
       if (ref != null) {
-        final query =
-            await ref.orderBy('createdAt', descending: true).get();
+        final query = await ref.orderBy('createdAt', descending: true).get();
         if (query.docs.isNotEmpty) {
           return query.docs
               .map((d) => SubscriptionPlanModel.fromMap(d.data(), d.id))
@@ -114,10 +116,9 @@ class SubscriptionRepository {
       return Stream.value([SubscriptionPlanModel.defaultFree()]);
     }
 
-    return ref
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
+    return ref.orderBy('createdAt', descending: true).snapshots().map((
+      snapshot,
+    ) {
       if (snapshot.docs.isNotEmpty) {
         return snapshot.docs
             .map((doc) => SubscriptionPlanModel.fromMap(doc.data(), doc.id))
@@ -141,7 +142,9 @@ class SubscriptionRepository {
         await currentRef.set(data, SetOptions(merge: true));
 
         // Add to plan history subcollection
-        await historyRef.doc(plan.transactionId).set(data);
+        await historyRef
+            .doc(plan.transactionId)
+            .set(data, SetOptions(merge: true));
       } catch (e) {
         // Will be uploaded once online
       }
@@ -158,10 +161,7 @@ class SubscriptionRepository {
   /// Cancel current active plan
   Future<void> cancelPlan() async {
     final current = await getCurrentPlan();
-    final updated = current.copyWith(
-      status: 'Cancelled',
-      autoRenew: false,
-    );
+    final updated = current.copyWith(status: 'Cancelled', autoRenew: false);
     await saveOrUpgradePlan(updated);
   }
 
@@ -181,12 +181,22 @@ class SubscriptionRepository {
         'finalAmount': plan.finalAmount,
         'status': plan.status,
         'transactionId': plan.transactionId,
+        'orderId': plan.orderId,
+        'paymentSignature': plan.paymentSignature,
         'paymentMethod': plan.paymentMethod,
         'startDate': plan.startDate.toIso8601String(),
         'expiryDate': plan.expiryDate?.toIso8601String(),
         'autoRenew': plan.autoRenew,
         'isWelcomeOffer': plan.isWelcomeOffer,
         'createdAt': plan.createdAt.toIso8601String(),
+        'maxCompaniesAllowed': plan.maxCompaniesAllowed,
+        'maxClientsAllowed': plan.maxClientsAllowed,
+        'maxItemsAllowed': plan.maxItemsAllowed,
+        'maxDocumentsPerDay': plan.maxDocumentsPerDay,
+        'maxDevicesAllowed': plan.maxDevicesAllowed,
+        'isAdFree': plan.isAdFree,
+        'hasPremiumTemplates': plan.hasPremiumTemplates,
+        'hasAnalytics': plan.hasAnalytics,
       };
       await prefs.setString(_cachedPlanKey, jsonEncode(jsonMap));
     } catch (_) {}

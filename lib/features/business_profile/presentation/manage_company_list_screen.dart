@@ -10,6 +10,8 @@ import '../data/business_profile_repository.dart';
 import '../domain/business_profile_model.dart';
 import '../bloc/business_profile_bloc.dart';
 import '../bloc/business_profile_event.dart';
+import '../../home/bloc/home_bloc.dart';
+import '../../home/bloc/home_event.dart';
 import '../../onboarding/presentation/onboarding_screen.dart';
 import 'company_detail_screen.dart';
 
@@ -36,13 +38,24 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    final profiles = await _repository.getAllProfiles();
-    final activeId = await _repository.getActiveProfileId();
-    setState(() {
-      _profiles = profiles;
-      _activeId = activeId;
-      _isLoading = false;
-    });
+    try {
+      final profiles = await _repository.getAllProfiles();
+      final activeId = await _repository.getActiveProfileId();
+      if (mounted) {
+        setState(() {
+          _profiles = profiles;
+          _activeId = activeId;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading profiles: $e')));
+      }
+    }
   }
 
   Future<void> _setActive(String id) async {
@@ -50,10 +63,9 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
     _loadData();
     if (mounted) {
       context.read<BusinessProfileBloc>().add(const LoadBusinessProfileEvent());
+      context.read<HomeBloc>().add(const LoadHomeDataEvent());
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +88,8 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                          const AdBannerWidget(),
-                          const SizedBox(height: 12),
+                        const AdBannerWidget(),
+                        const SizedBox(height: 12),
                         // Compact Buy Premium Tab (Visible only on Free plan)
                         _buildPremiumBanner(context),
 
@@ -148,8 +160,8 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
         onPressed: () async {
           final subState = context.read<SubscriptionBloc>().state;
           final maxAllowed = subState.effectivePlan.maxCompaniesAllowed;
-          
-          if (_profiles.length >= maxAllowed) {
+
+          if (maxAllowed != -1 && _profiles.length >= maxAllowed) {
             showDialog(
               context: context,
               builder: (ctx) => AlertDialog(
@@ -158,7 +170,11 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                 ),
                 title: const Row(
                   children: [
-                    Icon(Icons.workspace_premium, color: Colors.orange, size: 28),
+                    Icon(
+                      Icons.workspace_premium,
+                      color: Colors.orange,
+                      size: 28,
+                    ),
                     SizedBox(width: 12),
                     Text('Limit Reached'),
                   ],
@@ -167,13 +183,19 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                   'Your current plan allows up to $maxAllowed company profile${maxAllowed == 1 ? '' : 's'}. Upgrade to a premium plan to create and manage multiple companies seamlessly.',
                   style: const TextStyle(fontSize: 16, height: 1.4),
                 ),
-                actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                actionsPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx),
                     child: const Text(
                       'Maybe Later',
-                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   ElevatedButton(
@@ -193,7 +215,10 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                         ),
                       );
                     },
-                    child: const Text('Upgrade Plan', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'Upgrade Plan',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -206,7 +231,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
               builder: (_) => const OnboardingScreen(isAddingNewCompany: true),
             ),
           );
-          _loadData();
+          if (mounted) _loadData();
         },
         icon: const Icon(Icons.add),
         label: const Text('Add Company'),
@@ -221,13 +246,11 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
       onTap: () async {
         final result = await Navigator.of(context).push<bool>(
           MaterialPageRoute(
-            builder: (_) => CompanyDetailScreen(
-              profile: profile,
-              isActive: isActive,
-            ),
+            builder: (_) =>
+                CompanyDetailScreen(profile: profile, isActive: isActive),
           ),
         );
-        if (result == true) _loadData();
+        if (result == true && mounted) _loadData();
       },
       child: Builder(
         builder: (context) {
@@ -240,8 +263,8 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                 color: isActive
                     ? AppColors.primary
                     : (isDark
-                        ? AppColors.darkBorder
-                        : Colors.grey.withValues(alpha: 0.2)),
+                          ? AppColors.darkBorder
+                          : Colors.grey.withValues(alpha: 0.2)),
                 width: isActive ? 2 : 1,
               ),
               boxShadow: [
@@ -266,20 +289,24 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                             ? AppColors.darkSurfaceVariant
                             : AppColors.canvas,
                         backgroundImage:
-                            profile.logoPath != null && profile.logoPath!.isNotEmpty
-                                ? (profile.logoPath!.startsWith('http')
-                                    ? CachedNetworkImageProvider(profile.logoPath!)
+                            profile.logoPath != null &&
+                                profile.logoPath!.isNotEmpty
+                            ? (profile.logoPath!.startsWith('http')
+                                  ? CachedNetworkImageProvider(
+                                          profile.logoPath!,
+                                        )
                                         as ImageProvider
-                                    : FileImage(File(profile.logoPath!)))
-                                : null,
+                                  : FileImage(File(profile.logoPath!)))
+                            : null,
                         child:
-                            profile.logoPath == null || profile.logoPath!.isEmpty
-                                ? const Icon(
-                                    Icons.business,
-                                    size: 22,
-                                    color: AppColors.textSecondary,
-                                  )
-                                : null,
+                            profile.logoPath == null ||
+                                profile.logoPath!.isEmpty
+                            ? const Icon(
+                                Icons.business,
+                                size: 22,
+                                color: AppColors.textSecondary,
+                              )
+                            : null,
                       ),
                       const SizedBox(height: 10),
 
@@ -347,9 +374,13 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                         width: double.infinity,
                         child: isActive
                             ? Container(
-                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.1),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Row(
@@ -375,14 +406,15 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                             : TextButton(
                                 onPressed: () => _setActive(profile.id),
                                 style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 6,
+                                  ),
                                   minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                   backgroundColor: isDark
                                       ? AppColors.darkSurfaceVariant
-                                      : Colors.grey.withValues(
-                                          alpha: 0.05,
-                                        ),
+                                      : Colors.grey.withValues(alpha: 0.05),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -403,31 +435,35 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                   ),
                 ),
 
-            if (isActive)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(14),
-                      bottomLeft: Radius.circular(14),
+                if (isActive)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(14),
+                          bottomLeft: Radius.circular(14),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.star,
+                        size: 12,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  child: const Icon(Icons.star, size: 12, color: Colors.white),
-                ),
-              ),
-          ],
-        ),
-      );
-    },
-  ),
-);
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildPremiumBanner(BuildContext context) {
@@ -472,7 +508,10 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -486,10 +525,14 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
+                              color: const Color(
+                                0xFFF59E0B,
+                              ).withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                color: const Color(0xFFF59E0B).withValues(alpha: 0.5),
+                                color: const Color(
+                                  0xFFF59E0B,
+                                ).withValues(alpha: 0.5),
                                 width: 1,
                               ),
                             ),
@@ -529,7 +572,10 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                     ),
                     const SizedBox(width: 12),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
@@ -554,7 +600,4 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
       },
     );
   }
-
 }
-
-

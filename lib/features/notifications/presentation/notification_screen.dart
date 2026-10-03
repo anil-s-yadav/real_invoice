@@ -141,7 +141,6 @@ class _NotificationTile extends StatelessWidget {
         iconColor = AppColors.statusOverdueText;
         break;
       case NotificationType.system:
-      default:
         iconData = Icons.info_outline;
         iconColor = Colors.grey;
         break;
@@ -169,18 +168,28 @@ class _NotificationTile extends StatelessWidget {
       if (docId == null || docId.isEmpty) return;
 
       // Show a quick loading indicator
+      bool isDialogShowing = true;
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator()),
-      );
+        builder: (dialogCtx) {
+          return PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (didPop, _) {
+              if (didPop) isDialogShowing = false;
+            },
+            child: const Center(child: CircularProgressIndicator()),
+          );
+        },
+      ).then((_) => isDialogShowing = false);
 
       try {
         final repo = context.read<DocumentRepository>();
         final document = await repo.getDocumentById(docId);
 
         if (context.mounted) {
-          Navigator.pop(context); // Close loading dialog
+          if (isDialogShowing)
+            Navigator.pop(context); // Close loading dialog safely
           if (document != null) {
             Navigator.push(
               context,
@@ -196,7 +205,7 @@ class _NotificationTile extends StatelessWidget {
         }
       } catch (e) {
         if (context.mounted) {
-          Navigator.pop(context); // Close loading dialog
+          if (isDialogShowing) Navigator.pop(context); // Close loading dialog
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text('Error loading document: $e')));

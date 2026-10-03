@@ -25,7 +25,10 @@ import '../../products/bloc/product_bloc.dart';
 import '../../products/bloc/product_event.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_event.dart';
+import '../../home/bloc/home_bloc.dart';
+import '../../home/bloc/home_event.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
+import '../../subscription/data/subscription_repository.dart';
 import '../../subscription/domain/subscription_plan_model.dart';
 import '../../subscription/presentation/plan_info_screen.dart';
 
@@ -61,6 +64,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       final tplSettingsRepo = TemplateSettingsRepository();
       await tplSettingsRepo.syncSettings();
 
+      // Re-fetch subscription plan from Firestore (fixes ad-free, analytics, limits)
+      final subRepo = SubscriptionRepository();
+      final freshPlan = await subRepo.getCurrentPlan();
+
       if (mounted) {
         context.read<DocumentBloc>().add(const LoadDocumentsEvent());
         context.read<CustomerBloc>().add(const LoadCustomersEvent());
@@ -68,6 +75,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         context.read<BusinessProfileBloc>().add(
           const LoadBusinessProfileEvent(),
         );
+        context.read<SubscriptionBloc>().add(
+          ActivateSubscriptionEvent(freshPlan),
+        );
+        context.read<HomeBloc>().add(const LoadHomeDataEvent());
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -93,9 +104,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('User Profile'),
-      ),
+      appBar: AppBar(title: const Text('User Profile')),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           AuthUser? user;
@@ -522,17 +531,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               children: [
                 const Text(
                   'Cloud Sync',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Sync data securely across your devices.',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -579,7 +587,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         final isFree = plan.isFree;
         final isActive = plan.isActive;
         final planTitle = '${plan.planName} Plan';
-        
+
         String statusBadge;
         if (isFree) {
           statusBadge = 'FREE';
@@ -588,9 +596,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         } else {
           statusBadge = 'ACTIVE';
         }
-        
+
         final expiryText = plan.expiryDate != null
-            ? (isActive ? 'Valid until ' : 'Expired on ') + DateFormat('dd MMM yyyy').format(plan.expiryDate!)
+            ? (isActive ? 'Valid until ' : 'Expired on ') +
+                  DateFormat('dd MMM yyyy').format(plan.expiryDate!)
             : (isFree ? 'Lifetime Free Starter' : 'Active Subscription');
 
         return Material(
@@ -614,7 +623,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             : [Colors.white, const Color(0xFFF8FAFC)])
                       : [
                           SubscriptionPlanModel.getAccentColor(plan.planName),
-                          SubscriptionPlanModel.getSecondaryAccentColor(plan.planName)
+                          SubscriptionPlanModel.getSecondaryAccentColor(
+                            plan.planName,
+                          ),
                         ],
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -628,7 +639,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   BoxShadow(
                     color: (isFree || !isActive)
                         ? Colors.black.withValues(alpha: 0.04)
-                        : SubscriptionPlanModel.getAccentColor(plan.planName).withValues(alpha: 0.25),
+                        : SubscriptionPlanModel.getAccentColor(
+                            plan.planName,
+                          ).withValues(alpha: 0.25),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -686,7 +699,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     ? (isDark
                                           ? AppColors.darkSurfaceVariant
                                           : AppColors.canvas)
-                                    : (!isActive ? AppColors.statusOverdueText : const Color(0xFFF59E0B)),
+                                    : (!isActive
+                                          ? AppColors.statusOverdueText
+                                          : const Color(0xFFF59E0B)),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -698,7 +713,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       ? (isDark
                                             ? AppColors.darkTextSecondary
                                             : AppColors.textSecondary)
-                                      : (!isActive ? Colors.white : Colors.black),
+                                      : (!isActive
+                                            ? Colors.white
+                                            : Colors.black),
                                   letterSpacing: 0.5,
                                 ),
                               ),

@@ -22,7 +22,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
     super.initState();
     _loadPayments();
   }
-  
+
   Future<void> _loadPayments() async {
     final repo = PaymentDetailRepository();
     final payments = await repo.getAllPayments();
@@ -32,6 +32,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
       });
     }
   }
+
   void _showAddPaymentSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -327,8 +328,9 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
         centerTitle: true,
         elevation: 0,
       ),
-      body: Builder(builder: (context) {
-    final details = _payments;
+      body: Builder(
+        builder: (context) {
+          final details = _payments;
 
           return CustomScrollView(
             slivers: [
@@ -341,9 +343,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
               ),
 
               // 2. Sample Preview Card
-              SliverToBoxAdapter(
-                child: _buildSamplePreviewCard(details),
-              ),
+              SliverToBoxAdapter(child: _buildSamplePreviewCard(details)),
 
               // 3. Section Title & Add Action
               SliverToBoxAdapter(
@@ -363,8 +363,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                       ),
                       if (details.isNotEmpty)
                         TextButton.icon(
-                          onPressed: () =>
-                              _showAddPaymentSheet(context),
+                          onPressed: () => _showAddPaymentSheet(context),
                           icon: const Icon(Icons.add_circle_outline, size: 16),
                           label: const Text(
                             'Add New',
@@ -421,8 +420,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                         ),
                         const SizedBox(height: 20),
                         ElevatedButton.icon(
-                          onPressed: () =>
-                              _showAddPaymentSheet(context),
+                          onPressed: () => _showAddPaymentSheet(context),
                           icon: const Icon(Icons.add_rounded, size: 20),
                           label: const Text(
                             'Add Bank Account or UPI',
@@ -514,8 +512,7 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                                 color: Colors.redAccent,
                                 size: 22,
                               ),
-                              onPressed: () =>
-                                  _deletePayment(item.id),
+                              onPressed: () => _deletePayment(item.id),
                             ),
                           ),
                         ),
@@ -579,7 +576,7 @@ class _AddPaymentSheetState extends State<_AddPaymentSheet> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-        InterstitialAdManager.showAd(context);
+      InterstitialAdManager.showAd(context);
       widget.onSave(
         PaymentDetail(
           id: const Uuid().v4(),

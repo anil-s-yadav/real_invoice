@@ -1,7 +1,3 @@
-
-
-
-
 import '../../../core/constants/app_constants.dart';
 
 class BusinessProfile {
@@ -99,7 +95,6 @@ class BusinessProfile {
   }
 
   factory BusinessProfile.fromMap(Map<String, dynamic> map) {
-
     return BusinessProfile(
       id: map['id'] as String? ?? 'default_profile',
       businessName: map['businessName'] as String? ?? '',
@@ -126,7 +121,8 @@ class BusinessProfile {
   static String _sanitizeCurrencySymbol(String code, String fallback) {
     try {
       final matchingCountry = AppConstants.countries.firstWhere(
-          (c) => c['currency'] == code);
+        (c) => c['currency'] == code,
+      );
       return matchingCountry['symbol']!;
     } catch (e) {
       return fallback;

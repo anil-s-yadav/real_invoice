@@ -1,6 +1,6 @@
+import 'package:invoz/core/utils/premium_dialog_helper.dart';
+import 'package:invoz/features/ads/interstitial_ad_manager.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../../ads/ad_helper.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../settings/data/template_settings_repository.dart';
@@ -15,7 +15,6 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
-
 import '../../business_profile/presentation/manage_company_list_screen.dart';
 import '../../customers/domain/customer_model.dart';
 import '../../home/bloc/home_bloc.dart';
@@ -49,40 +48,6 @@ class DocumentEditorScreen extends StatefulWidget {
 }
 
 class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
-  InterstitialAd? _interstitialAd;
-  bool _isAdLoaded = false;
-
-  void _loadInterstitialAd() {
-    final subState = context.read<SubscriptionBloc>().state;
-    if (subState.effectivePlan.isAdFree) return;
-
-    InterstitialAd.load(
-      adUnitId: AdHelper.interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-          _isAdLoaded = true;
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              _interstitialAd = null;
-              _isAdLoaded = false;
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              _interstitialAd = null;
-              _isAdLoaded = false;
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          debugPrint('InterstitialAd failed to load: $error');
-        },
-      ),
-    );
-  }
-
   late String _documentId;
   late DocumentType _docType;
   late TextEditingController _docNumberController;
@@ -102,7 +67,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   bool _isInitialized = false;
   bool _includePaymentDetails = false;
   List<PaymentDetail> _payments = [];
-  
+
   String? _selectedBankDetailId;
   String? _selectedUpiDetailId;
 
@@ -137,78 +102,74 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeDefaults();
-      _loadInterstitialAd();
     });
   }
 
   Future<void> _initializeDefaults() async {
     if (_isInitialized) return;
-
-    if (widget.initialDocument == null) {
-      final repo = context.read<DocumentRepository>();
-      final nextNumber = await repo.getNextDocumentNumber(_docType);
-      if (!mounted) return;
-
-      setState(() {
-        _docNumberController.text = nextNumber;
-      });
-
-      final profileState = context.read<BusinessProfileBloc>().state;
-      if (profileState is BusinessProfileLoaded) {
-        final profile = profileState.profile;
-        if (_termsController.text.isEmpty) {
-          _termsController.text = profile.defaultTerms;
-        }
-        if (_notesController.text.isEmpty) {
-          _notesController.text = profile.defaultNotes;
-        }
-
-        final templateRepo = TemplateSettingsRepository();
-        final defaultTemplateId = await templateRepo.getDefaultTemplate(_docType);
-        
+    try {
+      if (widget.initialDocument == null) {
+        final repo = context.read<DocumentRepository>();
+        final nextNumber = await repo.getNextDocumentNumber(_docType);
         if (!mounted) return;
+
         setState(() {
-          _templateId = defaultTemplateId;
-
-          // Auto-select first available bank and UPI for new documents
-          if (_selectedBankDetailId == null) {
-            final banks = _payments
-                .where((p) => p.type == 'Bank')
-                .toList();
-            if (banks.isNotEmpty) {
-              _selectedBankDetailId = banks.first.id;
-            }
-          }
-          if (_selectedUpiDetailId == null) {
-            final upis = _payments
-                .where((p) => p.type == 'UPI')
-                .toList();
-            if (upis.isNotEmpty) {
-              _selectedUpiDetailId = upis.first.id;
-            }
-          }
+          _docNumberController.text = nextNumber;
         });
-      }
-    }
 
+        final profileState = context.read<BusinessProfileBloc>().state;
+        if (profileState is BusinessProfileLoaded) {
+          final profile = profileState.profile;
+          if (_termsController.text.isEmpty) {
+            _termsController.text = profile.defaultTerms;
+          }
+          if (_notesController.text.isEmpty) {
+            _notesController.text = profile.defaultNotes;
+          }
+
+          final templateRepo = TemplateSettingsRepository();
+          final defaultTemplateId = await templateRepo.getDefaultTemplate(
+            _docType,
+          );
+
+          if (!mounted) return;
+          setState(() {
+            _templateId = defaultTemplateId;
+
+            // Auto-select first available bank and UPI for new documents
+            if (_selectedBankDetailId == null) {
+              final banks = _payments.where((p) => p.type == 'Bank').toList();
+              if (banks.isNotEmpty) {
+                _selectedBankDetailId = banks.first.id;
+              }
+            }
+            if (_selectedUpiDetailId == null) {
+              final upis = _payments.where((p) => p.type == 'UPI').toList();
+              if (upis.isNotEmpty) {
+                _selectedUpiDetailId = upis.first.id;
+              }
+            }
+          });
+        }
+      }
+    } catch (_) {}
     _isInitialized = true;
   }
 
-
-  
   Future<void> _loadPayments() async {
-    final repo = PaymentDetailRepository();
-    final payments = await repo.getAllPayments();
-    if (mounted) {
-      setState(() {
-        _payments = payments;
-      });
-    }
+    try {
+      final repo = PaymentDetailRepository();
+      final payments = await repo.getAllPayments();
+      if (mounted) {
+        setState(() {
+          _payments = payments;
+        });
+      }
+    } catch (_) {}
   }
 
   @override
   void dispose() {
-    _interstitialAd?.dispose();
     _docNumberController.dispose();
     _poNumberController.dispose();
     _subjectController.dispose();
@@ -278,6 +239,25 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
             ),
             backgroundColor: Colors.orange,
           ),
+        );
+        return null;
+      }
+    }
+
+    if (widget.initialDocument == null) {
+      final subState = context.read<SubscriptionBloc>().state;
+      final maxDocs = subState.effectivePlan.maxDocumentsPerDay;
+
+      final repo = context.read<DocumentRepository>();
+      int todayCount = await repo.getTodayDocumentCount();
+      if (!mounted) return null;
+
+      if (maxDocs != -1 && todayCount >= maxDocs) {
+        PremiumDialogHelper.showLimitReachedDialog(
+          context: context,
+          title: 'Daily Limit Reached',
+          message:
+              'Your current plan allows up to $maxDocs document${maxDocs == 1 ? '' : 's'} per day. Upgrade to a premium plan for unlimited documents.',
         );
         return null;
       }
@@ -353,9 +333,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   Future<void> _handleSaveAndPreview() async {
     final doc = await _buildAndSaveDocument();
     if (doc != null && mounted) {
-      if (_isAdLoaded && _interstitialAd != null) {
-        _interstitialAd!.show();
-      }
+      InterstitialAdManager.showAd(context);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => PdfPreviewScreen(document: doc)),
       );
@@ -545,8 +523,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
                     child: profile.logoPath!.startsWith('http')
-                        ? CachedNetworkImage(imageUrl: 
-                            profile.logoPath!,
+                        ? CachedNetworkImage(
+                            imageUrl: profile.logoPath!,
                             width: 32,
                             height: 32,
                             fit: BoxFit.cover,
@@ -779,7 +757,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) {
+      builder: (sheetContext) {
         return Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -834,7 +812,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(sheetContext),
                   ),
                 ],
               ),
@@ -875,9 +853,11 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () async {
-                        Navigator.pop(context);
-                        final newCustomer = await CustomerSelectSheet.show(context);
-                        if (newCustomer != null) {
+                        Navigator.pop(sheetContext);
+                        final newCustomer = await CustomerSelectSheet.show(
+                          context,
+                        );
+                        if (newCustomer != null && mounted) {
                           setState(() => _selectedCustomer = newCustomer);
                         }
                       },
@@ -889,13 +869,13 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () async {
-                        Navigator.pop(context);
+                        Navigator.pop(sheetContext);
                         final newCustomer = await CustomerEditorSheet.show(
                           context,
                           customer: customer,
                           saveToDb: false,
                         );
-                        if (newCustomer != null) {
+                        if (newCustomer != null && mounted) {
                           setState(() => _selectedCustomer = newCustomer);
                         }
                       },
@@ -954,9 +934,13 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               label: const Text('Saved'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
-                side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+                side: BorderSide(
+                  color: AppColors.primary.withValues(alpha: 0.5),
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ),
@@ -964,7 +948,10 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
           Expanded(
             child: OutlinedButton.icon(
               onPressed: () async {
-                final customer = await CustomerEditorSheet.show(context, saveToDb: false);
+                final customer = await CustomerEditorSheet.show(
+                  context,
+                  saveToDb: false,
+                );
                 if (customer != null) {
                   setState(() => _selectedCustomer = customer);
                 }
@@ -973,9 +960,13 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               label: const Text('Manual Entry'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
-                side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+                side: BorderSide(
+                  color: AppColors.primary.withValues(alpha: 0.5),
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ),
@@ -1471,14 +1462,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
         BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
           builder: (context, state) {
             if (state is! BusinessProfileLoaded) return const SizedBox();
-            final banks = _payments
-                .where((p) => p.type == 'Bank')
-                .toList();
-            final upis = _payments
-                .where((p) => p.type == 'UPI')
-                .toList();
-
-
+            final banks = _payments.where((p) => p.type == 'Bank').toList();
+            final upis = _payments.where((p) => p.type == 'UPI').toList();
 
             final hasAny = banks.isNotEmpty || upis.isNotEmpty;
 
@@ -1797,8 +1782,3 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     );
   }
 }
-
-
-
-
-

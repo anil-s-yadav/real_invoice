@@ -34,10 +34,12 @@ class AppButton extends StatelessWidget {
     BorderSide? borderSide;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary =
-        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final surfaceVariant =
-        isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant;
+    final textPrimary = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
+    final surfaceVariant = isDark
+        ? AppColors.darkSurfaceVariant
+        : AppColors.surfaceVariant;
     final border = isDark ? AppColors.darkBorder : AppColors.border;
 
     switch (variant) {
@@ -63,9 +65,13 @@ class AppButton extends StatelessWidget {
         break;
       case AppButtonVariant.danger:
         bgColor = isDark ? const Color(0xFF450A0A) : AppColors.statusOverdueBg;
-        fgColor = isDark ? const Color(0xFFFCA5A5) : AppColors.statusOverdueText;
+        fgColor = isDark
+            ? const Color(0xFFFCA5A5)
+            : AppColors.statusOverdueText;
         borderSide = BorderSide(
-          color: isDark ? const Color(0xFF7F1D1D) : AppColors.statusOverdueBorder,
+          color: isDark
+              ? const Color(0xFF7F1D1D)
+              : AppColors.statusOverdueBorder,
           width: 1,
         );
         break;

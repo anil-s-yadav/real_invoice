@@ -12,9 +12,9 @@ class NotificationRepository {
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
     FirebaseMessaging? messaging,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance,
-        _messaging = messaging ?? FirebaseMessaging.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _auth = auth ?? FirebaseAuth.instance,
+       _messaging = messaging ?? FirebaseMessaging.instance;
 
   CollectionReference<Map<String, dynamic>> _getNotificationsRef() {
     final userId = _auth.currentUser?.uid;
@@ -32,10 +32,10 @@ class NotificationRepository {
           .limit(50)
           .snapshots()
           .map((snapshot) {
-        return snapshot.docs.map((doc) {
-          return AppNotification.fromMap(doc.data(), doc.id);
-        }).toList();
-      });
+            return snapshot.docs.map((doc) {
+              return AppNotification.fromMap(doc.data(), doc.id);
+            }).toList();
+          });
     } catch (e) {
       return Stream.value([]);
     }
@@ -54,7 +54,7 @@ class NotificationRepository {
       final unreadDocs = await _getNotificationsRef()
           .where('isRead', isEqualTo: false)
           .get();
-      
+
       final batch = _firestore.batch();
       for (var doc in unreadDocs.docs) {
         batch.update(doc.reference, {'isRead': true});
@@ -72,7 +72,7 @@ class NotificationRepository {
     try {
       // Request permission
       await _messaging.requestPermission();
-      
+
       // Get the token
       final token = await _messaging.getToken();
       if (token != null) {
