@@ -826,7 +826,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: () {
           final docState = context.read<DocumentBloc>().state;
           final subState = context.read<SubscriptionBloc>().state;
-          final maxDocs = subState.effectivePlan.maxDocumentsPerDay ?? 5;
+          final maxDocs = subState.effectivePlan.maxDocumentsPerDay;
 
           if (maxDocs != -1) {
             final today = DateTime.now();

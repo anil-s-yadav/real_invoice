@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../ads/interstitial_ad_manager.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';

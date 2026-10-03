@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../documents/domain/document_model.dart';
@@ -43,7 +44,7 @@ class InvoiceSettingsRepository {
         return doc.data() ?? {};
       }
     } catch (e) {
-      print('Error fetching settings: $e');
+      debugPrint('Error fetching settings: $e');
     }
     return {};
   }
@@ -55,7 +56,7 @@ class InvoiceSettingsRepository {
     try {
       await ref.set({key: value}, SetOptions(merge: true));
     } catch (e) {
-      print('Error saving setting $key: $e');
+      debugPrint('Error saving setting $key: $e');
     }
   }
 
@@ -129,7 +130,7 @@ class InvoiceSettingsRepository {
         return doc.data() ?? {};
       }
     } catch (e) {
-      print('Error fetching tax settings: $e');
+      debugPrint('Error fetching tax settings: $e');
     }
     return {};
   }
@@ -140,7 +141,7 @@ class InvoiceSettingsRepository {
     try {
       await ref.set({key: value}, SetOptions(merge: true));
     } catch (e) {
-      print('Error saving tax setting $key: $e');
+      debugPrint('Error saving tax setting $key: $e');
     }
   }
 

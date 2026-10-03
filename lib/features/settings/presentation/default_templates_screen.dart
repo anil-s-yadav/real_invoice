@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
-import '../../business_profile/bloc/business_profile_event.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
-import '../../business_profile/domain/business_profile_model.dart';
 import '../../documents/domain/document_model.dart';
 import '../../documents/presentation/template_preview_screen.dart';
 import '../../documents/presentation/widgets/template_thumbnail_card.dart';
@@ -26,7 +24,6 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
   late TabController _tabController;
   final _repo = TemplateSettingsRepository();
   Map<DocumentType, String> _defaults = {};
-  bool _isLoading = true;
 
   static const List<DocumentType> _types = [
     DocumentType.invoice,
@@ -59,7 +56,6 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
           DocumentType.receipt: rec,
           DocumentType.proforma: pro,
         };
-        _isLoading = false;
       });
     }
   }
@@ -314,11 +310,13 @@ class _DefaultTemplatesScreenState extends State<DefaultTemplatesScreen>
                               isDefault: isSelected,
 
                               onSetDefault: () async {
+                                final messenger = ScaffoldMessenger.of(context);
                                 await _repo.setDefaultTemplate(type, t.id);
+                                if (!mounted) return;
                                 setState(() {
                                   _defaults[type] = t.id;
                                 });
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                messenger.showSnackBar(
                                   SnackBar(
                                     content: Text(
                                       '${t.name} set as default for ${type.displayName}',

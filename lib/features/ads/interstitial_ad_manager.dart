@@ -13,7 +13,7 @@ class InterstitialAdManager {
     if (_isAdLoaded || _isLoading) return;
 
     final subState = context.read<SubscriptionBloc>().state;
-    if (subState.effectivePlan.isAdFree ?? false) return;
+    if (subState.effectivePlan.isAdFree) return;
 
     _isLoading = true;
     InterstitialAd.load(
@@ -31,7 +31,11 @@ class InterstitialAdManager {
               _isAdLoaded = false;
               // Preload next ad silently
               // Using Future.microtask prevents build context issues across frames
-              Future.microtask(() => loadAd(context));
+              Future.microtask(() {
+                if (context.mounted) {
+                  loadAd(context);
+                }
+              });
             },
             onAdFailedToShowFullScreenContent: (ad, error) {
               ad.dispose();
@@ -50,7 +54,7 @@ class InterstitialAdManager {
 
   static void showAd(BuildContext context) {
     final subState = context.read<SubscriptionBloc>().state;
-    if (subState.effectivePlan.isAdFree ?? false) return;
+    if (subState.effectivePlan.isAdFree) return;
 
     if (_isAdLoaded && _interstitialAd != null) {
       _interstitialAd!.show();

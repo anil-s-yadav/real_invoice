@@ -14,7 +14,6 @@ import '../bloc/product_state.dart';
 import '../domain/product_model.dart';
 import 'product_editor_sheet.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
-import '../../subscription/presentation/subscription_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -175,7 +174,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         onPressed: () {
           final state = context.read<ProductBloc>().state;
           final subState = context.read<SubscriptionBloc>().state;
-          final maxItems = subState.effectivePlan.maxItemsAllowed ?? 3;
+          final maxItems = subState.effectivePlan.maxItemsAllowed;
 
           int currentCount = 0;
           if (state is ProductLoaded) {

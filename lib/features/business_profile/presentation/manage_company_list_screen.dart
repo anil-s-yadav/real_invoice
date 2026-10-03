@@ -147,7 +147,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final subState = context.read<SubscriptionBloc>().state;
-          final maxAllowed = subState.effectivePlan.maxCompaniesAllowed ?? 1;
+          final maxAllowed = subState.effectivePlan.maxCompaniesAllowed;
           
           if (_profiles.length >= maxAllowed) {
             showDialog(

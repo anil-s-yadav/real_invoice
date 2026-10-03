@@ -13,7 +13,6 @@ import '../bloc/customer_state.dart';
 import '../domain/customer_model.dart';
 import 'customer_editor_sheet.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
-import '../../subscription/presentation/subscription_screen.dart';
 
 class CustomerListScreen extends StatefulWidget {
   const CustomerListScreen({super.key});
@@ -171,7 +170,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
         onPressed: () {
           final state = context.read<CustomerBloc>().state;
           final subState = context.read<SubscriptionBloc>().state;
-          final maxClients = subState.effectivePlan.maxClientsAllowed ?? 3;
+          final maxClients = subState.effectivePlan.maxClientsAllowed;
 
           int currentCount = 0;
           if (state is CustomerLoaded) {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../domain/payment_detail_model.dart';
@@ -32,7 +33,7 @@ class PaymentDetailRepository {
       
       return querySnapshot.docs.map((doc) => PaymentDetail.fromMap(doc.data())).toList();
     } catch (e) {
-      print('Error getting payments: ');
+      debugPrint('Error getting payments: ');
       if (forceSync) rethrow;
       return [];
     }

@@ -575,7 +575,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   // --- COMPONENT: HERO PLAN CARD ---
   Widget _buildHeroPlanCard(bool isDark) {
     final primaryAccent = SubscriptionPlanModel.getAccentColor(widget.planName);
-    final secondaryAccent = SubscriptionPlanModel.getSecondaryAccentColor(widget.planName);
+    final secondaryAccent = SubscriptionPlanModel.getSecondaryAccentColor(
+      widget.planName,
+    );
 
     return Container(
       width: double.infinity,
@@ -583,10 +585,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            primaryAccent,
-            secondaryAccent,
-          ],
+          colors: [primaryAccent, secondaryAccent],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [

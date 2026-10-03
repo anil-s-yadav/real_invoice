@@ -1167,7 +1167,6 @@ class DocumentPdfGenerator {
 
     final cName = doc.customerSnapshot?.name ?? 'Unknown Customer';
     final cEmail = doc.customerSnapshot?.email ?? '';
-    final cPhone = doc.customerSnapshot?.phone ?? '';
 
     return [
       pw.Row(

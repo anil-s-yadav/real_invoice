@@ -43,15 +43,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     setState(() => _isSyncing = true);
     try {
       final docRepo = context.read<DocumentRepository>();
-      await docRepo.getAllDocuments(forceSync: true);
-
       final custRepo = context.read<CustomerRepository>();
-      await custRepo.getAllCustomers(forceSync: true);
-
       final prodRepo = context.read<ProductRepository>();
-      await prodRepo.getAllProducts(forceSync: true);
-
       final bizRepo = context.read<BusinessProfileRepository>();
+
+      await docRepo.getAllDocuments(forceSync: true);
+      await custRepo.getAllCustomers(forceSync: true);
+      await prodRepo.getAllProducts(forceSync: true);
       await bizRepo.getAllProfiles(forceSync: true);
 
       final payRepo = PaymentDetailRepository();

@@ -1,11 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../domain/product_model.dart';
 import 'package:uuid/uuid.dart';
 
 class ProductRepository {
-  static const String _activeProfileKey = 'active_profile_id';
+
 
   String get _userId {
     final user = FirebaseAuth.instance.currentUser;
@@ -13,10 +14,10 @@ class ProductRepository {
     return user.uid;
   }
 
-  Future<String> _getCompanyId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_activeProfileKey) ?? 'default_profile';
-  }
+
+
+
+
 
   Future<CollectionReference<Map<String, dynamic>>> _getProductsRef() async {
     return FirebaseFirestore.instance
@@ -43,7 +44,7 @@ class ProductRepository {
       
       return querySnapshot.docs.map((doc) => ProductItem.fromMap(doc.data())).toList();
     } catch (e) {
-      print('Error getting products: $e');
+      debugPrint('Error getting products: $e');
       if (forceSync) rethrow;
       return [];
     }

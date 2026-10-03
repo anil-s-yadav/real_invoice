@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:uuid/uuid.dart';
 import '../domain/document_item_model.dart';
 import '../domain/document_model.dart';
@@ -27,18 +28,13 @@ class SummaryStats {
 }
 
 class DocumentRepository {
-  static const String _activeProfileKey = 'active_profile_id';
+
   final _uuid = const Uuid();
 
   String get _userId {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('User not authenticated');
     return user.uid;
-  }
-
-  Future<String> _getCompanyId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_activeProfileKey) ?? 'default_profile';
   }
 
   Future<CollectionReference<Map<String, dynamic>>> _getDocumentsRef() async {
@@ -103,7 +99,7 @@ class DocumentRepository {
 
       return docs;
     } catch (e) {
-      print('Error getting documents: $e');
+      debugPrint('Error getting documents: $e');
       if (forceSync) rethrow;
       return [];
     }
@@ -161,7 +157,7 @@ class DocumentRepository {
     );
 
     final updatedPayments = List<PaymentRecord>.from(document.payments)..add(payment);
-    final totalPaid = updatedPayments.fold<double>(0.0, (sum, p) => sum + p.amount);
+    final totalPaid = updatedPayments.fold<double>(0.0, (total, p) => total + p.amount);
 
     DocumentStatus newStatus;
     if (totalPaid >= document.totalAmount && document.totalAmount > 0) {
@@ -210,7 +206,7 @@ class DocumentRepository {
       final nextNumber = (number + 1).toString().padLeft(padding, '0');
       return '$prefix$nextNumber';
     } catch (e) {
-      print('Error getting next doc number: $e');
+      debugPrint('Error getting next doc number: $e');
       return '$prefix${1.toString().padLeft(padding, '0')}';
     }
   }
@@ -423,7 +419,7 @@ class DocumentRepository {
         paidCount: paidCount,
       );
     } catch (e) {
-      print('Error getting stats: $e');
+      debugPrint('Error getting stats: $e');
       return const SummaryStats();
     }
   }

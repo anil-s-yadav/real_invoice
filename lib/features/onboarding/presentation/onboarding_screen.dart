@@ -162,6 +162,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         await prefs.setString('app_country', _selectedCountry);
       }
 
+      if (!mounted) return;
+
       if (profile.businessName.isNotEmpty) {
         // Await the repository directly so it finishes before we navigate
         final repo = context.read<BusinessProfileRepository>();

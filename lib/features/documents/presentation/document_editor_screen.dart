@@ -54,7 +54,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
 
   void _loadInterstitialAd() {
     final subState = context.read<SubscriptionBloc>().state;
-    if (subState.effectivePlan.isAdFree ?? false) return;
+    if (subState.effectivePlan.isAdFree) return;
 
     InterstitialAd.load(
       adUnitId: AdHelper.interstitialAdUnitId,
@@ -102,7 +102,6 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   bool _isInitialized = false;
   bool _includePaymentDetails = false;
   List<PaymentDetail> _payments = [];
-  bool _isLoadingPayments = true;
   
   String? _selectedBankDetailId;
   String? _selectedUpiDetailId;
@@ -195,7 +194,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     _isInitialized = true;
   }
 
-  @override
+
   
   Future<void> _loadPayments() async {
     final repo = PaymentDetailRepository();
@@ -203,12 +202,13 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     if (mounted) {
       setState(() {
         _payments = payments;
-        _isLoadingPayments = false;
       });
     }
   }
 
+  @override
   void dispose() {
+    _interstitialAd?.dispose();
     _docNumberController.dispose();
     _poNumberController.dispose();
     _subjectController.dispose();
@@ -1385,33 +1385,37 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: RadioListTile<DiscountType>(
-                        title: const Text(
-                          '%',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                RadioGroup<DiscountType>(
+                  groupValue: tempType,
+                  onChanged: (val) {
+                    if (val != null) {
+                      setStateSB(() => tempType = val);
+                    }
+                  },
+                  child: const Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<DiscountType>(
+                          title: Text(
+                            '%',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          value: DiscountType.percentage,
+                          contentPadding: EdgeInsets.zero,
                         ),
-                        value: DiscountType.percentage,
-                        groupValue: tempType,
-                        contentPadding: EdgeInsets.zero,
-                        onChanged: (val) => setStateSB(() => tempType = val!),
                       ),
-                    ),
-                    Expanded(
-                      child: RadioListTile<DiscountType>(
-                        title: const Text(
-                          'Flat',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: RadioListTile<DiscountType>(
+                          title: Text(
+                            'Flat',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          value: DiscountType.fixed,
+                          contentPadding: EdgeInsets.zero,
                         ),
-                        value: DiscountType.fixed,
-                        groupValue: tempType,
-                        contentPadding: EdgeInsets.zero,
-                        onChanged: (val) => setStateSB(() => tempType = val!),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 TextFormField(
                   initialValue: tempValue > 0 ? tempValue.toString() : '',
@@ -1467,7 +1471,6 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
         BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
           builder: (context, state) {
             if (state is! BusinessProfileLoaded) return const SizedBox();
-            final profile = state.profile;
             final banks = _payments
                 .where((p) => p.type == 'Bank')
                 .toList();

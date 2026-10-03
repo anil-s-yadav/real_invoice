@@ -21,7 +21,6 @@ import '../domain/document_model.dart';
 import 'document_editor_screen.dart';
 import 'widgets/payment_entry_sheet.dart';
 import '../../settings/data/payment_detail_repository.dart';
-import '../../settings/domain/payment_detail_model.dart';
 import 'widgets/template_thumbnail_card.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../../subscription/presentation/subscription_screen.dart';
@@ -191,7 +190,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                         if (!isSelected) {
                           if (t.isPremium) {
                             final subState = context.read<SubscriptionBloc>().state;
-                            if (!(subState.effectivePlan.hasPremiumTemplates ?? false)) {
+                            if (!subState.effectivePlan.hasPremiumTemplates) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Premium template. Please upgrade your plan.'),
@@ -296,14 +295,10 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       );
                     },
                   ),
-                  Divider(),
+                  const Divider(),
                   const SizedBox(height: AppDimensions.xl),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(child: AdBannerWidget()),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Center(child: AdBannerWidget()),
                   ),
                 ],

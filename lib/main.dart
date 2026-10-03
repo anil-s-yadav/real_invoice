@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoz/features/business_profile/bloc/business_profile_state.dart';
 import 'core/bloc/app_bloc_observer.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
@@ -116,45 +117,65 @@ class InvozRoot extends StatelessWidget {
           BlocProvider(
             create: (ctx) => BusinessProfileBloc(
               repository: ctx.read<BusinessProfileRepository>(),
-            )..add(const LoadBusinessProfileEvent()),
+            ),
           ),
           BlocProvider(
             create: (ctx) =>
-                CustomerBloc(repository: ctx.read<CustomerRepository>())
-                  ..add(const LoadCustomersEvent()),
+                CustomerBloc(repository: ctx.read<CustomerRepository>()),
           ),
           BlocProvider(
             create: (ctx) =>
-                ProductBloc(repository: ctx.read<ProductRepository>())
-                  ..add(const LoadProductsEvent()),
+                ProductBloc(repository: ctx.read<ProductRepository>()),
           ),
           BlocProvider(
             create: (ctx) =>
-                DocumentBloc(repository: ctx.read<DocumentRepository>())
-                  ..add(const LoadDocumentsEvent()),
+                DocumentBloc(repository: ctx.read<DocumentRepository>()),
           ),
           BlocProvider(
             create: (ctx) => HomeBloc(
               documentRepository: ctx.read<DocumentRepository>(),
               businessProfileRepository: ctx.read<BusinessProfileRepository>(),
-            )..add(const LoadHomeDataEvent()),
+            ),
           ),
           BlocProvider(
             create: (ctx) =>
                 AuthBloc(authRepository: ctx.read<AuthRepository>())
                   ..add(const AppStartedEvent()),
           ),
-          BlocProvider(
-            create: (_) =>
-                SubscriptionBloc()..add(const ObserveSubscriptionEvent()),
-          ),
+          BlocProvider(create: (_) => SubscriptionBloc()),
           BlocProvider(
             create: (ctx) =>
                 ReportsBloc(documentRepository: ctx.read<DocumentRepository>()),
           ),
           BlocProvider(create: (_) => OnboardingCubit()),
         ],
-        child: const InvozApp(),
+        child: BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is Authenticated) {
+              context.read<BusinessProfileBloc>().add(
+                const LoadBusinessProfileEvent(),
+              );
+              context.read<CustomerBloc>().add(const LoadCustomersEvent());
+              context.read<ProductBloc>().add(const LoadProductsEvent());
+              context.read<DocumentBloc>().add(const LoadDocumentsEvent());
+              context.read<HomeBloc>().add(const LoadHomeDataEvent());
+              context.read<SubscriptionBloc>().add(
+                const ObserveSubscriptionEvent(),
+              );
+            }
+          },
+          child: BlocListener<BusinessProfileBloc, BusinessProfileState>(
+            listener: (context, bpState) {
+              if (bpState is BusinessProfileLoaded) {
+                if (bpState.profile.businessName.isNotEmpty) {
+                  // If the user already has a business profile, skip onboarding
+                  context.read<OnboardingCubit>().completeOnboarding();
+                }
+              }
+            },
+            child: const InvozApp(),
+          ),
+        ),
       ),
     );
   }
@@ -171,57 +192,72 @@ class InvozApp extends StatelessWidget {
           builder: (context, authState) {
             return BlocBuilder<OnboardingCubit, bool>(
               builder: (context, hasCompletedOnboarding) {
-                Widget homeWidget;
-                if (authState is AuthInitial || authState is AuthLoading) {
-                  homeWidget = Scaffold(
-                    backgroundColor: themeMode == ThemeMode.dark
-                        ? const Color(0xFF0F172A)
-                        : Colors.white,
-                    body: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/icons/applogo.png',
-                            width: 140,
-                            height: 140,
-                          ),
-                          const SizedBox(height: 32),
-                          const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFF4F46E5), // Indigo / AppColors.primary
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'Setting up your workspace...',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: themeMode == ThemeMode.dark
-                                  ? Colors.grey[400]
-                                  : Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                } else if (authState is Authenticated) {
-                  homeWidget = hasCompletedOnboarding
-                      ? const MainNavScaffold()
-                      : const OnboardingScreen();
-                } else {
-                  homeWidget = const SignInScreen();
-                }
+                return BlocBuilder<BusinessProfileBloc, BusinessProfileState>(
+                  builder: (context, bpState) {
+                    Widget homeWidget;
 
-                return MaterialApp(
-                  title: 'invoz',
-                  debugShowCheckedModeBanner: false,
-                  themeMode: themeMode,
-                  theme: AppTheme.lightTheme,
-                  darkTheme: AppTheme.darkTheme,
-                  home: homeWidget,
+                    bool isCheckingProfile =
+                        authState is Authenticated &&
+                        !hasCompletedOnboarding &&
+                        (bpState is BusinessProfileInitial ||
+                            bpState is BusinessProfileLoading);
+
+                    if (authState is AuthInitial ||
+                        authState is AuthLoading ||
+                        isCheckingProfile) {
+                      homeWidget = Scaffold(
+                        backgroundColor: themeMode == ThemeMode.dark
+                            ? const Color(0xFF0F172A)
+                            : Colors.white,
+                        body: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/icons/applogo.png',
+                                width: 140,
+                                height: 140,
+                              ),
+                              const SizedBox(height: 32),
+                              const CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(
+                                    0xFF4F46E5,
+                                  ), // Indigo / AppColors.primary
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              Text(
+                                'Setting up your workspace...',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: themeMode == ThemeMode.dark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else if (authState is Authenticated) {
+                      homeWidget = hasCompletedOnboarding
+                          ? const MainNavScaffold()
+                          : const OnboardingScreen();
+                    } else {
+                      homeWidget = const SignInScreen();
+                    }
+
+                    return MaterialApp(
+                      title: 'invoz',
+                      debugShowCheckedModeBanner: false,
+                      themeMode: themeMode,
+                      theme: AppTheme.lightTheme,
+                      darkTheme: AppTheme.darkTheme,
+                      home: homeWidget,
+                    );
+                  },
                 );
               },
             );

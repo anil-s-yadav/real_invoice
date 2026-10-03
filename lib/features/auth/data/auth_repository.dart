@@ -167,22 +167,26 @@ class FirebaseAuthRepository implements AuthRepository {
       String deviceModel = 'Unknown Device';
       String platformStr = 'unknown';
 
+      String deviceIdInput = 'unknown_id';
       if (kIsWeb) {
         final webInfo = await deviceInfo.webBrowserInfo;
         deviceModel = webInfo.userAgent ?? 'Web Browser';
         platformStr = 'web';
+        deviceIdInput = deviceModel + platformStr + (webInfo.vendor ?? '');
       } else if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
         deviceModel = '${androidInfo.brand} ${androidInfo.model}';
         platformStr = 'android';
+        deviceIdInput = androidInfo.id;
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfo.iosInfo;
         deviceModel = iosInfo.name;
         platformStr = 'ios';
+        deviceIdInput = iosInfo.identifierForVendor ?? iosInfo.name;
       }
 
       final deviceId = _sha256ofString(
-        deviceModel + platformStr,
+        deviceIdInput,
       ).substring(0, 16);
 
       // Check device limits FIRST
@@ -190,8 +194,8 @@ class FirebaseAuthRepository implements AuthRepository {
         final subDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
-            .collection('settings')
-            .doc('subscription_plan')
+            .collection('subscription')
+            .doc('current')
             .get();
 
         int maxDevices = 1;

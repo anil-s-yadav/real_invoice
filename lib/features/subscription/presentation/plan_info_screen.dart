@@ -22,6 +22,15 @@ class PlanInfoScreen extends StatefulWidget {
 class _PlanInfoScreenState extends State<PlanInfoScreen> {
   final SubscriptionRepository _repository = SubscriptionRepository();
   bool _isLoading = false;
+  late final Stream<SubscriptionPlanModel> _currentPlanStream;
+  late final Stream<List<SubscriptionPlanModel>> _planHistoryStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPlanStream = _repository.currentPlanStream();
+    _planHistoryStream = _repository.planHistoryStream();
+  }
 
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
   Color get _textPrimary =>
@@ -123,7 +132,7 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
         ],
       ),
       body: StreamBuilder<SubscriptionPlanModel>(
-        stream: _repository.currentPlanStream(),
+        stream: _currentPlanStream,
         builder: (context, snapshot) {
           final plan = snapshot.data ?? SubscriptionPlanModel.defaultFree();
 
@@ -627,7 +636,7 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
         SizedBox(height: 12),
 
         StreamBuilder<List<SubscriptionPlanModel>>(
-          stream: _repository.planHistoryStream(),
+          stream: _planHistoryStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(

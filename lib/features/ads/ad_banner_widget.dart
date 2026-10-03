@@ -53,7 +53,7 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
     return BlocBuilder<SubscriptionBloc, SubscriptionState>(
       builder: (context, subState) {
         // If the user's plan is Ad-Free, we return an empty widget
-        if (subState.effectivePlan.isAdFree ?? false) {
+        if (subState.effectivePlan.isAdFree) {
           return const SizedBox.shrink();
         }
 

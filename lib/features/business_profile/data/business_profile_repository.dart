@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -77,7 +78,7 @@ class BusinessProfileRepository {
 
       return profile;
     } catch (e) {
-      print('Error fetching profile: $e');
+      debugPrint('Error fetching profile: $e');
       return BusinessProfile(id: targetId);
     }
   }
@@ -98,7 +99,7 @@ class BusinessProfileRepository {
           .map((doc) => BusinessProfile.fromMap(doc.data()))
           .toList();
     } catch (e) {
-      print('Error fetching all profiles: $e');
+      debugPrint('Error fetching all profiles: $e');
       if (forceSync) rethrow;
       return [];
     }
@@ -152,7 +153,7 @@ class BusinessProfileRepository {
       await ref.putFile(file);
       return await ref.getDownloadURL();
     } catch (e) {
-      print('Error uploading $fileName: $e');
+      debugPrint('Error uploading $fileName: $e');
       return pathOrUrl; // Fallback to local path if upload fails
     }
   }

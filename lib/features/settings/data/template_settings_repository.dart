@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../documents/domain/document_model.dart';
@@ -35,7 +36,7 @@ class TemplateSettingsRepository {
         return doc.data() ?? {};
       }
     } catch (e) {
-      print('Error fetching template settings: $e');
+      debugPrint('Error fetching template settings: $e');
     }
     return {};
   }
@@ -46,7 +47,7 @@ class TemplateSettingsRepository {
     try {
       await ref.set({key: value}, SetOptions(merge: true));
     } catch (e) {
-      print('Error saving template setting $key: $e');
+      debugPrint('Error saving template setting $key: $e');
     }
   }
 
