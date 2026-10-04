@@ -223,10 +223,13 @@ class InvozApp extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Image.asset(
-                                'assets/icons/applogo.png',
-                                width: 140,
-                                height: 140,
+                              ClipRRect(
+                                borderRadius: BorderRadiusGeometry.circular(10),
+                                child: Image.asset(
+                                  'assets/icons/applogo.png',
+                                  width: 140,
+                                  height: 140,
+                                ),
                               ),
                               const SizedBox(height: 32),
                               const CircularProgressIndicator(
