@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsConditions from './pages/TermsConditions'
 import Faqs from './pages/Faqs'
+import DataDeletion from './pages/DataDeletion'
 import './App.css'
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
           <div className="nav-links">
             <Link to="/privacy">Privacy Policy</Link>
             <Link to="/terms">Terms & Conditions</Link>
-            <Link to="/faq">FAQs</Link>
+            <Link to="/faq">FAQs</Link>`n            <Link to="/data-deletion">Data Deletion</Link>
           </div>
         </nav>
 
@@ -23,7 +24,7 @@ function App() {
             <Route path="/" element={<Faqs />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsConditions />} />
-            <Route path="/faq" element={<Faqs />} />
+            <Route path="/faq" element={<Faqs />} />`n            <Route path="/data-deletion" element={<DataDeletion />} />
           </Routes>
         </main>
 
@@ -36,3 +37,4 @@ function App() {
 }
 
 export default App
+
