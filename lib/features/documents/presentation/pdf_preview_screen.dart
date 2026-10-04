@@ -324,7 +324,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       ),
                     ),
                     value: _document.includePaymentDetails,
-                    activeThumbColor: AppColors.primary,
+                    activeTrackColor: AppColors.primary,
                     onChanged: (val) {
                       setStateSheet(() {
                         _document = _document.copyWith(
@@ -337,7 +337,55 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                       );
                     },
                   ),
-                  const Divider(),
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    title: Text(
+                      'Show Signature',
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Include business signature on PDF',
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                      ),
+                    ),
+                    value: _document.showSignature,
+                    activeTrackColor: AppColors.primary,
+                    onChanged: (val) {
+                      setStateSheet(() {
+                        _document = _document.copyWith(showSignature: val);
+                      });
+                      setState(() {});
+                      context.read<DocumentBloc>().add(SaveDocumentEvent(_document));
+                    },
+                  ),
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    title: Text(
+                      'Show Stamp',
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Include business stamp on PDF',
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                      ),
+                    ),
+                    value: _document.showStamp,
+                    activeTrackColor: AppColors.primary,
+                    onChanged: (val) {
+                      setStateSheet(() {
+                        _document = _document.copyWith(showStamp: val);
+                      });
+                      setState(() {});
+                      context.read<DocumentBloc>().add(SaveDocumentEvent(_document));
+                    },
+                  ),
+                  const Divider(height: 1),
                   const SizedBox(height: AppDimensions.xl),
                   const Padding(
                     padding: EdgeInsets.all(8.0),

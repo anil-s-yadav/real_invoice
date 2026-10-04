@@ -75,6 +75,9 @@ class DocumentPdfGenerator {
     final Uint8List? signatureBytes = profile.signaturePath != null
         ? await _fetchImageBytes(profile.signaturePath!)
         : null;
+    final Uint8List? stampBytes = profile.stampPath != null
+        ? await _fetchImageBytes(profile.stampPath!)
+        : null;
 
     pdf.addPage(
       pw.MultiPage(
@@ -105,6 +108,7 @@ class DocumentPdfGenerator {
               payments: payments,
               logoBytes: logoBytes,
               signatureBytes: signatureBytes,
+              stampBytes: stampBytes,
             );
           }
           if (selectedTemplate == TemplateRegistry.elegantCenter) {
@@ -115,6 +119,7 @@ class DocumentPdfGenerator {
               payments: payments,
               logoBytes: logoBytes,
               signatureBytes: signatureBytes,
+              stampBytes: stampBytes,
             );
           }
           return _buildFreeClassic(
@@ -139,6 +144,7 @@ class DocumentPdfGenerator {
     required List<PaymentDetail> payments,
     Uint8List? logoBytes,
     Uint8List? signatureBytes,
+    Uint8List? stampBytes,
   }) {
     final title = doc.docType.displayName.toUpperCase();
     final primaryColor = PdfColor.fromHex('#0F172A'); // Slate 900
@@ -643,21 +649,31 @@ class DocumentPdfGenerator {
               primaryColor: primaryColor,
             ),
           ),
-          if (signatureBytes != null)
-            pw.Column(
+          pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
               children: [
-                pw.Image(pw.MemoryImage(signatureBytes), height: 40),
-                pw.SizedBox(height: 4),
+                if (stampBytes != null && doc.showStamp)
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.only(right: 20),
+                    child: pw.Image(pw.MemoryImage(stampBytes), height: 50),
+                  ),
+                if (signatureBytes != null && doc.showSignature)
+                  pw.Column(
+                    children: [
+                      pw.Image(pw.MemoryImage(signatureBytes), height: 40),
+                      pw.SizedBox(height: 4),
                 pw.Container(width: 120, height: 1.5, color: borderColor),
                 pw.SizedBox(height: 4),
                 pw.Text(
-                  'Authorized Signature',
-                  style: pw.TextStyle(
+                        'Authorized Signature',
+                        style: pw.TextStyle(
                     fontSize: 9,
                     fontWeight: pw.FontWeight.bold,
                     color: mutedColor,
                   ),
-                ),
+                      ),
+                    ],
+                  ),
               ],
             ),
         ],
@@ -672,6 +688,7 @@ class DocumentPdfGenerator {
     required List<PaymentDetail> payments,
     Uint8List? logoBytes,
     Uint8List? signatureBytes,
+    Uint8List? stampBytes,
   }) {
     final title = doc.docType.displayName.toUpperCase();
     final primaryColor = PdfColor.fromHex('#2563EB'); // Blue accent
@@ -896,22 +913,32 @@ class DocumentPdfGenerator {
               primaryColor: primaryColor,
             ),
           ),
-          if (signatureBytes != null)
-            pw.Column(
+          pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
               children: [
-                pw.Image(pw.MemoryImage(signatureBytes), height: 50),
-                pw.Container(
+                if (stampBytes != null && doc.showStamp)
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.only(right: 20),
+                    child: pw.Image(pw.MemoryImage(stampBytes), height: 50),
+                  ),
+                if (signatureBytes != null && doc.showSignature)
+                  pw.Column(
+                    children: [
+                      pw.Image(pw.MemoryImage(signatureBytes), height: 50),
+                      pw.Container(
                   width: 150,
                   child: pw.Divider(color: primaryColor),
                 ),
                 pw.Text(
-                  'Authorized Signature',
-                  style: pw.TextStyle(
+                        'Authorized Signature',
+                        style: pw.TextStyle(
                     fontSize: 10,
                     color: primaryColor,
                     fontWeight: pw.FontWeight.bold,
                   ),
-                ),
+                      ),
+                    ],
+                  ),
               ],
             ),
         ],
@@ -1018,7 +1045,7 @@ class DocumentPdfGenerator {
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 4),
                     child: pw.Text(
-                      'UPI (${upiDetail.title}): ${upiDetail.details}',
+                      'UPI: ${upiDetail.details}',
                       style: pw.TextStyle(
                         fontSize: 10,
                         fontWeight: pw.FontWeight.bold,
@@ -1160,6 +1187,7 @@ class DocumentPdfGenerator {
     required List<PaymentDetail> payments,
     Uint8List? logoBytes,
     Uint8List? signatureBytes,
+    Uint8List? stampBytes,
   }) {
     final title = doc.docType.displayName.toUpperCase();
     final primaryColor = PdfColor.fromHex('#0D47A1');
@@ -1651,18 +1679,28 @@ class DocumentPdfGenerator {
               ],
             ),
           ),
-          if (signatureBytes != null)
-            pw.Column(
+          pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
               children: [
-                pw.Image(pw.MemoryImage(signatureBytes), height: 50),
-                pw.Container(
-                  width: 150,
-                  child: pw.Divider(color: primaryColor),
-                ),
-                pw.Text(
-                  'Authorized Signature',
-                  style: pw.TextStyle(fontSize: 10, color: primaryColor),
-                ),
+                if (stampBytes != null && doc.showStamp)
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.only(right: 20),
+                    child: pw.Image(pw.MemoryImage(stampBytes), height: 60),
+                  ),
+                if (signatureBytes != null && doc.showSignature)
+                  pw.Column(
+                    children: [
+                      pw.Image(pw.MemoryImage(signatureBytes), height: 50),
+                      pw.Container(
+                        width: 150,
+                        child: pw.Divider(color: primaryColor),
+                      ),
+                      pw.Text(
+                        'Authorized Signature',
+                        style: pw.TextStyle(fontSize: 10, color: primaryColor),
+                      ),
+                    ],
+                  ),
               ],
             ),
         ],
@@ -1670,4 +1708,3 @@ class DocumentPdfGenerator {
     ];
   }
 }
-

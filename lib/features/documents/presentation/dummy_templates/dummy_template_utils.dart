@@ -62,11 +62,7 @@ Widget buildDummyPaymentDetails({
               color: primary,
             ),
             const SizedBox(height: 6),
-            buildDummyText(
-              'UPI (PhonePe): merchant@okaxis',
-              bold: true,
-              size: 10,
-            ),
+            buildDummyText('UPI: merchant@okaxis', bold: true, size: 10),
             const SizedBox(height: 4),
             buildDummyText('Bank: HDFC Bank', bold: true, size: 10),
             const SizedBox(height: 1),

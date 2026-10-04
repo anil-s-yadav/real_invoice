@@ -62,6 +62,8 @@ class DocumentModel {
   final String? terms;
   final String? relatedDocId;
   final bool enableRoundOff;
+  final bool showSignature;
+  final bool showStamp;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -89,6 +91,8 @@ class DocumentModel {
     this.terms,
     this.relatedDocId,
     this.enableRoundOff = true,
+    this.showSignature = true,
+    this.showStamp = false,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -183,6 +187,8 @@ class DocumentModel {
     String? terms,
     String? relatedDocId,
     bool? enableRoundOff,
+    bool? showSignature,
+    bool? showStamp,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -211,6 +217,8 @@ class DocumentModel {
       terms: terms ?? this.terms,
       relatedDocId: relatedDocId ?? this.relatedDocId,
       enableRoundOff: enableRoundOff ?? this.enableRoundOff,
+      showSignature: showSignature ?? this.showSignature,
+      showStamp: showStamp ?? this.showStamp,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -241,6 +249,8 @@ class DocumentModel {
       'terms': terms,
       'relatedDocId': relatedDocId,
       'enableRoundOff': enableRoundOff,
+      'showSignature': showSignature,
+      'showStamp': showStamp,
       'subtotal': subtotal,
       'taxAmount': totalTaxAmount,
       'roundOff': roundOff,
@@ -330,6 +340,8 @@ class DocumentModel {
       terms: map['terms'] as String?,
       relatedDocId: map['relatedDocId'] as String?,
       enableRoundOff: map['enableRoundOff'] as bool? ?? true,
+      showSignature: map['showSignature'] as bool? ?? true,
+      showStamp: map['showStamp'] as bool? ?? false,
       createdAt:
           DateTime.tryParse(map['createdAt'] as String? ?? '') ??
           DateTime.now(),
