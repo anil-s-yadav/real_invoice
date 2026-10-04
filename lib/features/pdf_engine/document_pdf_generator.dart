@@ -656,27 +656,20 @@ class DocumentPdfGenerator {
               primaryColor: primaryColor,
             ),
           ),
-          pw.Expanded(
-
-            flex: 4,
-
-            child: pw.Row(
-
-              mainAxisAlignment: pw.MainAxisAlignment.end,
-
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
-
-              children: [
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.end,
+            crossAxisAlignment: pw.CrossAxisAlignment.end,
+            children: [
 
                 if (stampBytes != null && doc.showStamp)
                   pw.Padding(
-                    padding: const pw.EdgeInsets.only(right: 20),
+                    padding: const pw.EdgeInsets.only(right: 12),
                     child: pw.Column(
                       children: [
                         pw.Image(pw.MemoryImage(stampBytes), height: 50),
                         pw.SizedBox(height: 4),
                         pw.Container(
-                          width: 150,
+                          width: 100,
                           child: pw.Divider(color: primaryColor),
                         ),
                         pw.SizedBox(height: 4),
@@ -695,7 +688,7 @@ class DocumentPdfGenerator {
                     children: [
                       pw.Image(pw.MemoryImage(signatureBytes), height: 40),
                       pw.SizedBox(height: 4),
-                pw.Container(width: 120, height: 1.5, color: borderColor),
+                pw.Container(width: 100, height: 1.5, color: borderColor),
                 pw.SizedBox(height: 4),
                 pw.Text(
                       'Authorized Signature',
@@ -709,7 +702,6 @@ class DocumentPdfGenerator {
                 ),
             ],
           ),
-        ),
         ],
       ),
     ];
@@ -947,27 +939,20 @@ class DocumentPdfGenerator {
               primaryColor: primaryColor,
             ),
           ),
-          pw.Expanded(
-
-            flex: 4,
-
-            child: pw.Row(
-
-              mainAxisAlignment: pw.MainAxisAlignment.end,
-
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
-
-              children: [
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.end,
+            crossAxisAlignment: pw.CrossAxisAlignment.end,
+            children: [
 
                 if (stampBytes != null && doc.showStamp)
                   pw.Padding(
-                    padding: const pw.EdgeInsets.only(right: 20),
+                    padding: const pw.EdgeInsets.only(right: 12),
                     child: pw.Column(
                       children: [
                         pw.Image(pw.MemoryImage(stampBytes), height: 50),
                         pw.SizedBox(height: 4),
                         pw.Container(
-                          width: 150,
+                          width: 100,
                           child: pw.Divider(color: primaryColor),
                         ),
                         pw.SizedBox(height: 4),
@@ -986,7 +971,7 @@ class DocumentPdfGenerator {
                     children: [
                       pw.Image(pw.MemoryImage(signatureBytes), height: 50),
                       pw.Container(
-                  width: 150,
+                  width: 100,
                   child: pw.Divider(color: primaryColor),
                 ),
                 pw.Text(
@@ -1001,7 +986,6 @@ class DocumentPdfGenerator {
                 ),
             ],
           ),
-        ),
         ],
       ),
     ];
@@ -1740,27 +1724,18 @@ class DocumentPdfGenerator {
               ],
             ),
           ),
-          pw.Expanded(
-
-            flex: 4,
-
-            child: pw.Row(
-
-              mainAxisAlignment: pw.MainAxisAlignment.end,
-
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
-
-              children: [
-
-                if (stampBytes != null && doc.showStamp)
+          pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.end,
+            children: [
+              if (stampBytes != null && doc.showStamp)
                   pw.Padding(
-                    padding: const pw.EdgeInsets.only(right: 20),
+                    padding: const pw.EdgeInsets.only(right: 12),
                     child: pw.Column(
                       children: [
                         pw.Image(pw.MemoryImage(stampBytes), height: 50),
                         pw.SizedBox(height: 4),
                         pw.Container(
-                          width: 150,
+                          width: 100,
                           child: pw.Divider(color: primaryColor),
                         ),
                         pw.SizedBox(height: 4),
@@ -1779,7 +1754,7 @@ class DocumentPdfGenerator {
                     children: [
                       pw.Image(pw.MemoryImage(signatureBytes), height: 50),
                       pw.Container(
-                        width: 150,
+                        width: 100,
                         child: pw.Divider(color: primaryColor),
                       ),
                       pw.Text(
@@ -1790,7 +1765,6 @@ class DocumentPdfGenerator {
                 ),
             ],
           ),
-        ),
         ],
       ),
     ];
