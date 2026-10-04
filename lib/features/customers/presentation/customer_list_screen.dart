@@ -269,12 +269,16 @@ class _CustomerItemCard extends StatelessWidget {
                             ? AppColors.darkTextSecondary
                             : AppColors.textSecondary,
                         fontSize: 13,
-                      ),),
-                  if (customer.contactPerson != null && customer.contactPerson!.isNotEmpty)
+                      ),
+                    ),
+                  if (customer.contactPerson != null &&
+                      customer.contactPerson!.isNotEmpty)
                     Text(
                       'Contact: ',
                       style: TextStyle(
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                         fontSize: 12,
                       ),
                       maxLines: 1,
@@ -284,7 +288,9 @@ class _CustomerItemCard extends StatelessWidget {
                     Text(
                       'CIN: ',
                       style: TextStyle(
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                         fontSize: 12,
                       ),
                       maxLines: 1,
@@ -297,12 +303,19 @@ class _CustomerItemCard extends StatelessWidget {
                         if (!urlStr.startsWith('http')) urlStr = 'https://';
                         final url = Uri.parse(urlStr);
                         if (await canLaunchUrl(url)) {
-                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                          await launchUrl(
+                            url,
+                            mode: LaunchMode.externalApplication,
+                          );
                         }
                       },
                       child: Row(
                         children: [
-                          Icon(Icons.language, size: 14, color: AppColors.primary),
+                          Icon(
+                            Icons.language,
+                            size: 14,
+                            color: AppColors.primary,
+                          ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
@@ -319,7 +332,7 @@ class _CustomerItemCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                   else if (customer.email != null && customer.email!.isNotEmpty)
+                  if (customer.email != null && customer.email!.isNotEmpty)
                     Text(
                       customer.email!,
                       style: TextStyle(

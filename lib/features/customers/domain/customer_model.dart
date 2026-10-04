@@ -52,9 +52,6 @@ class Customer {
       cin: cin ?? this.cin,
       contactPerson: contactPerson ?? this.contactPerson,
       website: website ?? this.website,
-    this.cin,
-    this.contactPerson,
-    this.website,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -96,3 +93,4 @@ class Customer {
     );
   }
 }
+
