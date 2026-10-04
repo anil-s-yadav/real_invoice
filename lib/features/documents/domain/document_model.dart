@@ -92,7 +92,7 @@ class DocumentModel {
     this.relatedDocId,
     this.enableRoundOff = true,
     this.showSignature = true,
-    this.showStamp = false,
+    this.showStamp = true,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -341,7 +341,7 @@ class DocumentModel {
       relatedDocId: map['relatedDocId'] as String?,
       enableRoundOff: map['enableRoundOff'] as bool? ?? true,
       showSignature: map['showSignature'] as bool? ?? true,
-      showStamp: map['showStamp'] as bool? ?? false,
+      showStamp: map['showStamp'] as bool? ?? true,
       createdAt:
           DateTime.tryParse(map['createdAt'] as String? ?? '') ??
           DateTime.now(),

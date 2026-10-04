@@ -104,11 +104,17 @@ class HelpSupportScreen extends StatelessWidget {
                       title: 'View Detailed Web FAQs',
                       subtitle: 'Read our comprehensive guides online',
                       icon: Icons.public,
+
                       color: Colors.blueAccent,
                       isLast: true,
                       onTap: () async {
-                        final Uri url = Uri.parse('https://invoice-c1603.web.app/faq');
-                        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                        final Uri url = Uri.parse(
+                          'https://invoice-c1603.web.app/faq',
+                        );
+                        if (!await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        )) {
                           debugPrint('Could not launch $url');
                         }
                       },
@@ -124,19 +130,20 @@ class HelpSupportScreen extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
-                    if (isPremium) SettingsTile(
-                      title: 'Contact Phone',
-                      subtitle: _supportPhone,
-                      icon: Icons.phone_outlined,
-                      color: AppColors.primary,
-                      isFirst: true,
-                      trailing: const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 14,
-                        color: AppColors.textMuted,
+                    if (isPremium)
+                      SettingsTile(
+                        title: 'Contact Phone',
+                        subtitle: _supportPhone,
+                        icon: Icons.phone_outlined,
+                        color: AppColors.primary,
+                        isFirst: true,
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 14,
+                          color: AppColors.textMuted,
+                        ),
+                        onTap: () => _handleCallPhone(context),
                       ),
-                      onTap: () => _handleCallPhone(context),
-                    ),
                     Divider(
                       height: 1,
                       color: AppColors.border.withValues(alpha: 0.5),
@@ -325,6 +332,3 @@ class HelpSupportScreen extends StatelessWidget {
     );
   }
 }
-
-
-
