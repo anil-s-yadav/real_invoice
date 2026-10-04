@@ -27,7 +27,7 @@ const DataDeletion = () => {
         <h2>Option 2: Email Request</h2>
         <p>If you no longer have access to the app, you can request data deletion by contacting our support team:</p>
         <ul>
-          <li>Send an email to <strong>support@invozapp.com</strong> from the email address associated with your account.</li>
+          <li>Send an email to <strong>anilyadav44x@gmail.com</strong> from the email address associated with your account.</li>
           <li>Use the subject line: "Account Deletion Request".</li>
           <li>Our team will process your request and permanently delete your data within 7 business days.</li>
         </ul>
@@ -48,3 +48,4 @@ const DataDeletion = () => {
 };
 
 export default DataDeletion;
+

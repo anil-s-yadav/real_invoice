@@ -106,7 +106,7 @@ const Faqs = () => {
         <div className="faq-item">
           <h3>How do I contact customer support?</h3>
           <p>
-            We are always here to help! You can reach our support team directly from the app by going to <strong>Settings</strong> &gt; <strong>Help & Support</strong>, or you can email us directly at <strong>support@invozapp.com</strong>.
+            We are always here to help! You can reach our support team directly from the app by going to <strong>Settings</strong> &gt; <strong>Help & Support</strong>, or you can email us directly at <strong>anilyadav44x@gmail.com</strong>.
           </p>
         </div>
 
@@ -116,3 +116,4 @@ const Faqs = () => {
 };
 
 export default Faqs;
+

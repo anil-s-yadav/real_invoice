@@ -68,7 +68,7 @@ const PrivacyPolicy = () => {
 
         <h2>8. Contact Us</h2>
         <p>
-          If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact our Data Protection Officer at <strong>support@invozapp.com</strong>.
+          If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact our Data Protection Officer at <strong>anilyadav44x@gmail.com</strong>.
         </p>
       </div>
     </div>
@@ -76,3 +76,4 @@ const PrivacyPolicy = () => {
 };
 
 export default PrivacyPolicy;
+

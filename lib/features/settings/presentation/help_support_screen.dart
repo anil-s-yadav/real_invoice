@@ -10,7 +10,7 @@ class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
 
   static const String _supportPhone = '+91 98765 43210';
-  static const String _supportEmail = 'support@invoz.app';
+  static const String _supportEmail = 'anilyadav44x@gmail.com';
   static const String _whatsappNumber = '919876543210';
 
   static const List<Map<String, String>> _faqs = [
@@ -301,4 +301,5 @@ class HelpSupportScreen extends StatelessWidget {
     );
   }
 }
+
 

@@ -90,7 +90,7 @@ const TermsConditions = () => {
 
         <h2>11. Contact Information</h2>
         <p>
-          If you have any questions regarding these Terms, please contact us at <strong>support@invozapp.com</strong>.
+          If you have any questions regarding these Terms, please contact us at <strong>anilyadav44x@gmail.com</strong>.
         </p>
       </div>
     </div>
@@ -98,3 +98,4 @@ const TermsConditions = () => {
 };
 
 export default TermsConditions;
+

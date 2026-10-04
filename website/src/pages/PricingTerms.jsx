@@ -45,3 +45,4 @@ const PricingTerms = () => {
 };
 
 export default PricingTerms;
+
