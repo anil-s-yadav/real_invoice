@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:invoz/features/settings/domain/payment_detail_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:http/http.dart' as http;
 import '../../core/utils/image_cache_service.dart';
@@ -24,41 +26,47 @@ class DocumentPdfGenerator {
     try {
       String resolvedUrl = path;
 
-      // Handle gs:// URLs explicitly by converting them to HTTP download URLs
+      // Extremely fast gs:// caching using SharedPreferences
       if (path.startsWith('gs://')) {
-        try {
-          resolvedUrl = await FirebaseStorage.instance.refFromURL(path).getDownloadURL();
-        } catch (e) {
-          return null;
+        final prefs = await SharedPreferences.getInstance();
+        final cacheKey = 'gs_url_$path';
+        final cachedUrl = prefs.getString(cacheKey);
+        
+        if (cachedUrl != null && cachedUrl.isNotEmpty) {
+          resolvedUrl = cachedUrl;
+        } else {
+          try {
+            resolvedUrl = await FirebaseStorage.instance.refFromURL(path).getDownloadURL();
+            await prefs.setString(cacheKey, resolvedUrl);
+          } catch (e) {
+            return null;
+          }
         }
       }
 
-      String cacheKey = resolvedUrl.startsWith('http')
-          ? 'pdf_img_'
-          : '';
-      String? resolvedPath = resolvedUrl.startsWith('http')
-          ? await ImageCacheService.cacheImage(
-              pathOrUrl: resolvedUrl,
-              cacheKey: cacheKey,
-            )
-          : resolvedUrl;
-
-      if (resolvedPath != null) {
-        if (resolvedPath.startsWith('http')) {
-          final response = await http
-              .get(Uri.parse(resolvedPath))
-              .timeout(const Duration(seconds: 5));
-          if (response.statusCode == 200) {
-            _imageCache[path] = response.bodyBytes;
-            return response.bodyBytes;
-          }
-        } else {
-          final file = File(resolvedPath);
+      if (resolvedUrl.startsWith('http')) {
+        // Share EXACT cache with the UI's CachedNetworkImage to completely eliminate downloads
+        try {
+          final file = await DefaultCacheManager().getSingleFile(resolvedUrl);
           if (await file.exists()) {
             final bytes = await file.readAsBytes();
             _imageCache[path] = bytes;
             return bytes;
           }
+        } catch (_) {}
+        
+        // Ultimate fallback
+        final response = await http.get(Uri.parse(resolvedUrl)).timeout(const Duration(seconds: 5));
+        if (response.statusCode == 200) {
+          _imageCache[path] = response.bodyBytes;
+          return response.bodyBytes;
+        }
+      } else {
+        final file = File(resolvedUrl);
+        if (await file.exists()) {
+          final bytes = await file.readAsBytes();
+          _imageCache[path] = bytes;
+          return bytes;
         }
       }
     } catch (_) {}

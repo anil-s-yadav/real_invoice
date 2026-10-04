@@ -49,6 +49,7 @@ dependencies:
   firebase_analytics: ^12.6.0
   in_app_update: ^5.0.0
   in_app_review: ^2.0.12
+  flutter_cache_manager: ^3.4.5
 
 
 dev_dependencies:
