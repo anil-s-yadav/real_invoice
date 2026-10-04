@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
@@ -251,26 +253,37 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               children: [
                 SettingsTile(
-                  title: 'Privacy Policy & Terms',
+                  title: 'Rate the App',
+                  subtitle: 'Love Invoz? Leave a review!',
+                  icon: Icons.star_rate_rounded,
+                  color: Colors.amber,
+                  isFirst: true,
+                  onTap: () async {
+                    final InAppReview inAppReview = InAppReview.instance;
+                    if (await inAppReview.isAvailable()) {
+                      inAppReview.requestReview();
+                    }
+                  },
+                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
+                SettingsTile(
+                  title: 'Privacy Policy',
+                  isFirst: false,
 
                   icon: Icons.security,
                   color: Colors.green,
-                  isLast: true,
-                  trailing: const Icon(
-                    Icons.info_outline,
-                    size: 20,
-                    color: AppColors.textMuted,
-                  ),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'All data is securely stored on your device only.',
-                        ),
-                        backgroundColor: AppColors.primary,
-                      ),
-                    );
-                  },
+                  isLast: false,
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 14,
+                      color: AppColors.textMuted,
+                    ),
+                  onTap: () async {
+                      final Uri url = Uri.parse('https://invoice-c1603.web.app/privacy');
+                      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                        debugPrint('Could not launch \');
+                      }
+                    },
                 ),
                 Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
@@ -362,3 +375,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+

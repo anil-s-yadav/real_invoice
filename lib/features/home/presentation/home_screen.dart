@@ -3,6 +3,8 @@ import 'package:invoz/features/documents/bloc/document_state.dart';
 
 import '../../ads/ad_banner_widget.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:in_app_update/in_app_update.dart';
 import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,9 +61,37 @@ class _HomeScreenState extends State<HomeScreen> {
       InterstitialAdManager.loadAd(context);
     });
     _checkPromoBanner();
+    if (Platform.isAndroid) _checkForUpdates();
+  }
+
+  Future<void> _checkForUpdates() async {
+    try {
+      final info = await InAppUpdate.checkForUpdate();
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        if (info.immediateUpdateAllowed) {
+          await InAppUpdate.performImmediateUpdate();
+        } else if (info.flexibleUpdateAllowed) {
+          await InAppUpdate.startFlexibleUpdate();
+          await InAppUpdate.completeFlexibleUpdate();
+        }
+      }
+    } catch (e) {
+      debugPrint("In-app update check failed: $e");
+    }
   }
 
   Future<void> _checkPromoBanner() async {
+    // Never show promo banner to premium users or old users with payment history
+    if (mounted) {
+      final subState = context.read<SubscriptionBloc>().state;
+      if (subState is PremiumTierState || !subState.isEligibleForWelcomeOffer) {
+        setState(() {
+          _showPromoBanner = false;
+        });
+        return;
+      }
+    }
+
     final prefs = await SharedPreferences.getInstance();
     final lastDismissedStr = prefs.getString('promo_banner_dismissed_date');
     if (lastDismissedStr != null) {
@@ -405,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                  if (_showPromoBanner) ...[
+                  if (_showPromoBanner && context.read<SubscriptionBloc>().state is! PremiumTierState && context.read<SubscriptionBloc>().state.isEligibleForWelcomeOffer) ...[
                     _buildPremiumPromoBanner(context),
                     const SizedBox(height: AppDimensions.xl),
                   ],
@@ -1042,3 +1072,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

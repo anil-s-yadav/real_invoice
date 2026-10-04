@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "714420260814-rjp464s7i6acnii7meufslorb43nks9b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.real_invoice",
+            "certificate_hash": "db22f5de3551bb5d5d54c38d0a293b33f82291aa"
+          }
+        },
+        {
           "client_id": "714420260814-vq24mn99nrvfmksfpk88m32hmc2u6v6o.apps.googleusercontent.com",
           "client_type": 3
         }
