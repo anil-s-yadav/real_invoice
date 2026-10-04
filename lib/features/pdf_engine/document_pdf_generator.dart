@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:invoz/features/settings/domain/payment_detail_model.dart';
 import 'package:pdf/pdf.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:http/http.dart' as http;
 import '../../core/utils/image_cache_service.dart';
@@ -21,21 +22,29 @@ class DocumentPdfGenerator {
     if (_imageCache.containsKey(path)) return _imageCache[path];
 
     try {
-      // 1. Resolve local path via ImageCacheService if it's a remote URL
-      // For caching key, we use a hash of the URL to ensure uniqueness
-      String cacheKey = path.startsWith('http')
-          ? 'pdf_img_${path.hashCode}'
+      String resolvedUrl = path;
+
+      // Handle gs:// URLs explicitly by converting them to HTTP download URLs
+      if (path.startsWith('gs://')) {
+        try {
+          resolvedUrl = await FirebaseStorage.instance.refFromURL(path).getDownloadURL();
+        } catch (e) {
+          return null;
+        }
+      }
+
+      String cacheKey = resolvedUrl.startsWith('http')
+          ? 'pdf_img_'
           : '';
-      String? resolvedPath = path.startsWith('http')
+      String? resolvedPath = resolvedUrl.startsWith('http')
           ? await ImageCacheService.cacheImage(
-              pathOrUrl: path,
+              pathOrUrl: resolvedUrl,
               cacheKey: cacheKey,
             )
-          : path;
+          : resolvedUrl;
 
       if (resolvedPath != null) {
         if (resolvedPath.startsWith('http')) {
-          // Fallback to direct HTTP if caching failed but it's still a URL
           final response = await http
               .get(Uri.parse(resolvedPath))
               .timeout(const Duration(seconds: 5));
@@ -44,11 +53,10 @@ class DocumentPdfGenerator {
             return response.bodyBytes;
           }
         } else {
-          // Read local file
           final file = File(resolvedPath);
           if (await file.exists()) {
             final bytes = await file.readAsBytes();
-            _imageCache[path] = bytes; // cache in-memory by original path
+            _imageCache[path] = bytes;
             return bytes;
           }
         }
@@ -660,11 +668,7 @@ class DocumentPdfGenerator {
             mainAxisAlignment: pw.MainAxisAlignment.end,
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              if (stampBytes == null)
-                  pw.Text('STAMP IS NULL!', style: pw.TextStyle(color: PdfColors.red)),
-                if (stampBytes != null && !doc.showStamp)
-                  pw.Text('STAMP IS HIDDEN (doc.showStamp=false)!', style: pw.TextStyle(color: PdfColors.orange)),
-                if (stampBytes != null && doc.showStamp)
+              if (stampBytes != null && doc.showStamp)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
@@ -943,11 +947,7 @@ class DocumentPdfGenerator {
             mainAxisAlignment: pw.MainAxisAlignment.end,
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              if (stampBytes == null)
-                  pw.Text('STAMP IS NULL!', style: pw.TextStyle(color: PdfColors.red)),
-                if (stampBytes != null && !doc.showStamp)
-                  pw.Text('STAMP IS HIDDEN (doc.showStamp=false)!', style: pw.TextStyle(color: PdfColors.orange)),
-                if (stampBytes != null && doc.showStamp)
+              if (stampBytes != null && doc.showStamp)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
@@ -1732,11 +1732,7 @@ class DocumentPdfGenerator {
           pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              if (stampBytes == null)
-                  pw.Text('STAMP IS NULL!', style: pw.TextStyle(color: PdfColors.red)),
-                if (stampBytes != null && !doc.showStamp)
-                  pw.Text('STAMP IS HIDDEN (doc.showStamp=false)!', style: pw.TextStyle(color: PdfColors.orange)),
-                if (stampBytes != null && doc.showStamp)
+              if (stampBytes != null && doc.showStamp)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
