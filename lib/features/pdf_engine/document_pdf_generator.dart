@@ -660,7 +660,11 @@ class DocumentPdfGenerator {
             mainAxisAlignment: pw.MainAxisAlignment.end,
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              if (stampBytes != null && doc.showStamp)
+              if (stampBytes == null)
+                  pw.Text('STAMP IS NULL!', style: pw.TextStyle(color: PdfColors.red)),
+                if (stampBytes != null && !doc.showStamp)
+                  pw.Text('STAMP IS HIDDEN (doc.showStamp=false)!', style: pw.TextStyle(color: PdfColors.orange)),
+                if (stampBytes != null && doc.showStamp)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
@@ -939,7 +943,11 @@ class DocumentPdfGenerator {
             mainAxisAlignment: pw.MainAxisAlignment.end,
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              if (stampBytes != null && doc.showStamp)
+              if (stampBytes == null)
+                  pw.Text('STAMP IS NULL!', style: pw.TextStyle(color: PdfColors.red)),
+                if (stampBytes != null && !doc.showStamp)
+                  pw.Text('STAMP IS HIDDEN (doc.showStamp=false)!', style: pw.TextStyle(color: PdfColors.orange)),
+                if (stampBytes != null && doc.showStamp)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
@@ -1724,7 +1732,11 @@ class DocumentPdfGenerator {
           pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              if (stampBytes != null && doc.showStamp)
+              if (stampBytes == null)
+                  pw.Text('STAMP IS NULL!', style: pw.TextStyle(color: PdfColors.red)),
+                if (stampBytes != null && !doc.showStamp)
+                  pw.Text('STAMP IS HIDDEN (doc.showStamp=false)!', style: pw.TextStyle(color: PdfColors.orange)),
+                if (stampBytes != null && doc.showStamp)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
