@@ -281,9 +281,28 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () async {
                       final Uri url = Uri.parse('https://invoice-c1603.web.app/privacy');
                       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                        debugPrint('Could not launch \');
+                        debugPrint('Could not launch $url');
                       }
                     },
+                ),
+                Divider(height: 1, color: dividerColor, indent: 56),
+                SettingsTile(
+                  title: 'Terms & Conditions',
+                  icon: Icons.gavel,
+                  color: Colors.deepPurple,
+                  isFirst: false,
+                  isLast: false,
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: AppColors.textMuted,
+                  ),
+                  onTap: () async {
+                    final Uri url = Uri.parse('https://invoice-c1603.web.app/terms');
+                    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                      debugPrint('Could not launch $url');
+                    }
+                  },
                 ),
                 Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
@@ -375,6 +394,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 
