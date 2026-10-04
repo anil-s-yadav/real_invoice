@@ -5,7 +5,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/app_card.dart';
+
 import '../../../customers/bloc/customer_bloc.dart';
 import '../../../customers/bloc/customer_state.dart';
 import '../../../customers/domain/customer_model.dart';
@@ -122,75 +122,58 @@ class _CustomerSelectSheetState extends State<CustomerSelectSheet> {
                   }
 
                   return ListView.separated(
-                    padding: const EdgeInsets.all(AppDimensions.lg),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: filtered.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: AppDimensions.xs),
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1, 
+                      indent: 16, 
+                      endIndent: 16, 
+                      color: AppColors.border.withValues(alpha: 0.3)
+                    ),
                     itemBuilder: (context, index) {
                       final customer = filtered[index];
-                      final isSelected =
-                          widget.selectedCustomer?.id == customer.id;
-                      final isDark =
-                          Theme.of(context).brightness == Brightness.dark;
+                      final isSelected = widget.selectedCustomer?.id == customer.id;
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
 
-                      return AppCard(
-                        backgroundColor: isSelected
-                            ? (isDark
-                                  ? AppColors.primary.withValues(alpha: 0.15)
-                                  : AppColors.primaryLight)
-                            : null,
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.primary
-                              : (isDark
-                                    ? AppColors.darkBorder
-                                    : AppColors.border),
-                          width: isSelected ? 1.5 : 1.0,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppDimensions.md,
-                          vertical: AppDimensions.sm,
-                        ),
+                      return InkWell(
                         onTap: () => Navigator.of(context).pop(customer),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    customer.name,
-                                    style: AppTypography.titleMedium.copyWith(
-                                      fontWeight: isSelected
-                                          ? FontWeight.w700
-                                          : FontWeight.w600,
-                                      color: isDark
-                                          ? AppColors.darkTextPrimary
-                                          : AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  if (customer.phone != null &&
-                                      customer.phone!.isNotEmpty) ...[
-                                    const SizedBox(height: 2),
+                        child: Container(
+                          color: isSelected
+                              ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08)
+                              : Colors.transparent,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                     Text(
-                                      customer.phone!,
-                                      style: AppTypography.bodySmall.copyWith(
-                                        color: isDark
-                                            ? AppColors.darkTextSecondary
-                                            : AppColors.textSecondary,
+                                      customer.name,
+                                      style: AppTypography.titleMedium.copyWith(
+                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                                       ),
                                     ),
+                                    if (customer.phone != null && customer.phone!.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        customer.phone!,
+                                        style: AppTypography.bodySmall.copyWith(
+                                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
                                   ],
-                                ],
+                                ),
                               ),
-                            ),
-                            if (isSelected)
-                              const Icon(
-                                Icons.check_circle,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
-                          ],
+                              if (isSelected)
+                                const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+                            ],
+                          ),
                         ),
                       );
                     },

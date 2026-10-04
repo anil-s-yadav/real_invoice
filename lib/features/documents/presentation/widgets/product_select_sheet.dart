@@ -6,7 +6,7 @@ import '../../../../core/constants/app_typography.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/app_card.dart';
+
 import '../../../products/bloc/product_bloc.dart';
 import '../../../products/bloc/product_state.dart';
 import '../../../products/domain/product_model.dart';
@@ -23,7 +23,7 @@ class ProductSelectSheet extends StatefulWidget {
   }) {
     return AppBottomSheet.show<ProductItem>(
       context: context,
-      title: 'Select Item',
+      title: 'Select Product/Service',
       child: ProductSelectSheet(selectedProduct: current),
     );
   }
@@ -122,94 +122,75 @@ class _ProductSelectSheetState extends State<ProductSelectSheet> {
                   }
 
                   return ListView.separated(
-                    padding: const EdgeInsets.all(AppDimensions.md),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
+                    separatorBuilder: (_, _) => Divider(
+                      height: 1, 
+                      indent: 16, 
+                      endIndent: 16, 
+                      color: AppColors.border.withValues(alpha: 0.3)
+                    ),
                     itemBuilder: (context, index) {
                       final product = filtered[index];
-                      final isSelected =
-                          widget.selectedProduct?.id == product.id;
-                      final isDark =
-                          Theme.of(context).brightness == Brightness.dark;
+                      final isSelected = widget.selectedProduct?.id == product.id;
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
 
-                      return AppCard(
-                        padding: EdgeInsets.zero,
-                        backgroundColor: isSelected
-                            ? AppColors.primary.withValues(
-                                alpha: isDark ? 0.15 : 0.05,
-                              )
-                            : null,
-                        border: Border.all(
+                      return InkWell(
+                        onTap: () => Navigator.of(context).pop(product),
+                        child: Container(
                           color: isSelected
-                              ? AppColors.primary
-                              : (isDark
-                                    ? AppColors.darkBorder
-                                    : AppColors.border),
-                        ),
-                        child: InkWell(
-                          onTap: () => Navigator.of(context).pop(product),
-                          borderRadius: BorderRadius.circular(12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? AppColors.primary.withValues(
-                                            alpha: 0.1,
-                                          )
-                                        : (isDark
-                                              ? AppColors.darkSurface
-                                              : AppColors.surfaceVariant),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    Icons.inventory_2_outlined,
-                                    color: isSelected
-                                        ? AppColors.primary
-                                        : (isDark
-                                              ? AppColors.darkTextSecondary
-                                              : AppColors.textMuted),
-                                  ),
+                              ? AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08)
+                              : Colors.transparent,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? AppColors.primary.withValues(alpha: 0.1)
+                                      : (isDark ? AppColors.darkSurface : AppColors.surfaceVariant),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        product.title,
-                                        style: AppTypography.titleSmall
-                                            .copyWith(
-                                              color: isSelected
-                                                  ? AppColors.primary
-                                                  : (isDark
-                                                        ? AppColors
-                                                              .darkTextPrimary
-                                                        : AppColors
-                                                              .textPrimary),
-                                            ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${CurrencyFormatter.format(product.unitPrice)} / ${product.unit}',
-                                        style: TextStyle(
-                                          color: isDark
-                                              ? AppColors.darkTextSecondary
-                                              : AppColors.textSecondary,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                child: Icon(
+                                  Icons.inventory_2_outlined,
+                                  color: isSelected
+                                      ? AppColors.primary
+                                      : (isDark ? AppColors.darkTextSecondary : AppColors.textMuted),
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      product.title,
+                                      style: AppTypography.titleSmall.copyWith(
+                                        color: isSelected
+                                            ? AppColors.primary
+                                            : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${CurrencyFormatter.format(product.unitPrice)} / ${product.unit}',
+                                      style: TextStyle(
+                                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (isSelected)
+                                const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+                            ],
                           ),
                         ),
                       );
