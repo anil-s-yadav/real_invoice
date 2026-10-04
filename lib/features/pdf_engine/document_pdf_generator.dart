@@ -670,41 +670,52 @@ class DocumentPdfGenerator {
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
               if (stampBytes != null && doc.showStamp)
-                pw.Padding(
-                  padding: const pw.EdgeInsets.only(right: 12),
-                  child: pw.Column(
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.only(right: 24),
+                    child: pw.Column(
+                      mainAxisAlignment: pw.MainAxisAlignment.end,
+                      children: [
+                        pw.Container(
+                          width: 90, 
+                          height: 45, 
+                          alignment: pw.Alignment.bottomCenter,
+                          child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain),
+                        ),
+                        pw.SizedBox(height: 6),
+                        pw.Container(width: 90, child: pw.Divider(color: primaryColor, thickness: 1)),
+                        pw.SizedBox(height: 4),
+                        pw.Text(
+                          'Company Stamp',
+                          style: pw.TextStyle(
+                            fontSize: 10,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (signatureBytes != null && doc.showSignature)
+                  pw.Column(
+                    mainAxisAlignment: pw.MainAxisAlignment.end,
                     children: [
-                      pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain)),
-                      pw.SizedBox(height: 4),
                       pw.Container(
-                        width: 100,
-                        child: pw.Divider(color: primaryColor),
+                        width: 90, 
+                        height: 45, 
+                        alignment: pw.Alignment.bottomCenter,
+                        child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain),
                       ),
+                      pw.SizedBox(height: 6),
+                      pw.Container(width: 90, child: pw.Divider(color: primaryColor, thickness: 1)),
                       pw.SizedBox(height: 4),
                       pw.Text(
-                        'Company Stamp',
-                        style: pw.TextStyle(fontSize: 10, color: primaryColor),
+                        'Authorized Signature',
+                        style: pw.TextStyle(
+                          fontSize: 10,
+                          color: primaryColor,
+                        ),
                       ),
                     ],
                   ),
-                ),
-              if (signatureBytes != null && doc.showSignature)
-                pw.Column(
-                  children: [
-                    pw.Container(width: 100, height: 40, child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain)),
-                    pw.SizedBox(height: 4),
-                    pw.Container(width: 100, height: 1.5, color: borderColor),
-                    pw.SizedBox(height: 4),
-                    pw.Text(
-                      'Authorized Signature',
-                      style: pw.TextStyle(
-                        fontSize: 9,
-                        fontWeight: pw.FontWeight.bold,
-                        color: mutedColor,
-                      ),
-                    ),
-                  ],
-                ),
             ],
           ),
         ],
@@ -950,15 +961,12 @@ class DocumentPdfGenerator {
             children: [
               if (stampBytes != null && doc.showStamp)
                 pw.Padding(
-                  padding: const pw.EdgeInsets.only(right: 12),
+                  padding: const pw.EdgeInsets.only(right: 24),
                   child: pw.Column(
                     children: [
-                      pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain)),
+                      pw.Container(width: 90, height: 45, alignment: pw.Alignment.bottomCenter, child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain)),
                       pw.SizedBox(height: 4),
-                      pw.Container(
-                        width: 100,
-                        child: pw.Divider(color: primaryColor),
-                      ),
+                      pw.Container(width: 90, height: 1.5, color: primaryColor),
                       pw.SizedBox(height: 4),
                       pw.Text(
                         'Company Stamp',
@@ -970,7 +978,7 @@ class DocumentPdfGenerator {
               if (signatureBytes != null && doc.showSignature)
                 pw.Column(
                   children: [
-                    pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain)),
+                    pw.Container(width: 90, height: 45, alignment: pw.Alignment.bottomCenter, child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain)),
                     pw.Container(
                       width: 100,
                       child: pw.Divider(color: primaryColor),
@@ -1735,15 +1743,12 @@ class DocumentPdfGenerator {
             children: [
               if (stampBytes != null && doc.showStamp)
                 pw.Padding(
-                  padding: const pw.EdgeInsets.only(right: 12),
+                  padding: const pw.EdgeInsets.only(right: 24),
                   child: pw.Column(
                     children: [
-                      pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain)),
+                      pw.Container(width: 90, height: 45, alignment: pw.Alignment.bottomCenter, child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain)),
                       pw.SizedBox(height: 4),
-                      pw.Container(
-                        width: 100,
-                        child: pw.Divider(color: primaryColor),
-                      ),
+                      pw.Container(width: 90, height: 1.5, color: primaryColor),
                       pw.SizedBox(height: 4),
                       pw.Text(
                         'Company Stamp',
@@ -1755,7 +1760,7 @@ class DocumentPdfGenerator {
               if (signatureBytes != null && doc.showSignature)
                 pw.Column(
                   children: [
-                    pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain)),
+                    pw.Container(width: 90, height: 45, alignment: pw.Alignment.bottomCenter, child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain)),
                     pw.Container(
                       width: 100,
                       child: pw.Divider(color: primaryColor),

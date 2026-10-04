@@ -1,6 +1,7 @@
 import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/documents/bloc/document_state.dart';
 import 'package:invoz/features/reports/bloc/reports_bloc.dart';
+import 'package:invoz/features/subscription/presentation/plan_info_screen.dart';
 
 import '../../ads/ad_banner_widget.dart';
 import 'package:flutter/material.dart';
@@ -230,11 +231,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     tooltip: 'Premium',
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const SubscriptionScreen(),
-                        ),
-                      );
+                      if (isPremium) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PlanInfoScreen(),
+                          ),
+                        );
+                      } else {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SubscriptionScreen(),
+                          ),
+                        );
+                      }
                     },
                   );
                 },
@@ -337,7 +346,9 @@ class _HomeScreenState extends State<HomeScreen> {
             color: AppColors.primary,
             onRefresh: () async {
               context.read<HomeBloc>().add(const LoadHomeDataEvent());
-              context.read<ReportsBloc>().add(const LoadAnalyticsEvent(forceRefresh: true));
+              context.read<ReportsBloc>().add(
+                const LoadAnalyticsEvent(forceRefresh: true),
+              );
             },
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -1080,4 +1091,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
