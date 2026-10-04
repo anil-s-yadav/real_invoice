@@ -985,7 +985,7 @@ class DocumentPdfGenerator {
                       )
                     : pw.BarcodeWidget(
                         barcode: pw.Barcode.qrCode(),
-                        data: 'https://invoz.com',
+                        data: 'https://invoice-c1603.web.app',
                       ),
               ),
               pw.SizedBox(height: 4),
@@ -1670,3 +1670,4 @@ class DocumentPdfGenerator {
     ];
   }
 }
+

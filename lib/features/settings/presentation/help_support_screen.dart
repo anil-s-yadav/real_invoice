@@ -89,6 +89,25 @@ class HelpSupportScreen extends StatelessWidget {
                           endIndent: 16,
                         ),
                     ],
+                    Divider(
+                      height: 1,
+                      color: AppColors.border.withValues(alpha: 0.5),
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                    SettingsTile(
+                      title: 'View Detailed Web FAQs',
+                      subtitle: 'Read our comprehensive guides online',
+                      icon: Icons.public,
+                      color: Colors.blueAccent,
+                      isLast: true,
+                      onTap: () async {
+                        final Uri url = Uri.parse('https://invoice-c1603.web.app/faq');
+                        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                          debugPrint('Could not launch $url');
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
