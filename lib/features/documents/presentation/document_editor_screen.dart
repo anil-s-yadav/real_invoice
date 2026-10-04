@@ -66,6 +66,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   bool _isSaving = false;
   bool _isInitialized = false;
   bool _includePaymentDetails = false;
+  bool _enableRoundOff = true;
   List<PaymentDetail> _payments = [];
 
   String? _selectedBankDetailId;
@@ -89,6 +90,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     );
     _issueDate = doc?.issueDate ?? DateTime.now();
     _includePaymentDetails = doc?.includePaymentDetails ?? true;
+    _enableRoundOff = doc?.enableRoundOff ?? true;
     _selectedBankDetailId = doc?.selectedBankDetailId;
     _selectedUpiDetailId = doc?.selectedUpiDetailId;
     _dueDate = doc?.dueDate ?? DateTime.now().add(const Duration(days: 15));
@@ -194,7 +196,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   }
 
   double get _rawTotal => (_subtotal - _overallDiscountAmount) + _taxTotal;
-  double get _roundOff => (_rawTotal.roundToDouble() - _rawTotal);
+  double get _calculatedRoundOff => (_rawTotal.roundToDouble() - _rawTotal);
+  double get _roundOff => _enableRoundOff ? _calculatedRoundOff : 0.0;
   double get _finalTotal => _rawTotal + _roundOff;
 
   Future<void> _selectIssueDate() async {
@@ -297,7 +300,8 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
       overallDiscountValue: _overallDiscountValue,
       overallDiscountType: _overallDiscountType,
       templateId: _templateId,
-      includePaymentDetails:
+      enableRoundOff: _enableRoundOff,
+        includePaymentDetails:
           _selectedBankDetailId != null ||
           _selectedUpiDetailId != null ||
           _includePaymentDetails,
@@ -395,7 +399,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               _buildItemsSection(),
               const SizedBox(height: 24),
 
-              _buildSectionTitle('DETAILS (OPTIONAL)'),
+              // _buildSectionTitle('DETAILS (OPTIONAL)'),
               _buildOptionalFields(),
               const SizedBox(height: 24),
 
@@ -717,12 +721,6 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppTextField(
-          controller: _subjectController,
-          label: 'Subject / Title (Optional)',
-          hint: 'e.g. Website Redesign Project',
-        ),
-        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
@@ -1277,13 +1275,48 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
             ),
           ],
 
-          if (_roundOff != 0) ...[
+          if (_calculatedRoundOff != 0) ...[
             const SizedBox(height: 12),
-            _buildSummaryRow(
-              'Round Off',
-              _roundOff > 0
-                  ? '+ ${CurrencyFormatter.format(_roundOff)}'
-                  : CurrencyFormatter.format(_roundOff),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'Round Off',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      height: 24,
+                      child: Transform.scale(
+                        scale: 0.7,
+                        child: Switch(
+                          value: _enableRoundOff,
+                          onChanged: (val) {
+                            setState(() => _enableRoundOff = val);
+                          },
+                          activeTrackColor: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  _calculatedRoundOff > 0
+                      ? '+ '
+                      : CurrencyFormatter.format(_calculatedRoundOff),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
             ),
           ],
 
@@ -1782,3 +1815,4 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
     );
   }
 }
+

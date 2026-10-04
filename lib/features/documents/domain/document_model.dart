@@ -61,6 +61,7 @@ class DocumentModel {
   final String? notes;
   final String? terms;
   final String? relatedDocId;
+  final bool enableRoundOff;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -87,6 +88,7 @@ class DocumentModel {
     this.notes,
     this.terms,
     this.relatedDocId,
+    this.enableRoundOff = true,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -122,7 +124,7 @@ class DocumentModel {
   double get rawTotalAmount => taxableAmount + totalTaxAmount + shippingCharges;
 
   /// Round-off adjustment to nearest integer (standard in Indian invoices)
-  double get roundOff => (rawTotalAmount.roundToDouble() - rawTotalAmount);
+  double get roundOff => enableRoundOff ? (rawTotalAmount.roundToDouble() - rawTotalAmount) : 0.0;
 
   /// Final payable total amount
   double get totalAmount => rawTotalAmount + roundOff;
@@ -180,6 +182,7 @@ class DocumentModel {
     String? notes,
     String? terms,
     String? relatedDocId,
+    bool? enableRoundOff,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -207,6 +210,7 @@ class DocumentModel {
       notes: notes ?? this.notes,
       terms: terms ?? this.terms,
       relatedDocId: relatedDocId ?? this.relatedDocId,
+      enableRoundOff: enableRoundOff ?? this.enableRoundOff,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -236,6 +240,7 @@ class DocumentModel {
       'notes': notes,
       'terms': terms,
       'relatedDocId': relatedDocId,
+      'enableRoundOff': enableRoundOff,
       'subtotal': subtotal,
       'taxAmount': totalTaxAmount,
       'roundOff': roundOff,
@@ -324,6 +329,7 @@ class DocumentModel {
       notes: map['notes'] as String?,
       terms: map['terms'] as String?,
       relatedDocId: map['relatedDocId'] as String?,
+      enableRoundOff: map['enableRoundOff'] as bool? ?? true,
       createdAt:
           DateTime.tryParse(map['createdAt'] as String? ?? '') ??
           DateTime.now(),
@@ -333,3 +339,4 @@ class DocumentModel {
     );
   }
 }
+
