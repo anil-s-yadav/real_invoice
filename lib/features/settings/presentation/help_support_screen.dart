@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../subscriptions/bloc/subscription_bloc.dart';
+
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
@@ -9,9 +12,9 @@ import '../../../core/widgets/settings_tile.dart';
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
 
-  static const String _supportPhone = '+91 98765 43210';
+  static const String _supportPhone = '+91 9892986314';
   static const String _supportEmail = 'anilyadav44x@gmail.com';
-  static const String _whatsappNumber = '919876543210';
+  static const String _whatsappNumber = '919892986314';
 
   static const List<Map<String, String>> _faqs = [
     {
@@ -53,6 +56,8 @@ class HelpSupportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final subState = context.watch<SubscriptionBloc>().state;
+    final isPremium = subState is PremiumTierState;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -119,7 +124,7 @@ class HelpSupportScreen extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
-                    SettingsTile(
+                    if (isPremium) SettingsTile(
                       title: 'Contact Phone',
                       subtitle: _supportPhone,
                       icon: Icons.phone_outlined,
@@ -320,5 +325,6 @@ class HelpSupportScreen extends StatelessWidget {
     );
   }
 }
+
 
 

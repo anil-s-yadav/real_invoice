@@ -33,9 +33,11 @@ class ProductEditorSheet extends StatefulWidget {
   }) {
     return AppBottomSheet.show<ProductItem>(
       context: context,
-      title: saveToDb
-          ? (product != null ? 'Edit Item / Service' : 'New Item / Service')
-          : 'Enter Item Details',
+      isDismissible: false,
+        enableDrag: false,
+        title: saveToDb
+          ? (product != null ? 'Edit Product/Service' : 'Add Product/Service')
+          : 'Enter Product/Service Details',
       child: ProductEditorSheet(initialProduct: product, saveToDb: saveToDb),
     );
   }
@@ -207,7 +209,7 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
                     child: Center(
                       widthFactor: 1.0,
                       child: Text(
-                        'â‚¹',
+                        '\u20B9',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -350,3 +352,6 @@ class _ProductEditorSheetState extends State<ProductEditorSheet> {
     );
   }
 }
+
+
+

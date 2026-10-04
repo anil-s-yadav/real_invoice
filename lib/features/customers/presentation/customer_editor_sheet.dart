@@ -32,7 +32,9 @@ class CustomerEditorSheet extends StatefulWidget {
   }) {
     return AppBottomSheet.show<Customer>(
       context: context,
-      title: saveToDb
+      isDismissible: false,
+        enableDrag: false,
+        title: saveToDb
           ? (customer != null ? 'Edit Customer' : 'New Customer')
           : 'Enter Customer Details',
       child: CustomerEditorSheet(initialCustomer: customer, saveToDb: saveToDb),
@@ -50,6 +52,9 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
   late final TextEditingController _billingAddressController;
   late final TextEditingController _shippingAddressController;
   late final TextEditingController _gstinController;
+  late final TextEditingController _cinController;
+  late final TextEditingController _contactPersonController;
+  late final TextEditingController _websiteController;
   late final TextEditingController _notesController;
 
   String? _nameError;
@@ -80,6 +85,9 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
     _billingAddressController.dispose();
     _shippingAddressController.dispose();
     _gstinController.dispose();
+    _cinController.dispose();
+    _contactPersonController.dispose();
+    _websiteController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -260,3 +268,4 @@ class _CustomerEditorSheetState extends State<CustomerEditorSheet> {
     );
   }
 }
+

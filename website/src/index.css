@@ -305,3 +305,118 @@ li {
   color: #4b5563;
   line-height: 1.6;
 }
+/* FAQ Accordion & Search */
+.search-container {
+  margin: 2rem 0;
+}
+.faq-search-input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.faq-search-input:focus {
+  border-color: #1a56db;
+  box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+}
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.faq-category-title {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: #1a56db;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+.faq-tile {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.faq-tile:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.faq-tile-header {
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  background-color: #ffffff;
+}
+.faq-tile-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #111827;
+  font-weight: 600;
+  padding-right: 1rem;
+}
+.faq-icon {
+  font-size: 1.5rem;
+  color: #6b7280;
+  font-weight: bold;
+}
+.faq-tile.expanded .faq-icon {
+  color: #1a56db;
+}
+.faq-tile-content {
+  padding: 0 1.25rem 1.25rem;
+  color: #4b5563;
+  line-height: 1.6;
+  border-top: 1px solid #f3f4f6;
+  background-color: #f9fafb;
+}
+.faq-tile-content p {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+.faq-not-found {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+.faq-not-found h3 {
+  color: #111827;
+  margin-bottom: 1rem;
+}
+.contact-support-btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #1a56db;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+.contact-support-btn:hover {
+  background-color: #1e40af;
+}
+
+/* Mobile Navbar Fixes */
+@media (max-width: 767px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  .nav-links {
+    justify-content: center;
+    gap: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+}

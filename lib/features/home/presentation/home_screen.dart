@@ -336,6 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: AppColors.primary,
             onRefresh: () async {
               context.read<HomeBloc>().add(const LoadHomeDataEvent());
+                context.read<ReportsBloc>().add(const GenerateReportEvent());
             },
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -654,7 +655,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           indent: 56,
                         ),
                         SettingsTile(
-                          title: 'Items',
+                          title: 'Products/Services',
                           subtitle: 'Products & Services',
                           icon: Icons.inventory_2,
                           color: Colors.orange,
@@ -1072,4 +1073,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
 

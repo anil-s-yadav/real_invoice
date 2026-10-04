@@ -112,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final state = context.read<BusinessProfileBloc>().state;
 
     BusinessProfile profile;
-    if (state is BusinessProfileLoaded) {
+    if (state is BusinessProfileLoaded && !widget.isAddingNewCompany) {
       profile = state.profile.copyWith(
         businessName: _nameController.text.trim(),
         email: _emailController.text.trim(),
@@ -168,13 +168,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       if (profile.businessName.isNotEmpty) {
         // Await the repository directly so it finishes before we navigate
         final repo = context.read<BusinessProfileRepository>();
-        await repo.saveProfile(profile);
-        AnalyticsService.logBusinessCreated(profile.id);
+        final savedProfile = await repo.saveProfile(profile);
+        AnalyticsService.logBusinessCreated(savedProfile.id);
 
         if (mounted) {
-          // Tell the bloc to load this specific profile
           context.read<BusinessProfileBloc>().add(
-            LoadBusinessProfileEvent(profile.id),
+            LoadBusinessProfileEvent(savedProfile.id),
           );
         }
       }
@@ -882,3 +881,5 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+
+

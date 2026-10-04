@@ -321,14 +321,6 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
-                  title: 'Rate Us',
-                  subtitle: 'Share your feedback',
-                  icon: Icons.star_outline,
-                  color: Colors.amber,
-                  onTap: () => _showComingSoon(context, 'Rate Us'),
-                ),
-                Divider(height: 1, color: dividerColor, indent: 56),
-                SettingsTile(
                   title: 'App Version',
                   icon: Icons.info_outline,
                   color: Colors.grey,

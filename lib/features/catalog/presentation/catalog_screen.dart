@@ -76,7 +76,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       Tab(
                         child: _buildTabItem(
                           icon: Icons.inventory_2_rounded,
-                          label: 'Items',
+                          label: 'Products/Services',
                           count: productsCount,
                           color: const Color(0xFFEA580C),
                           lightColor: const Color(0xFFFFF7ED),
@@ -154,3 +154,4 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 }
+

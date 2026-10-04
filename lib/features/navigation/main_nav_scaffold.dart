@@ -59,8 +59,8 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
             _navigateToIndex(1);
           }
         },
-        onNavigateToCustomers: () => _navigateToIndex(2),
-        onNavigateToProducts: () => _navigateToIndex(2),
+        onNavigateToCustomers: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CatalogScreen(initialTabIndex: 0))),
+        onNavigateToProducts: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CatalogScreen(initialTabIndex: 1))),
         onNavigateToSettings: () => _navigateToIndex(3),
       ),
       DocumentListScreen(key: _docListKey),
@@ -118,3 +118,4 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
     );
   }
 }
+

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
@@ -269,6 +270,55 @@ class _CustomerItemCard extends StatelessWidget {
                             : AppColors.textSecondary,
                         fontSize: 13,
                       ),
+                  if (customer.contactPerson != null && customer.contactPerson!.isNotEmpty)
+                    Text(
+                      'Contact: ',
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (customer.cin != null && customer.cin!.isNotEmpty)
+                    Text(
+                      'CIN: ',
+                      style: TextStyle(
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (customer.website != null && customer.website!.isNotEmpty)
+                    GestureDetector(
+                      onTap: () async {
+                        var urlStr = customer.website!;
+                        if (!urlStr.startsWith('http')) urlStr = 'https://';
+                        final url = Uri.parse(urlStr);
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.language, size: 14, color: AppColors.primary),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              customer.website!,
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 12,
+                                decoration: TextDecoration.underline,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     )
                   else if (customer.email != null && customer.email!.isNotEmpty)
                     Text(

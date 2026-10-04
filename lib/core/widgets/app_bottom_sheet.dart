@@ -12,10 +12,14 @@ class AppBottomSheet {
     required Widget child,
     Widget? trailingAction,
     bool isScrollControlled = true,
+    bool isDismissible = true,
+    bool enableDrag = true,
   }) {
     return showModalBottomSheet<T>(
       context: context,
       isScrollControlled: isScrollControlled,
+      isDismissible: isDismissible,
+      enableDrag: enableDrag,
       useSafeArea: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
@@ -89,3 +93,4 @@ class AppBottomSheet {
     );
   }
 }
+

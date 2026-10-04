@@ -498,7 +498,8 @@ class _PaymentDetailsListScreenState extends State<PaymentDetailsListScreen> {
                               padding: const EdgeInsets.only(top: 3),
                               child: Text(
                                 item.type == 'Bank'
-                                    ? 'A/C: ${item.details}${item.extra != null && item.extra!.isNotEmpty ? '  â€¢  IFSC: ${item.extra}' : ''}'
+                                    ? 'A/C: ${item.details}${item.extra != null && item.extra!.isNotEmpty ? '
+IFSC: ${item.extra}' : ''}'
                                     : 'UPI: ${item.details}',
                                 style: const TextStyle(
                                   color: AppColors.textSecondary,

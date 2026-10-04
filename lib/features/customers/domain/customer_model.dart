@@ -6,6 +6,9 @@ class Customer {
   final String? billingAddress;
   final String? shippingAddress;
   final String? gstin;
+  final String? cin;
+  final String? contactPerson;
+  final String? website;
   final String? notes;
   final DateTime createdAt;
 
@@ -17,6 +20,9 @@ class Customer {
     this.billingAddress,
     this.shippingAddress,
     this.gstin,
+    this.cin,
+    this.contactPerson,
+    this.website,
     this.notes,
     required this.createdAt,
   });
@@ -29,6 +35,9 @@ class Customer {
     String? billingAddress,
     String? shippingAddress,
     String? gstin,
+    String? cin,
+    String? contactPerson,
+    String? website,
     String? notes,
     DateTime? createdAt,
   }) {
@@ -40,6 +49,12 @@ class Customer {
       billingAddress: billingAddress ?? this.billingAddress,
       shippingAddress: shippingAddress ?? this.shippingAddress,
       gstin: gstin ?? this.gstin,
+      cin: cin ?? this.cin,
+      contactPerson: contactPerson ?? this.contactPerson,
+      website: website ?? this.website,
+    this.cin,
+    this.contactPerson,
+    this.website,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -54,6 +69,9 @@ class Customer {
       'billingAddress': billingAddress,
       'shippingAddress': shippingAddress,
       'gstin': gstin,
+      'cin': cin,
+      'contactPerson': contactPerson,
+      'website': website,
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
     };
@@ -68,6 +86,9 @@ class Customer {
       billingAddress: map['billingAddress'] as String?,
       shippingAddress: map['shippingAddress'] as String?,
       gstin: map['gstin'] as String?,
+      cin: map['cin'] as String?,
+      contactPerson: map['contactPerson'] as String?,
+      website: map['website'] as String?,
       notes: map['notes'] as String?,
       createdAt:
           DateTime.tryParse(map['createdAt'] as String? ?? '') ??

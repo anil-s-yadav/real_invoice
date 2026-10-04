@@ -31,6 +31,7 @@ import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../../subscription/data/subscription_repository.dart';
 import '../../subscription/domain/subscription_plan_model.dart';
 import '../../subscription/presentation/plan_info_screen.dart';
+import '../../reports/bloc/reports_bloc.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -79,6 +80,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ActivateSubscriptionEvent(freshPlan),
         );
         context.read<HomeBloc>().add(const LoadHomeDataEvent());
+        context.read<ReportsBloc>().add(const GenerateReportEvent());
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
