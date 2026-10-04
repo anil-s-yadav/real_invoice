@@ -285,3 +285,23 @@ li {
   margin-bottom: 0.75rem;
   line-height: 1.6;
 }
+
+.faq-category {
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  color: #1a56db;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.faq-item h3 {
+  color: #1f2937;
+  font-size: 1.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.faq-item p {
+  color: #4b5563;
+  line-height: 1.6;
+}
