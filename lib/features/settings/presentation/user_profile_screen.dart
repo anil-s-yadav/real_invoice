@@ -80,7 +80,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ActivateSubscriptionEvent(freshPlan),
         );
         context.read<HomeBloc>().add(const LoadHomeDataEvent());
-        context.read<ReportsBloc>().add(const GenerateReportEvent());
+        context.read<ReportsBloc>().add(const LoadAnalyticsEvent(forceRefresh: true));
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -768,3 +768,4 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 }
+

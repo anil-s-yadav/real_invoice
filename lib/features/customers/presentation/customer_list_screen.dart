@@ -269,7 +269,7 @@ class _CustomerItemCard extends StatelessWidget {
                             ? AppColors.darkTextSecondary
                             : AppColors.textSecondary,
                         fontSize: 13,
-                      ),
+                      ),),
                   if (customer.contactPerson != null && customer.contactPerson!.isNotEmpty)
                     Text(
                       'Contact: ',
@@ -319,8 +319,7 @@ class _CustomerItemCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    )
-                  else if (customer.email != null && customer.email!.isNotEmpty)
+                   else if (customer.email != null && customer.email!.isNotEmpty)
                     Text(
                       customer.email!,
                       style: TextStyle(

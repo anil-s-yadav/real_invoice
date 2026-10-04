@@ -26,12 +26,14 @@ class LoadAnalyticsEvent extends ReportsEvent {
   final DateTime? customStartDate;
   final DateTime? customEndDate;
   final String? businessGstin;
+  final bool forceRefresh;
 
   const LoadAnalyticsEvent({
     this.preset = TimeFilterPreset.thisMonth,
     this.customStartDate,
     this.customEndDate,
     this.businessGstin,
+    this.forceRefresh = false,
   });
 
   @override
@@ -40,6 +42,7 @@ class LoadAnalyticsEvent extends ReportsEvent {
     customStartDate,
     customEndDate,
     businessGstin,
+    forceRefresh,
   ];
 }
 
@@ -137,7 +140,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
       SummaryStats stats;
       List<DocumentModel> allDocs;
 
-      if (state is ReportsLoaded) {
+      if (state is ReportsLoaded && !event.forceRefresh) {
         // Option 1 Caching: Reuse in-memory Dart objects for lightning-fast filter changes
         // This avoids parsing thousands of JSON documents from SQLite on every tap
         final currentState = state as ReportsLoaded;

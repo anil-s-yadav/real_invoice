@@ -1,5 +1,6 @@
 import 'package:invoz/core/utils/premium_dialog_helper.dart';
 import 'package:invoz/features/documents/bloc/document_state.dart';
+import 'package:invoz/features/reports/bloc/reports_bloc.dart';
 
 import '../../ads/ad_banner_widget.dart';
 import 'package:flutter/material.dart';
@@ -336,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: AppColors.primary,
             onRefresh: () async {
               context.read<HomeBloc>().add(const LoadHomeDataEvent());
-                context.read<ReportsBloc>().add(const GenerateReportEvent());
+              context.read<ReportsBloc>().add(const LoadAnalyticsEvent(forceRefresh: true));
             },
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -436,7 +437,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                  if (_showPromoBanner && context.read<SubscriptionBloc>().state is! PremiumTierState && context.read<SubscriptionBloc>().state.isEligibleForWelcomeOffer) ...[
+                  if (_showPromoBanner &&
+                      context.read<SubscriptionBloc>().state
+                          is! PremiumTierState &&
+                      context
+                          .read<SubscriptionBloc>()
+                          .state
+                          .isEligibleForWelcomeOffer) ...[
                     _buildPremiumPromoBanner(context),
                     const SizedBox(height: AppDimensions.xl),
                   ],
@@ -1073,5 +1080,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
 
