@@ -656,9 +656,18 @@ class DocumentPdfGenerator {
               primaryColor: primaryColor,
             ),
           ),
-          pw.Row(
+          pw.Expanded(
+
+            flex: 4,
+
+            child: pw.Row(
+
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+
               crossAxisAlignment: pw.CrossAxisAlignment.end,
+
               children: [
+
                 if (stampBytes != null && doc.showStamp)
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(right: 20),
@@ -672,7 +681,7 @@ class DocumentPdfGenerator {
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
-                          'Stamp',
+                          'Company Stamp',
                           style: pw.TextStyle(
                             fontSize: 10,
                             color: primaryColor,
@@ -689,17 +698,18 @@ class DocumentPdfGenerator {
                 pw.Container(width: 120, height: 1.5, color: borderColor),
                 pw.SizedBox(height: 4),
                 pw.Text(
-                        'Authorized Signature',
-                        style: pw.TextStyle(
-                    fontSize: 9,
-                    fontWeight: pw.FontWeight.bold,
-                    color: mutedColor,
-                  ),
+                      'Authorized Signature',
+                      style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                        color: mutedColor,
                       ),
-                    ],
-                  ),
-              ],
-            ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
         ],
       ),
     ];
@@ -937,9 +947,18 @@ class DocumentPdfGenerator {
               primaryColor: primaryColor,
             ),
           ),
-          pw.Row(
+          pw.Expanded(
+
+            flex: 4,
+
+            child: pw.Row(
+
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+
               crossAxisAlignment: pw.CrossAxisAlignment.end,
+
               children: [
+
                 if (stampBytes != null && doc.showStamp)
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(right: 20),
@@ -953,7 +972,7 @@ class DocumentPdfGenerator {
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
-                          'Stamp',
+                          'Company Stamp',
                           style: pw.TextStyle(
                             fontSize: 10,
                             color: primaryColor,
@@ -971,17 +990,18 @@ class DocumentPdfGenerator {
                   child: pw.Divider(color: primaryColor),
                 ),
                 pw.Text(
-                        'Authorized Signature',
-                        style: pw.TextStyle(
-                    fontSize: 10,
-                    color: primaryColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+                      'Authorized Signature',
+                      style: pw.TextStyle(
+                        fontSize: 10,
+                        color: primaryColor,
+                        fontWeight: pw.FontWeight.bold,
                       ),
-                    ],
-                  ),
-              ],
-            ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
         ],
       ),
     ];
@@ -1720,9 +1740,18 @@ class DocumentPdfGenerator {
               ],
             ),
           ),
-          pw.Row(
+          pw.Expanded(
+
+            flex: 4,
+
+            child: pw.Row(
+
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+
               crossAxisAlignment: pw.CrossAxisAlignment.end,
+
               children: [
+
                 if (stampBytes != null && doc.showStamp)
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(right: 20),
@@ -1736,7 +1765,7 @@ class DocumentPdfGenerator {
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
-                          'Stamp',
+                          'Company Stamp',
                           style: pw.TextStyle(
                             fontSize: 10,
                             color: primaryColor,
@@ -1754,13 +1783,14 @@ class DocumentPdfGenerator {
                         child: pw.Divider(color: primaryColor),
                       ),
                       pw.Text(
-                        'Authorized Signature',
-                        style: pw.TextStyle(fontSize: 10, color: primaryColor),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
+                      'Authorized Signature',
+                      style: pw.TextStyle(fontSize: 10, color: primaryColor),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
         ],
       ),
     ];
