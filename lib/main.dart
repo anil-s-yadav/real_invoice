@@ -224,7 +224,7 @@ class InvozApp extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ClipRRect(
-                                borderRadius: BorderRadiusGeometry.circular(10),
+                                borderRadius: BorderRadiusGeometry.circular(30),
                                 child: Image.asset(
                                   'assets/icons/applogo.png',
                                   width: 140,

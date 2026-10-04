@@ -665,7 +665,7 @@ class DocumentPdfGenerator {
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
                     children: [
-                      pw.Image(pw.MemoryImage(stampBytes), height: 50),
+                      pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain)),
                       pw.SizedBox(height: 4),
                       pw.Container(
                         width: 100,
@@ -682,7 +682,7 @@ class DocumentPdfGenerator {
               if (signatureBytes != null && doc.showSignature)
                 pw.Column(
                   children: [
-                    pw.Image(pw.MemoryImage(signatureBytes), height: 40),
+                    pw.Container(width: 100, height: 40, child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain)),
                     pw.SizedBox(height: 4),
                     pw.Container(width: 100, height: 1.5, color: borderColor),
                     pw.SizedBox(height: 4),
@@ -944,7 +944,7 @@ class DocumentPdfGenerator {
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
                     children: [
-                      pw.Image(pw.MemoryImage(stampBytes), height: 50),
+                      pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain)),
                       pw.SizedBox(height: 4),
                       pw.Container(
                         width: 100,
@@ -961,7 +961,7 @@ class DocumentPdfGenerator {
               if (signatureBytes != null && doc.showSignature)
                 pw.Column(
                   children: [
-                    pw.Image(pw.MemoryImage(signatureBytes), height: 50),
+                    pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain)),
                     pw.Container(
                       width: 100,
                       child: pw.Divider(color: primaryColor),
@@ -1729,7 +1729,7 @@ class DocumentPdfGenerator {
                   padding: const pw.EdgeInsets.only(right: 12),
                   child: pw.Column(
                     children: [
-                      pw.Image(pw.MemoryImage(stampBytes), height: 50),
+                      pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(stampBytes), fit: pw.BoxFit.contain)),
                       pw.SizedBox(height: 4),
                       pw.Container(
                         width: 100,
@@ -1746,7 +1746,7 @@ class DocumentPdfGenerator {
               if (signatureBytes != null && doc.showSignature)
                 pw.Column(
                   children: [
-                    pw.Image(pw.MemoryImage(signatureBytes), height: 50),
+                    pw.Container(width: 100, height: 50, child: pw.Image(pw.MemoryImage(signatureBytes), fit: pw.BoxFit.contain)),
                     pw.Container(
                       width: 100,
                       child: pw.Divider(color: primaryColor),
