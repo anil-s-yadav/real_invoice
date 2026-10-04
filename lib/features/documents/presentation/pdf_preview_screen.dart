@@ -166,8 +166,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
         final templates = TemplateRegistry.getTemplatesFor(_document.docType);
 
         return Container(
-          height: screenHeight * 0.9,
-          color: isDark ? AppColors.darkSurface : Colors.white,
+            height: screenHeight * 0.9,
           padding: const EdgeInsets.only(top: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,8 +288,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
         return StatefulBuilder(
           builder: (context, setStateSheet) {
             return Container(
-              color: isDark ? AppColors.darkSurface : Colors.white,
-              padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -808,3 +806,4 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     );
   }
 }
+
