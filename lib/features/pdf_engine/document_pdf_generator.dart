@@ -144,6 +144,7 @@ class DocumentPdfGenerator {
             payments: payments,
             logoBytes: logoBytes,
             signatureBytes: signatureBytes,
+            stampBytes: stampBytes,
           );
         },
       ),
