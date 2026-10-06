@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +9,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/confirm_dialog.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../bloc/business_profile_bloc.dart';
 import '../bloc/business_profile_event.dart';
 import '../../home/bloc/home_bloc.dart';
@@ -313,8 +315,9 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+      body: ResponsiveMaxWidth(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -489,6 +492,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -538,12 +542,15 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                 child: hasImage
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: imagePath.startsWith('http')
-                            ? CachedNetworkImage(
-                                imageUrl: imagePath,
-                                fit: BoxFit.contain,
-                              )
-                            : Image.file(File(imagePath), fit: BoxFit.contain),
+                        child: kIsWeb
+                            ? Image.network(imagePath, fit: BoxFit.contain)
+                            : (imagePath.startsWith('http')
+                                ? CachedNetworkImage(
+                                    imageUrl: imagePath,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Image.file(File(imagePath),
+                                    fit: BoxFit.contain)),
                       )
                     : Icon(
                         Icons.add_photo_alternate_outlined,

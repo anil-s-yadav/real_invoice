@@ -8,6 +8,7 @@ import '../../../core/services/analytics_service.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_typography.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
@@ -475,8 +476,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
             ],
           ),
           body: SafeArea(
-            child: Column(
-              children: [
+            child: ResponsiveMaxWidth(
+              child: Column(
+                children: [
                 // Quick actions banner (Convert / Record Payment)
                 if (_document.docType == DocumentType.quotation &&
                     _document.status != DocumentStatus.accepted &&
@@ -724,10 +726,11 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 Expanded(
                   child: PdfPreview(
                     build: (format) async {
+                      final subState = context.read<SubscriptionBloc>().state;
+                      
                       final repo = PaymentDetailRepository();
                       final payments = await repo.getAllPayments();
 
-                      final subState = context.read<SubscriptionBloc>().state;
                       final hasPremium =
                           subState.effectivePlan.hasPremiumTemplates;
 
@@ -749,6 +752,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                         profile: profile,
                         payments: payments,
                         templateId: actualTemplateId,
+                        pageFormat: format,
                       );
                     },
                     previewPageMargin: const EdgeInsets.symmetric(
@@ -800,6 +804,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
                 AdBannerWidget(),
               ],
             ),
+          ),
           ),
         );
       },

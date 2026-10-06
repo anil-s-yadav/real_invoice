@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../subscription/presentation/subscription_screen.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../data/business_profile_repository.dart';
@@ -80,8 +81,9 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
-              slivers: [
+          : ResponsiveMaxWidth(
+              child: CustomScrollView(
+                slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -156,6 +158,7 @@ class _ManageCompanyListScreenState extends State<ManageCompanyListScreen> {
                 ),
               ],
             ),
+          ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final subState = context.read<SubscriptionBloc>().state;

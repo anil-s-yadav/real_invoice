@@ -69,52 +69,107 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
       const SettingsScreen(),
     ];
 
+    final isWideScreen = MediaQuery.of(context).size.width >= 800;
+
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: screens),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          border: Border(
-            top: BorderSide(
-              color: Theme.of(context).colorScheme.outline,
+      body: Row(
+        children: [
+          if (isWideScreen)
+            NavigationRail(
+              selectedIndex: _currentIndex,
+              onDestinationSelected: _navigateToIndex,
+              labelType: NavigationRailLabelType.all,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              useIndicator: true,
+              indicatorColor: AppColors.primary.withValues(alpha: 0.1),
+              destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home, color: AppColors.primary),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.receipt_long_outlined),
+                  selectedIcon: Icon(Icons.receipt_long, color: AppColors.primary),
+                  label: Text('Documents'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.folder_outlined),
+                  selectedIcon: Icon(Icons.folder, color: AppColors.primary),
+                  label: Text('Catalog'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.analytics_outlined),
+                  selectedIcon: Icon(Icons.analytics, color: AppColors.primary),
+                  label: Text('Analytics'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.tune_outlined),
+                  selectedIcon: Icon(Icons.tune, color: AppColors.primary),
+                  label: Text('Settings'),
+                ),
+              ],
+            ),
+          if (isWideScreen)
+            VerticalDivider(
+              thickness: 1,
               width: 1,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: screens,
             ),
           ),
-        ),
-        child: NavigationBar(
-          selectedIndex: _currentIndex,
-          onDestinationSelected: _navigateToIndex,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home, color: AppColors.primary),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.receipt_long_outlined),
-              selectedIcon: Icon(Icons.receipt_long, color: AppColors.primary),
-              label: 'Documents',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.folder_outlined),
-              selectedIcon: Icon(Icons.folder, color: AppColors.primary),
-              label: 'Catalog',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.analytics_outlined),
-              selectedIcon: Icon(Icons.analytics, color: AppColors.primary),
-              label: 'Analytics',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.tune_outlined),
-              selectedIcon: Icon(Icons.tune, color: AppColors.primary),
-              label: 'Settings',
-            ),
-          ],
-        ),
+        ],
       ),
+      bottomNavigationBar: isWideScreen
+          ? null
+          : Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                border: Border(
+                  top: BorderSide(
+                    color: Theme.of(context).colorScheme.outline,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: NavigationBar(
+                selectedIndex: _currentIndex,
+                onDestinationSelected: _navigateToIndex,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                destinations: const [
+                  NavigationDestination(
+                    icon: Icon(Icons.home_outlined),
+                    selectedIcon: Icon(Icons.home, color: AppColors.primary),
+                    label: 'Home',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.receipt_long_outlined),
+                    selectedIcon: Icon(Icons.receipt_long, color: AppColors.primary),
+                    label: 'Documents',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.folder_outlined),
+                    selectedIcon: Icon(Icons.folder, color: AppColors.primary),
+                    label: 'Catalog',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.analytics_outlined),
+                    selectedIcon: Icon(Icons.analytics, color: AppColors.primary),
+                    label: 'Analytics',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.tune_outlined),
+                    selectedIcon: Icon(Icons.tune, color: AppColors.primary),
+                    label: 'Settings',
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -468,106 +469,108 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 1. HERO PLAN CARD
-            _buildHeroPlanCard(isDark),
-            const SizedBox(height: 24),
+      body: ResponsiveMaxWidth(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. HERO PLAN CARD
+              _buildHeroPlanCard(isDark),
+              const SizedBox(height: 24),
 
-            // 2. DURATION SELECTOR TITLE & OPTIONS
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Choose Billing Cycle',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : const Color(0xFF0F172A),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Text(
-                    'Cancel Anytime',
+              // 2. DURATION SELECTOR TITLE & OPTIONS
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Choose Billing Cycle',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: Colors.green,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : const Color(0xFF0F172A),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Dynamic Duration Cards
-            ..._durations.map(
-              (duration) => _buildDurationOptionCard(duration, isDark),
-            ),
-
-            // Welcome Offer banner notification if applied
-            if (widget.hasWelcomeOffer &&
-                (_selectedDuration == 12 || _selectedDuration == 1)) ...[
-              const SizedBox(height: 4),
-              _buildWelcomeOfferBanner(),
-            ],
-
-            const SizedBox(height: 24),
-
-            // 3. PAYMENT & ORDER BREAKDOWN
-            Text(
-              'Order Summary',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : const Color(0xFF0F172A),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'Cancel Anytime',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            _buildOrderSummaryCard(
-              isDark: isDark,
-              baseTotal: baseTotal,
-              invozPerc: invozPerc,
-              invozDiscount: invozDiscount,
-              welcomePerc: welcomePerc,
-              welcomeDiscount: welcomeDiscount,
-              totalDiscount: totalDiscount,
-              subtotal: subtotal,
-              gstAmount: gstAmount,
-              totalPayable: totalPayable,
-            ),
+              const SizedBox(height: 12),
 
-            const SizedBox(height: 24),
+              // Dynamic Duration Cards
+              ..._durations.map(
+                (duration) => _buildDurationOptionCard(duration, isDark),
+              ),
 
-            // 4. MAIN ACTION BUTTON
-            _buildCheckoutCTAButton(totalPayable),
+              // Welcome Offer banner notification if applied
+              if (widget.hasWelcomeOffer &&
+                  (_selectedDuration == 12 || _selectedDuration == 1)) ...[
+                const SizedBox(height: 4),
+                _buildWelcomeOfferBanner(),
+              ],
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // 5. PAYMENT METHODS SUPPORTED (UPI, Cards, NetBanking)
-            _buildPaymentMethodsRow(isDark),
+              // 3. PAYMENT & ORDER BREAKDOWN
+              Text(
+                'Order Summary',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : const Color(0xFF0F172A),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _buildOrderSummaryCard(
+                isDark: isDark,
+                baseTotal: baseTotal,
+                invozPerc: invozPerc,
+                invozDiscount: invozDiscount,
+                welcomePerc: welcomePerc,
+                welcomeDiscount: welcomeDiscount,
+                totalDiscount: totalDiscount,
+                subtotal: subtotal,
+                gstAmount: gstAmount,
+                totalPayable: totalPayable,
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
-            // 6. TRUST & SAFETY BADGES
-            _buildModernTrustBadges(isDark),
-          ],
+              // 4. MAIN ACTION BUTTON
+              _buildCheckoutCTAButton(totalPayable),
+
+              const SizedBox(height: 24),
+
+              // 5. PAYMENT METHODS SUPPORTED (UPI, Cards, NetBanking)
+              _buildPaymentMethodsRow(isDark),
+
+              const SizedBox(height: 20),
+
+              // 6. TRUST & SAFETY BADGES
+              _buildModernTrustBadges(isDark),
+            ],
+          ),
         ),
       ),
     );
@@ -1279,4 +1282,3 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 }
-

@@ -56,34 +56,7 @@ class DocumentRepository {
       final ref = await _getDocumentsRef();
       Query<Map<String, dynamic>> query = ref;
 
-      if (type != null) {
-        query = query.where('docType', isEqualTo: type.name);
-      }
-      if (status != null) {
-        query = query.where('status', isEqualTo: status.name);
-      }
-      if (startDate != null) {
-        query = query.where(
-          'issueDate',
-          isGreaterThanOrEqualTo: startDate.toIso8601String(),
-        );
-      }
-      if (endDate != null) {
-        final endOfDay = DateTime(
-          endDate.year,
-          endDate.month,
-          endDate.day,
-          23,
-          59,
-          59,
-          999,
-        );
-        query = query.where(
-          'issueDate',
-          isLessThanOrEqualTo: endOfDay.toIso8601String(),
-        );
-      }
-
+      // Fetch all documents ordered by date to avoid requiring composite indexes
       query = query.orderBy('issueDate', descending: true);
       if (limit != null) {
         query = query.limit(limit);
@@ -101,9 +74,37 @@ class DocumentRepository {
         if (forceSync) rethrow;
         snapshot = await query.get(const GetOptions(source: Source.server));
       }
+      
       var docs = snapshot.docs
           .map((doc) => DocumentModel.fromMap(doc.data()))
           .toList();
+
+      // Apply Type filter
+      if (type != null) {
+        docs = docs.where((doc) => doc.docType == type).toList();
+      }
+
+      // Apply dynamic status filter in memory
+      if (status != null) {
+        docs = docs.where((doc) => doc.calculatedStatus == status).toList();
+      }
+      
+      // Apply Date filters
+      if (startDate != null) {
+        docs = docs.where((doc) => !doc.issueDate.isBefore(startDate)).toList();
+      }
+      if (endDate != null) {
+        final endOfDay = DateTime(
+          endDate.year,
+          endDate.month,
+          endDate.day,
+          23,
+          59,
+          59,
+          999,
+        );
+        docs = docs.where((doc) => !doc.issueDate.isAfter(endOfDay)).toList();
+      }
 
       if (searchQuery != null && searchQuery.trim().isNotEmpty) {
         final q = searchQuery.trim().toLowerCase();

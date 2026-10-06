@@ -81,6 +81,7 @@ class DocumentPdfGenerator {
     required BusinessProfile profile,
     required List<PaymentDetail> payments,
     String? templateId,
+    PdfPageFormat? pageFormat,
   }) async {
     final pdf = pw.Document(
       title: '${document.docType.displayName} ${document.docNumber}',
@@ -100,7 +101,7 @@ class DocumentPdfGenerator {
 
     pdf.addPage(
       pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
+        pageFormat: pageFormat ?? PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
         footer: (context) => pw.Container(
           margin: const pw.EdgeInsets.only(top: 25, left: 5),

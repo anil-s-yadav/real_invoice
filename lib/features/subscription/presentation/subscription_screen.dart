@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../../core/services/analytics_service.dart';
 import 'checkout_screen.dart';
 
@@ -243,8 +244,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               ),
             ],
           ),
-          body: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
+          body: ResponsiveMaxWidth(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
                 Text(
@@ -865,6 +867,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),
                 const SizedBox(height: 32),
               ],
+            ),
             ),
           ),
         );

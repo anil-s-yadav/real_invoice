@@ -6,6 +6,7 @@ import 'package:invoz/features/subscription/presentation/plan_info_screen.dart';
 import '../../ads/ad_banner_widget.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:in_app_update/in_app_update.dart';
 import '../../ads/interstitial_ad_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -63,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
       InterstitialAdManager.loadAd(context);
     });
     _checkPromoBanner();
-    if (Platform.isAndroid) _checkForUpdates();
+    if (!kIsWeb && Platform.isAndroid) _checkForUpdates();
   }
 
   Future<void> _checkForUpdates() async {
@@ -352,359 +353,369 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.lg,
-                vertical: AppDimensions.md,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Premium Welcome Offer Banner
-                  if (!isLoading && !isProfileConfigured)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isDark ? AppColors.darkSurface : Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isDark
-                                ? AppColors.darkBorder
-                                : AppColors.border,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(
-                                alpha: isDark ? 0.2 : 0.03,
-                              ),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      const ManageCompanyListScreen(),
-                                ),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.info_outline_rounded,
-                                    color: AppColors.primary,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Complete Profile',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: isDark
-                                                ? AppColors.darkTextPrimary
-                                                : AppColors.textPrimary,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Add your business details and logo to start creating professional invoices.',
-                                          style: TextStyle(
-                                            color: isDark
-                                                ? AppColors.darkTextSecondary
-                                                : AppColors.textSecondary,
-                                            fontSize: 13,
-                                            height: 1.3,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(
-                                    Icons.chevron_right_rounded,
-                                    color: AppColors.textMuted,
-                                    size: 24,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.lg,
+                      vertical: AppDimensions.md,
                     ),
-
-                  if (_showPromoBanner &&
-                      context.read<SubscriptionBloc>().state
-                          is! PremiumTierState &&
-                      context
-                          .read<SubscriptionBloc>()
-                          .state
-                          .isEligibleForWelcomeOffer) ...[
-                    _buildPremiumPromoBanner(context),
-                    const SizedBox(height: AppDimensions.xl),
-                  ],
-
-                  // 1. Overview Dashboard
-                  _buildOverviewDashboard(
-                    state is HomeLoaded ? state.stats : null,
-                  ),
-                  const SizedBox(height: AppDimensions.xxl),
-
-                  // 2. Create Document (Quick Actions - BIG)
-                  const Padding(
-                    padding: EdgeInsets.only(left: 4, bottom: 12),
-                    child: Text(
-                      'Create New',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildBigQuickAction(
-                        context,
-                        'Invoice',
-                        'assets/icons/invoice.png',
-                        DocumentType.invoice,
-                        fit: BoxFit.contain,
-                        imagePadding: 14.0,
-                      ),
-                      _buildBigQuickAction(
-                        context,
-                        'Quotation',
-                        'assets/icons/quotation.png',
-                        DocumentType.quotation,
-                        fit: BoxFit.contain,
-                        imagePadding: 14.0,
-                      ),
-                      _buildBigQuickAction(
-                        context,
-                        'Receipt',
-                        'assets/icons/receipt.png',
-                        DocumentType.receipt,
-                      ),
-                      _buildBigQuickAction(
-                        context,
-                        'Proforma',
-                        'assets/icons/proforma.png',
-                        DocumentType.proforma,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppDimensions.xxxl),
-
-                  // OVERDUE NOTIFICATION CARD (Native HomeScreen Theme)
-                  if (state is HomeLoaded && state.stats.overdueCount > 0)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: AppDimensions.xl),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isDark ? AppColors.darkSurface : Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isDark
-                                ? AppColors.darkBorder
-                                : AppColors.border,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(
-                                alpha: isDark ? 0.2 : 0.03,
-                              ),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () => widget.onNavigateToDocuments(
-                              status: DocumentStatus.overdue,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 14,
-                              ),
-                              child: Row(
-                                children: [
-                                  // Clean rounded alert icon
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? const Color(0xFF450A0A)
-                                          : const Color(0xFFFEF2F2),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.warning_amber_rounded,
-                                      color: Color(0xFFDC2626),
-                                      size: 22,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 14),
-
-                                  // Overdue text
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${state.stats.overdueCount} Overdue Bill${state.stats.overdueCount > 1 ? 's' : ''}',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                            color: isDark
-                                                ? AppColors.darkTextPrimary
-                                                : AppColors.textPrimary,
-                                            letterSpacing: -0.2,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          '${state.stats.overdueCount > 1 ? 'Payments are' : 'Payment is'} past the due date',
-                                          style: TextStyle(
-                                            fontSize: 12.5,
-                                            color: isDark
-                                                ? AppColors.darkTextSecondary
-                                                : AppColors.textSecondary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-
-                                  // View Action Button
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 7,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFEF2F2),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: const Color(0xFFFECACA),
-                                        width: 0.8,
-                                      ),
-                                    ),
-                                    child: const Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'View',
-                                          style: TextStyle(
-                                            fontSize: 12.5,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFFDC2626),
-                                          ),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Icon(
-                                          Icons.arrow_forward_rounded,
-                                          size: 13,
-                                          color: Color(0xFFDC2626),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  AdBannerWidget(),
-                  const SizedBox(height: AppDimensions.xxxl),
-                  // 3. Management Directories
-                  const Padding(
-                    padding: EdgeInsets.only(left: 4, bottom: 12),
-                    child: Text(
-                      'Manage Business',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  AppCard(
-                    padding: EdgeInsets.zero,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SettingsTile(
-                          title: 'Customers',
-                          subtitle: 'Clients & GSTINs',
-                          icon: Icons.people_alt,
-                          color: Colors.blue,
-                          onTap: widget.onNavigateToCustomers,
-                          isFirst: true,
-                        ),
-                        Divider(
-                          height: 1,
-                          color: AppColors.border.withValues(alpha: 0.5),
-                          indent: 56,
-                        ),
-                        SettingsTile(
-                          title: 'Products/Services',
-                          subtitle: 'Products & Services',
-                          icon: Icons.inventory_2,
-                          color: Colors.orange,
-                          onTap: widget.onNavigateToProducts,
-                        ),
-                        Divider(
-                          height: 1,
-                          color: AppColors.border.withValues(alpha: 0.5),
-                          indent: 56,
-                        ),
-                        SettingsTile(
-                          title: 'Company Profiles',
-                          subtitle: 'Switch or manage up to 10 companies',
-                          icon: Icons.business,
-                          color: Colors.purple,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const ManageCompanyListScreen(),
+                        // Premium Welcome Offer Banner
+                        if (!isLoading && !isProfileConfigured)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkSurface : Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.border,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(
+                                      alpha: isDark ? 0.2 : 0.03,
+                                    ),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                          isLast: true,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const ManageCompanyListScreen(),
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.info_outline_rounded,
+                                          color: AppColors.primary,
+                                          size: 28,
+                                        ),
+                                        const SizedBox(width: 14),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Complete Profile',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  color: isDark
+                                                      ? AppColors.darkTextPrimary
+                                                      : AppColors.textPrimary,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Add your business details and logo to start creating professional invoices.',
+                                                style: TextStyle(
+                                                  color: isDark
+                                                      ? AppColors.darkTextSecondary
+                                                      : AppColors.textSecondary,
+                                                  fontSize: 13,
+                                                  height: 1.3,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Icon(
+                                          Icons.chevron_right_rounded,
+                                          color: AppColors.textMuted,
+                                          size: 24,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        if (_showPromoBanner &&
+                            context.read<SubscriptionBloc>().state
+                                is! PremiumTierState &&
+                            context
+                                .read<SubscriptionBloc>()
+                                .state
+                                .isEligibleForWelcomeOffer) ...[
+                          _buildPremiumPromoBanner(context),
+                          const SizedBox(height: AppDimensions.xl),
+                        ],
+
+                        // 1. Overview Dashboard
+                        _buildOverviewDashboard(
+                          state is HomeLoaded ? state.stats : null,
                         ),
+                        const SizedBox(height: AppDimensions.xxl),
+
+                        // 2. Create Document (Quick Actions - BIG)
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4, bottom: 12),
+                          child: Text(
+                            'Create New',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildBigQuickAction(
+                              context,
+                              'Invoice',
+                              'assets/icons/invoice.png',
+                              DocumentType.invoice,
+                              fit: BoxFit.contain,
+                              imagePadding: 14.0,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildBigQuickAction(
+                              context,
+                              'Quotation',
+                              'assets/icons/quotation.png',
+                              DocumentType.quotation,
+                              fit: BoxFit.contain,
+                              imagePadding: 14.0,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildBigQuickAction(
+                              context,
+                              'Receipt',
+                              'assets/icons/receipt.png',
+                              DocumentType.receipt,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildBigQuickAction(
+                              context,
+                              'Proforma',
+                              'assets/icons/proforma.png',
+                              DocumentType.proforma,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppDimensions.xxxl),
+
+                        // OVERDUE NOTIFICATION CARD (Native HomeScreen Theme)
+                        if (state is HomeLoaded && state.stats.overdueCount > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: AppDimensions.xl),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkSurface : Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.border,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(
+                                      alpha: isDark ? 0.2 : 0.03,
+                                    ),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => widget.onNavigateToDocuments(
+                                    status: DocumentStatus.overdue,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 14,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        // Clean rounded alert icon
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: isDark
+                                                ? const Color(0xFF450A0A)
+                                                : const Color(0xFFFEF2F2),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: const Icon(
+                                            Icons.warning_amber_rounded,
+                                            color: Color(0xFFDC2626),
+                                            size: 22,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 14),
+
+                                        // Overdue text
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${state.stats.overdueCount} Overdue Bill${state.stats.overdueCount > 1 ? 's' : ''}',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: isDark
+                                                      ? AppColors.darkTextPrimary
+                                                      : AppColors.textPrimary,
+                                                  letterSpacing: -0.2,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                '${state.stats.overdueCount > 1 ? 'Payments are' : 'Payment is'} past the due date',
+                                                style: TextStyle(
+                                                  fontSize: 12.5,
+                                                  color: isDark
+                                                      ? AppColors.darkTextSecondary
+                                                      : AppColors.textSecondary,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+
+                                        // View Action Button
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 7,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFEF2F2),
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: const Color(0xFFFECACA),
+                                              width: 0.8,
+                                            ),
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'View',
+                                                style: TextStyle(
+                                                  fontSize: 12.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFFDC2626),
+                                                ),
+                                              ),
+                                              SizedBox(width: 4),
+                                              Icon(
+                                                Icons.arrow_forward_rounded,
+                                                size: 13,
+                                                color: Color(0xFFDC2626),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        AdBannerWidget(),
+                        const SizedBox(height: AppDimensions.xxxl),
+                        // 3. Management Directories
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4, bottom: 12),
+                          child: Text(
+                            'Manage Business',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                        AppCard(
+                          padding: EdgeInsets.zero,
+                          child: Column(
+                            children: [
+                              SettingsTile(
+                                title: 'Customers',
+                                subtitle: 'Clients & GSTINs',
+                                icon: Icons.people_alt,
+                                color: Colors.blue,
+                                onTap: widget.onNavigateToCustomers,
+                                isFirst: true,
+                              ),
+                              Divider(
+                                height: 1,
+                                color: AppColors.border.withValues(alpha: 0.5),
+                                indent: 56,
+                              ),
+                              SettingsTile(
+                                title: 'Products/Services',
+                                subtitle: 'Products & Services',
+                                icon: Icons.inventory_2,
+                                color: Colors.orange,
+                                onTap: widget.onNavigateToProducts,
+                              ),
+                              Divider(
+                                height: 1,
+                                color: AppColors.border.withValues(alpha: 0.5),
+                                indent: 56,
+                              ),
+                              SettingsTile(
+                                title: 'Company Profiles',
+                                subtitle: 'Switch or manage up to 10 companies',
+                                icon: Icons.business,
+                                color: Colors.purple,
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const ManageCompanyListScreen(),
+                                    ),
+                                  );
+                                },
+                                isLast: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppDimensions.xl),
+                        AdBannerWidget(),
+                        const SizedBox(height: AppDimensions.xxxl),
                       ],
                     ),
                   ),
-                  const SizedBox(height: AppDimensions.xl),
-                  AdBannerWidget(),
-                  const SizedBox(height: AppDimensions.xxxl),
-                ],
+                ),
               ),
             ),
           ),

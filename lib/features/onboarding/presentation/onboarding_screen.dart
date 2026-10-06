@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_event.dart';
@@ -315,140 +316,142 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           builder: (context, constraints) {
             final bool isKeyboardOpen =
                 MediaQuery.of(context).viewInsets.bottom > 0;
-            return Column(
-              children: [
-                // Progress Indicator
-                if (!isKeyboardOpen) ...[
+            return ResponsiveMaxWidth(
+              child: Column(
+                children: [
+                  // Progress Indicator
+                  if (!isKeyboardOpen) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        children: List.generate(_totalPages, (index) {
+                          return Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: index <= _currentPage
+                                    ? AppColors.primary
+                                    : (isDark
+                                          ? AppColors.darkBorder
+                                          : AppColors.border),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Page Content
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentPage = index;
+                        });
+                      },
+                      children: widget.isAddingNewCompany
+                          ? [
+                              _buildStepImageUpload(
+                                1,
+                                'Upload Company Logo',
+                                'A professional logo builds trust with your clients.',
+                                _logoPath,
+                              ),
+                              _buildStepImageUpload(
+                                2,
+                                'Upload Signature',
+                                'Digital signatures make your invoices authentic and legally compliant.',
+                                _signaturePath,
+                              ),
+                              _buildStepImageUpload(
+                                3,
+                                'Upload Company Stamp',
+                                'Optional. Add an official company stamp/seal.',
+                                _stampPath,
+                                isOptional: true,
+                              ),
+                              _buildStep5BusinessInfo(),
+                            ]
+                          : [
+                              _buildStep1Localization(),
+                              _buildStepImageUpload(
+                                1,
+                                'Upload Company Logo',
+                                'A professional logo builds trust with your clients.',
+                                _logoPath,
+                              ),
+                              _buildStepImageUpload(
+                                2,
+                                'Upload Signature',
+                                'Digital signatures make your invoices authentic and legally compliant.',
+                                _signaturePath,
+                              ),
+                              _buildStepImageUpload(
+                                3,
+                                'Upload Company Stamp',
+                                'Optional. Add an official company stamp/seal.',
+                                _stampPath,
+                                isOptional: true,
+                              ),
+                              _buildStep5BusinessInfo(),
+                            ],
+                    ),
+                  ),
+
+                  // Bottom Controls
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 8,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
                     child: Row(
-                      children: List.generate(_totalPages, (index) {
-                        return Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 2),
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: index <= _currentPage
-                                  ? AppColors.primary
-                                  : (isDark
-                                        ? AppColors.darkBorder
-                                        : AppColors.border),
-                              borderRadius: BorderRadius.circular(2),
+                      children: [
+                        Visibility(
+                          visible: _currentPage > 0,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: OutlinedButton(
+                              onPressed: _previousPage,
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: Size.zero,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                  horizontal: 20,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
+                              ),
                             ),
                           ),
-                        );
-                      }),
+                        ),
+                        Expanded(
+                          child: AppButton(
+                            key: const ValueKey('continue_button'),
+                            label: _currentPage == _totalPages - 1
+                                ? 'Complete Setup'
+                                : 'Continue',
+                            isLoading: _isSaving,
+                            onPressed: _isSaving ? null : _nextPage,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
                 ],
-
-                // Page Content
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentPage = index;
-                      });
-                    },
-                    children: widget.isAddingNewCompany
-                        ? [
-                            _buildStepImageUpload(
-                              1,
-                              'Upload Company Logo',
-                              'A professional logo builds trust with your clients.',
-                              _logoPath,
-                            ),
-                            _buildStepImageUpload(
-                              2,
-                              'Upload Signature',
-                              'Digital signatures make your invoices authentic and legally compliant.',
-                              _signaturePath,
-                            ),
-                            _buildStepImageUpload(
-                              3,
-                              'Upload Company Stamp',
-                              'Optional. Add an official company stamp/seal.',
-                              _stampPath,
-                              isOptional: true,
-                            ),
-                            _buildStep5BusinessInfo(),
-                          ]
-                        : [
-                            _buildStep1Localization(),
-                            _buildStepImageUpload(
-                              1,
-                              'Upload Company Logo',
-                              'A professional logo builds trust with your clients.',
-                              _logoPath,
-                            ),
-                            _buildStepImageUpload(
-                              2,
-                              'Upload Signature',
-                              'Digital signatures make your invoices authentic and legally compliant.',
-                              _signaturePath,
-                            ),
-                            _buildStepImageUpload(
-                              3,
-                              'Upload Company Stamp',
-                              'Optional. Add an official company stamp/seal.',
-                              _stampPath,
-                              isOptional: true,
-                            ),
-                            _buildStep5BusinessInfo(),
-                          ],
-                  ),
-                ),
-
-                // Bottom Controls
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-                  child: Row(
-                    children: [
-                      Visibility(
-                        visible: _currentPage > 0,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16.0),
-                          child: OutlinedButton(
-                            onPressed: _previousPage,
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: Size.zero,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 14,
-                                horizontal: 20,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.arrow_back,
-                              color: isDark
-                                  ? AppColors.darkTextPrimary
-                                  : AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: AppButton(
-                          key: const ValueKey('continue_button'),
-                          label: _currentPage == _totalPages - 1
-                              ? 'Complete Setup'
-                              : 'Continue',
-                          isLoading: _isSaving,
-                          onPressed: _isSaving ? null : _nextPage,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             );
           },
         ),
@@ -881,5 +884,3 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
-
-

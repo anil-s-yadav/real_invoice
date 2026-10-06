@@ -151,15 +151,20 @@ class DocumentModel {
     if (totalPaid >= totalAmount && totalAmount > 0) {
       return DocumentStatus.paid;
     }
-    if (totalPaid > 0) {
-      return DocumentStatus.partial;
-    }
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final targetDueDate = DateTime(dueDate.year, dueDate.month, dueDate.day);
-    if (status != DocumentStatus.sent && targetDueDate.isBefore(today)) {
+    
+    // If it's past due date and not fully paid, it's overdue
+    if (targetDueDate.isBefore(today)) {
       return DocumentStatus.overdue;
     }
+    
+    // If not overdue, but some amount is paid
+    if (totalPaid > 0) {
+      return DocumentStatus.partial;
+    }
+    
     return status;
   }
 

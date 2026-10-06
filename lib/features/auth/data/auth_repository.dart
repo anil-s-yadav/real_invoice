@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -44,7 +44,15 @@ class FirebaseAuthRepository implements AuthRepository {
 
   Future<void> _ensureGoogleSignInInitialized() async {
     if (!_isGoogleSignInInitialized) {
-      await _googleSignIn.initialize();
+      try {
+        if (kIsWeb) {
+          // the google sign in web plugin sometimes throws if initialized multiple times (e.g., hot restarts)
+          await _googleSignIn.initialize();
+        }
+      } catch (e) {
+        // Ignore "init() has already been called" error
+        debugPrint('GoogleSignIn init ignored: $e');
+      }
       _isGoogleSignInInitialized = true;
     }
   }
@@ -72,26 +80,39 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<AuthUser?> signInWithGoogle() async {
     try {
-      await _ensureGoogleSignInInitialized();
-      final googleUser = await _googleSignIn.authenticate(
-        scopeHint: ['email', 'profile'],
-      );
-      final googleAuth = googleUser.authentication;
-      final authorization = await googleUser.authorizationClient
-          .authorizationForScopes(['email', 'profile']);
-      final credential = fb.GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-        accessToken: authorization?.accessToken,
-      );
-      final userCredential = await _firebaseAuth.signInWithCredential(
-        credential,
-      );
-      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
-        AnalyticsService.logSignup('google');
+      if (kIsWeb) {
+        final provider = fb.GoogleAuthProvider();
+        provider.addScope('email');
+        provider.addScope('profile');
+        final userCredential = await _firebaseAuth.signInWithPopup(provider);
+        if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+          AnalyticsService.logSignup('google');
+        }
+        final user = _mapFirebaseUser(userCredential.user);
+        if (user == null) throw Exception('Sign-in failed.');
+        return user;
+      } else {
+        await _ensureGoogleSignInInitialized();
+        final googleUser = await _googleSignIn.authenticate(
+          scopeHint: ['email', 'profile'],
+        );
+        final googleAuth = googleUser.authentication;
+        final authorization = await googleUser.authorizationClient
+            .authorizationForScopes(['email', 'profile']);
+        final credential = fb.GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+          accessToken: authorization?.accessToken,
+        );
+        final userCredential = await _firebaseAuth.signInWithCredential(
+          credential,
+        );
+        if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+          AnalyticsService.logSignup('google');
+        }
+        final user = _mapFirebaseUser(userCredential.user);
+        if (user == null) throw Exception('Sign-in failed.');
+        return user;
       }
-      final user = _mapFirebaseUser(userCredential.user);
-      if (user == null) throw Exception('Sign-in failed.');
-      return user;
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) {
         return null;
@@ -101,11 +122,16 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  
   @override
-  Future<AuthUser> signInWithEmailAndPassword(String email, String password) async {
+  Future<AuthUser> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     try {
-      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       final u = _mapFirebaseUser(userCredential.user);
       if (u == null) throw Exception('User mapping failed');
       return u;

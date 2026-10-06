@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../domain/subscription_plan_model.dart';
 import '../../navigation/main_nav_scaffold.dart';
 
@@ -66,8 +67,9 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkCanvas : Colors.white,
-      body: SafeArea(
-        child: Padding(
+      body: ResponsiveMaxWidth(
+        child: SafeArea(
+          child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -179,6 +181,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen>
           ),
         ),
       ),
+    ),
     );
   }
 

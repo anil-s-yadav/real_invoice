@@ -12,6 +12,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
@@ -367,8 +368,9 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
         actions: const [],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
+        child: ResponsiveMaxWidth(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
             16,
             8,
             16,
@@ -415,6 +417,7 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
               _buildNotesTermsSection(),
             ],
           ),
+        ),
         ),
       ),
       bottomSheet: _buildBottomStickyBar(),
@@ -1763,53 +1766,55 @@ class _DocumentEditorScreenState extends State<DocumentEditorScreen> {
   }
 
   Widget _buildBottomStickyBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: _isDark ? AppColors.darkSurface : Colors.white,
-        border: Border(top: BorderSide(color: _border, width: 1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: _isDark ? 0.3 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: _isSaving ? null : _handleSaveAndPreview,
-                icon: _isSaving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Icon(Icons.picture_as_pdf_rounded),
-                label: Text(_isSaving ? 'Saving...' : 'Save & Preview'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
-                  shadowColor: AppColors.primary.withValues(alpha: 0.5),
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+    return ResponsiveMaxWidth(
+      child: Container(
+        decoration: BoxDecoration(
+          color: _isDark ? AppColors.darkSurface : Colors.white,
+          border: Border(top: BorderSide(color: _border, width: 1)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: _isDark ? 0.3 : 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: SafeArea(
+          child: Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _isSaving ? null : _handleSaveAndPreview,
+                  icon: _isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Icon(Icons.picture_as_pdf_rounded),
+                  label: Text(_isSaving ? 'Saving...' : 'Save & Preview'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                    shadowColor: AppColors.primary.withValues(alpha: 0.5),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

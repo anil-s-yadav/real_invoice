@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../../subscription/presentation/subscription_screen.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../business_profile/bloc/business_profile_bloc.dart';
 import '../../business_profile/bloc/business_profile_state.dart';
 import '../bloc/reports_bloc.dart';
@@ -212,7 +213,8 @@ class _ReportsScreenState extends State<ReportsScreen>
           ),
         ),
       ),
-      body: BlocBuilder<SubscriptionBloc, SubscriptionState>(
+      body: ResponsiveMaxWidth(
+        child: BlocBuilder<SubscriptionBloc, SubscriptionState>(
         builder: (context, subState) {
           final hasAnalytics = subState.effectivePlan.hasAnalytics;
           if (!hasAnalytics) {
@@ -358,6 +360,7 @@ class _ReportsScreenState extends State<ReportsScreen>
             },
           );
         },
+      ),
       ),
     );
   }

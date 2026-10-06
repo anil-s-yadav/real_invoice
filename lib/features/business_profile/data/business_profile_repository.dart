@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../domain/business_profile_model.dart';
 import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
 import '../../../core/utils/image_cache_service.dart';
 
 class BusinessProfileRepository {
@@ -173,18 +174,30 @@ class BusinessProfileRepository {
     String fileName,
   ) async {
     if (pathOrUrl == null || pathOrUrl.isEmpty) return null;
-    if (pathOrUrl.startsWith('http')) return pathOrUrl; // Already uploaded
+    
+    // If it's a real HTTP URL (but NOT a blob: URL), it's already uploaded.
+    if (pathOrUrl.startsWith('http') && !pathOrUrl.startsWith('blob:')) {
+      return pathOrUrl;
+    }
 
     try {
-      final file = File(pathOrUrl);
-      if (!await file.exists()) return pathOrUrl;
-
       final ref = FirebaseStorage.instance.ref().child(
         'users/$_userId/companies/$companyId/assets/$fileName',
       );
 
-      await ref.putFile(file);
-      return await ref.getDownloadURL();
+      if (kIsWeb) {
+        if (pathOrUrl.startsWith('blob:')) {
+          final response = await http.get(Uri.parse(pathOrUrl));
+          await ref.putData(response.bodyBytes);
+          return await ref.getDownloadURL();
+        }
+        return pathOrUrl;
+      } else {
+        final file = File(pathOrUrl);
+        if (!await file.exists()) return pathOrUrl;
+        await ref.putFile(file);
+        return await ref.getDownloadURL();
+      }
     } catch (e) {
       debugPrint('Error uploading $fileName: $e');
       return pathOrUrl; // Fallback to local path if upload fails

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/domain/auth_user_model.dart';
@@ -120,8 +121,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           final String? photoUrl = user?.photoUrl;
           final isDark = Theme.of(context).brightness == Brightness.dark;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppDimensions.lg),
+          return ResponsiveMaxWidth(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppDimensions.lg),
             child: Column(
               children: [
                 // Profile Avatar with CachedNetworkImage
@@ -415,6 +417,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                 ),
               ],
+            ),
             ),
           );
         },

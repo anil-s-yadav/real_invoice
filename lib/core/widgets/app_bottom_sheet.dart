@@ -21,6 +21,7 @@ class AppBottomSheet {
       isDismissible: isDismissible,
       enableDrag: enableDrag,
       useSafeArea: true,
+      constraints: const BoxConstraints(maxWidth: 600),
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

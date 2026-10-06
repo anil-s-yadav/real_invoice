@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../bloc/auth_bloc.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -114,7 +115,8 @@ class SignInScreen extends StatelessWidget {
                 ),
 
                 SafeArea(
-                  child: SingleChildScrollView(
+                  child: ResponsiveMaxWidth(
+                    child: SingleChildScrollView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -258,6 +260,7 @@ class SignInScreen extends StatelessWidget {
                         const SizedBox(height: 40),
                       ],
                     ),
+                  ),
                   ),
                 ),
               ],

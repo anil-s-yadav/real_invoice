@@ -4,6 +4,7 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/theme/theme_cubit.dart';
 import '../../../core/widgets/app_card.dart';
@@ -37,8 +38,9 @@ class SettingsScreen extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(
+      body: ResponsiveMaxWidth(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.lg,
           // vertical: AppDimensions.md,
         ),
@@ -355,6 +357,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 36),
         ],
       ),
+      ),
     );
   }
 
@@ -386,13 +389,4 @@ class SettingsScreen extends StatelessWidget {
     ).push(MaterialPageRoute(builder: (_) => const DefaultTemplatesScreen()));
   }
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature is coming soon!'),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 }

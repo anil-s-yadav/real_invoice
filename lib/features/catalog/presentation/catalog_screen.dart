@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../customers/bloc/customer_bloc.dart';
 import '../../customers/bloc/customer_state.dart';
 import '../../customers/presentation/customer_list_screen.dart';
@@ -86,17 +87,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   ),
                 ),
                 body: SafeArea(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: TabBarView(
-                          children: const [
-                            CustomerListScreen(),
-                            ProductListScreen(),
-                          ],
+                  child: ResponsiveMaxWidth(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: TabBarView(
+                            children: const [
+                              CustomerListScreen(),
+                              ProductListScreen(),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

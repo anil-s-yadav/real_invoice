@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/responsive_max_width.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../subscriptions/bloc/subscription_bloc.dart';
 import '../data/subscription_repository.dart';
@@ -138,8 +139,9 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
         builder: (context, snapshot) {
           final plan = snapshot.data ?? SubscriptionPlanModel.defaultFree();
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+          return ResponsiveMaxWidth(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -163,6 +165,7 @@ class _PlanInfoScreenState extends State<PlanInfoScreen> {
                 _buildPlanHistorySection(),
                 SizedBox(height: 40),
               ],
+            ),
             ),
           );
         },
