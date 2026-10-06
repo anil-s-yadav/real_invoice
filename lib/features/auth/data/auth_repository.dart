@@ -24,6 +24,7 @@ abstract class AuthRepository {
   Stream<AuthUser?> get user;
   Future<AuthUser?> signInWithGoogle();
   Future<AuthUser> signInWithApple();
+  Future<AuthUser> signInWithEmailAndPassword(String email, String password);
   Future<void> signOut();
   Future<AuthUser?> getCurrentUser();
   Future<void> registerDevice({bool force = false});
@@ -96,6 +97,20 @@ class FirebaseAuthRepository implements AuthRepository {
         return null;
       }
       rethrow;
+    }
+  }
+
+  @override
+  
+  @override
+  Future<AuthUser> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      final userCredential = await _firebaseAuth.signInWithCredential(
+        EmailAuthProvider.credential(email: email, password: password)
+      );
+      return _mapFirebaseUser(userCredential.user!);
+    } catch (e) {
+      throw Exception('Failed to sign in with email: $e');
     }
   }
 

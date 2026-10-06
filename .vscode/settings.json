@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "D:/real_invoice/linux",
+    "cmake.sourceDirectory": "D:/invoz/linux",
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive"
 }
