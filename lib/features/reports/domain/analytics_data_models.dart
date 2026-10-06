@@ -292,7 +292,8 @@ class AnalyticsData {
     // Map to track the very first invoice date for each customer (for New vs Returning logic)
     final Map<String, DateTime> customerFirstInvoiceDate = {};
     for (final doc in allDocuments) {
-      if (doc.docType == DocumentType.invoice || doc.docType == DocumentType.receipt) {
+      if (doc.docType == DocumentType.invoice ||
+          doc.docType == DocumentType.receipt) {
         final custName = doc.customerSnapshot?.name ?? 'Unknown';
         if (!customerFirstInvoiceDate.containsKey(custName) ||
             doc.issueDate.isBefore(customerFirstInvoiceDate[custName]!)) {
@@ -333,7 +334,8 @@ class AnalyticsData {
         // Track billed, taxes, and new vs returning
         final custName = doc.customerSnapshot?.name ?? 'Unknown';
         final firstInvoiceDate = customerFirstInvoiceDate[custName];
-        final isNewClientThisDoc = firstInvoiceDate != null &&
+        final isNewClientThisDoc =
+            firstInvoiceDate != null &&
             firstInvoiceDate.year == doc.issueDate.year &&
             firstInvoiceDate.month == doc.issueDate.month;
 
@@ -355,7 +357,8 @@ class AnalyticsData {
             if (isNewClientThisDoc) {
               newClientRevenueSpots[doc.issueDate.month - 1] += doc.totalAmount;
             } else {
-              returningClientRevenueSpots[doc.issueDate.month - 1] += doc.totalAmount;
+              returningClientRevenueSpots[doc.issueDate.month - 1] +=
+                  doc.totalAmount;
             }
           } else if (doc.issueDate.year == targetYear - 1) {
             lastYearBilledSpots[doc.issueDate.month - 1] += doc.totalAmount;
@@ -384,8 +387,9 @@ class AnalyticsData {
 
           if (isAllTime) {
             final yearIdx = payment.paymentDate.year - (targetYear - 11);
-            if (yearIdx >= 0 && yearIdx < 12)
+            if (yearIdx >= 0 && yearIdx < 12) {
               collectedSpots[yearIdx] += payment.amount;
+            }
           } else {
             if (payment.paymentDate.year == targetYear) {
               collectedSpots[payment.paymentDate.month - 1] += payment.amount;

@@ -105,10 +105,10 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<AuthUser> signInWithEmailAndPassword(String email, String password) async {
     try {
-      final userCredential = await _firebaseAuth.signInWithCredential(
-        EmailAuthProvider.credential(email: email, password: password)
-      );
-      return _mapFirebaseUser(userCredential.user!);
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      final u = _mapFirebaseUser(userCredential.user);
+      if (u == null) throw Exception('User mapping failed');
+      return u;
     } catch (e) {
       throw Exception('Failed to sign in with email: $e');
     }

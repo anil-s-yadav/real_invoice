@@ -63,8 +63,9 @@ class SubscriptionPlanModel {
   bool get isActive {
     if (status.trim().toLowerCase() != 'active') return false;
     if (isFree) return true;
-    if (expiryDate == null && durationMonths == -1)
+    if (expiryDate == null && durationMonths == -1) {
       return true; // For lifetime plans
+    }
     if (expiryDate == null) return false; // Corrupt expiry date on paid plan
     return expiryDate!.isAfter(DateTime.now());
   }

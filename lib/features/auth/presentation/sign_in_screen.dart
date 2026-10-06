@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../bloc/auth_bloc.dart';
@@ -220,6 +219,21 @@ class SignInScreen extends StatelessWidget {
                                     );
                                   },
                                 ),
+                                  const SizedBox(height: 16),
+                                  _SocialSignInButton(
+                                    icon: const Icon(
+                                      Icons.email_outlined,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                                    label: 'Login with Password',
+                                    backgroundColor: AppColors.primary,
+                                    textColor: Colors.white,
+                                    hasBorder: false,
+                                    onPressed: () {
+                                      _showReviewerLogin(context);
+                                    },
+                                  ),
                                 const SizedBox(height: 16),
                                 _SocialSignInButton(
                                   icon: const Icon(

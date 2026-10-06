@@ -27,8 +27,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
     double maxMonthVal = 1000.0;
     for (final spot in data.cashFlowSpots) {
       if (spot.billedAmount > maxMonthVal) maxMonthVal = spot.billedAmount;
-      if (spot.collectedAmount > maxMonthVal)
+      if (spot.collectedAmount > maxMonthVal) {
         maxMonthVal = spot.collectedAmount;
+      }
     }
 
     final billedSpots = data.cashFlowSpots
@@ -385,7 +386,9 @@ class _OverviewCashflowTabState extends State<OverviewCashflowTab> {
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.5,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
             ),
           ),

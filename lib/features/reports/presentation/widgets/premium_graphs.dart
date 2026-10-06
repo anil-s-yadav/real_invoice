@@ -165,7 +165,7 @@ class PremiumGraphs {
     }
 
     final sections = <PieChartSectionData>[];
-    if (bucket15 > 0)
+    if (bucket15 > 0) {
       sections.add(
         PieChartSectionData(
           color: Colors.green,
@@ -179,7 +179,8 @@ class PremiumGraphs {
           ),
         ),
       );
-    if (bucket30 > 0)
+    }
+    if (bucket30 > 0) {
       sections.add(
         PieChartSectionData(
           color: Colors.yellow.shade700,
@@ -193,7 +194,8 @@ class PremiumGraphs {
           ),
         ),
       );
-    if (bucket60 > 0)
+    }
+    if (bucket60 > 0) {
       sections.add(
         PieChartSectionData(
           color: Colors.orange,
@@ -207,7 +209,8 @@ class PremiumGraphs {
           ),
         ),
       );
-    if (bucket90 > 0)
+    }
+    if (bucket90 > 0) {
       sections.add(
         PieChartSectionData(
           color: Colors.deepOrange,
@@ -221,7 +224,8 @@ class PremiumGraphs {
           ),
         ),
       );
-    if (bucketOlder > 0)
+    }
+    if (bucketOlder > 0) {
       sections.add(
         PieChartSectionData(
           color: Colors.red,
@@ -235,6 +239,7 @@ class PremiumGraphs {
           ),
         ),
       );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

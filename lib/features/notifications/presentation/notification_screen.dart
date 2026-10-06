@@ -188,8 +188,9 @@ class _NotificationTile extends StatelessWidget {
         final document = await repo.getDocumentById(docId);
 
         if (context.mounted) {
-          if (isDialogShowing)
+          if (isDialogShowing) {
             Navigator.pop(context); // Close loading dialog safely
+          }
           if (document != null) {
             Navigator.push(
               context,

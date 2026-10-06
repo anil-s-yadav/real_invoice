@@ -157,10 +157,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         emit(AuthLoading());
         final user = await authRepository.signInWithEmailAndPassword(event.email, event.password);
-        emit(Authenticated(user));
+        emit(Authenticated(user: user));
       } catch (e) {
         emit(AuthError(e.toString()));
-        emit(Unauthenticated());
+        emit(const Unauthenticated());
       }
     });
 

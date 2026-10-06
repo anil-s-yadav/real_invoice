@@ -273,17 +273,22 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.security,
                   color: Colors.green,
                   isLast: false,
-                    trailing: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 14,
-                      color: AppColors.textMuted,
-                    ),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: AppColors.textMuted,
+                  ),
                   onTap: () async {
-                      final Uri url = Uri.parse('https://invoice-c1603.web.app/privacy');
-                      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                        debugPrint('Could not launch $url');
-                      }
-                    },
+                    final Uri url = Uri.parse(
+                      'https://invoice-c1603.web.app/privacy',
+                    );
+                    if (!await launchUrl(
+                      url,
+                      mode: LaunchMode.externalApplication,
+                    )) {
+                      debugPrint('Could not launch $url');
+                    }
+                  },
                 ),
                 Divider(height: 1, color: dividerColor, indent: 56),
                 SettingsTile(
@@ -298,8 +303,13 @@ class SettingsScreen extends StatelessWidget {
                     color: AppColors.textMuted,
                   ),
                   onTap: () async {
-                    final Uri url = Uri.parse('https://invoice-c1603.web.app/terms');
-                    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                    final Uri url = Uri.parse(
+                      'https://invoice-c1603.web.app/terms',
+                    );
+                    if (!await launchUrl(
+                      url,
+                      mode: LaunchMode.externalApplication,
+                    )) {
                       debugPrint('Could not launch $url');
                     }
                   },
@@ -386,8 +396,3 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

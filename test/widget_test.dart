@@ -21,6 +21,9 @@ class MockAuthRepository implements AuthRepository {
   Future<AuthUser> signInWithApple() async => throw UnimplementedError();
 
   @override
+  Future<AuthUser> signInWithEmailAndPassword(String email, String password) async => throw UnimplementedError();
+
+  @override
   Future<void> signOut() async {}
 
   @override
