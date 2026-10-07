@@ -7,6 +7,8 @@ import 'features/business_profile/bloc/business_profile_state.dart';
 import 'core/bloc/app_bloc_observer.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
+import 'core/services/local_notification_service.dart';
+
 import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/presentation/sign_in_screen.dart';
@@ -76,6 +78,14 @@ void main() async {
     );
   } catch (e) {
     debugPrint("Firebase init failed: $e");
+  }
+
+  try {
+    final notificationService = LocalNotificationService();
+    await notificationService.init();
+    await notificationService.scheduleDailyReminders();
+  } catch (e) {
+    debugPrint("Local Notifications init failed: $e");
   }
   // Fire-and-forget: don't await MobileAds init so native crash won't block app
   try {
