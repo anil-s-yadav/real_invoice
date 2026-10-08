@@ -31,10 +31,11 @@ class SignInWithGoogleRequestedEvent extends AuthEvent {
 class SignInWithEmailRequestedEvent extends AuthEvent {
   final String email;
   final String password;
-  const SignInWithEmailRequestedEvent(this.email, this.password);
+  final String? name;
+  const SignInWithEmailRequestedEvent(this.email, this.password, {this.name});
   
   @override
-  List<Object> get props => [email, password];
+  List<Object?> get props => [email, password, name];
 }
 
 class SignInWithAppleRequestedEvent extends AuthEvent {
@@ -155,8 +156,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     
     on<SignInWithEmailRequestedEvent>((event, emit) async {
       try {
-        emit(AuthLoading());
-        final user = await authRepository.signInWithEmailAndPassword(event.email, event.password);
+        emit(const AuthLoading());
+        final user = await authRepository.signInWithEmailAndPassword(
+          event.email, 
+          event.password, 
+          name: event.name,
+        );
         emit(Authenticated(user: user));
       } catch (e) {
         emit(AuthError(e.toString()));

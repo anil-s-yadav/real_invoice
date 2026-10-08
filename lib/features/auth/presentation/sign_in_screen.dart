@@ -233,7 +233,7 @@ class SignInScreen extends StatelessWidget {
                                     textColor: Colors.white,
                                     hasBorder: false,
                                     onPressed: () {
-                                      _showReviewerLogin(context);
+                                      _showEmailLogin(context);
                                     },
                                   ),
                                 const SizedBox(height: 16),
@@ -728,9 +728,10 @@ class _SocialSignInButton extends StatelessWidget {
   }
 }
 
-void _showReviewerLogin(BuildContext context) {
-  final emailCtrl = TextEditingController(text: 'invoz.review@gmail.com');
-  final passCtrl = TextEditingController(text: 'invoz@123Z');
+void _showEmailLogin(BuildContext context) {
+  final nameCtrl = TextEditingController();
+  final emailCtrl = TextEditingController();
+  final passCtrl = TextEditingController();
   
   showModalBottomSheet(
     context: context,
@@ -752,11 +753,19 @@ void _showReviewerLogin(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Reviewer Login',
+              'Login with Email',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : Colors.black,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Name (Optional)',
+                border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
@@ -786,6 +795,7 @@ void _showReviewerLogin(BuildContext context) {
                     SignInWithEmailRequestedEvent(
                       emailCtrl.text.trim(),
                       passCtrl.text.trim(),
+                      name: nameCtrl.text.trim(),
                     ),
                   );
                   Navigator.pop(ctx);

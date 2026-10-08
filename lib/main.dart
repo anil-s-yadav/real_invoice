@@ -273,6 +273,7 @@ class InvozApp extends StatelessWidget {
                     }
 
                     return MaterialApp(
+                      key: ValueKey(authState.runtimeType),
                       title: 'invoz',
                       debugShowCheckedModeBanner: false,
                       themeMode: themeMode,

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/responsive_max_width.dart';
@@ -385,7 +386,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
     log(prefillContact);
     final options = {
-      'key': 'rzp_test_ThkLyPi706leO9',
+      'key': kDebugMode ? 'rzp_test_ThkLyPi706leO9' : 'rzp_live_YOUR_PRODUCTION_KEY_HERE',
       'amount': (totalPayable * 100).toInt(),
       'name': 'Invoz App',
       'description': '${widget.planName} - $_selectedDuration Months Plan',

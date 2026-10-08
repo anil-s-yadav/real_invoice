@@ -24,7 +24,7 @@ abstract class AuthRepository {
   Stream<AuthUser?> get user;
   Future<AuthUser?> signInWithGoogle();
   Future<AuthUser> signInWithApple();
-  Future<AuthUser> signInWithEmailAndPassword(String email, String password);
+  Future<AuthUser> signInWithEmailAndPassword(String email, String password, {String? name});
   Future<void> signOut();
   Future<AuthUser?> getCurrentUser();
   Future<void> registerDevice({bool force = false});
@@ -125,14 +125,22 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<AuthUser> signInWithEmailAndPassword(
     String email,
-    String password,
-  ) async {
+    String password, {
+    String? name,
+  }) async {
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      final u = _mapFirebaseUser(userCredential.user);
+
+      if (name != null && name.trim().isNotEmpty) {
+        await userCredential.user?.updateDisplayName(name.trim());
+        await userCredential.user?.reload();
+      }
+
+      final updatedUser = _firebaseAuth.currentUser;
+      final u = _mapFirebaseUser(updatedUser);
       if (u == null) throw Exception('User mapping failed');
       return u;
     } catch (e) {
