@@ -71,13 +71,15 @@ exports.dailyChecks = functions.pubsub.schedule('0 9 * * *').onRun(async (contex
     }
 
     // B. Check Documents Due (Invoices, Quotations, Proformas)
+    // Firestore only allows ONE 'in' clause per query. 
+    // We filter docType in query, and filter status in memory.
     const documentsSnapshot = await db.collectionGroup('documents')
         .where('docType', 'in', ['invoice', 'quotation', 'proforma'])
-        .where('status', 'in', ['sent', 'partial'])
         .get();
 
     for (const doc of documentsSnapshot.docs) {
         const inv = doc.data();
+        if (!['sent', 'partial'].includes(inv.status)) continue;
         if (!inv.dueDate) continue;
 
         const due = inv.dueDate.toDate();
