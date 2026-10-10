@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import '../../../core/services/local_notification_service.dart';
 import '../domain/notification_model.dart';
 
 class NotificationRepository {
@@ -65,6 +67,20 @@ class NotificationRepository {
     }
   }
 
+  Future<void> clearAll() async {
+    try {
+      final docs = await _getNotificationsRef().get();
+
+      final batch = _firestore.batch();
+      for (var doc in docs.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    } catch (e) {
+      // Ignore
+    }
+  }
+
   Future<void> setupFCMToken() async {
     final userId = _auth.currentUser?.uid;
     if (userId == null) return;
@@ -82,6 +98,31 @@ class NotificationRepository {
       // Listen to token refreshes
       _messaging.onTokenRefresh.listen((newToken) {
         _saveTokenToFirestore(newToken, userId);
+      });
+
+      // Handle foreground notifications
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        final notification = message.notification;
+        final android = message.notification?.android;
+
+        if (notification != null && android != null) {
+          LocalNotificationService().flutterLocalNotificationsPlugin.show(
+            id: notification.hashCode,
+            title: notification.title,
+            body: notification.body,
+            notificationDetails: const NotificationDetails(
+              android: AndroidNotificationDetails(
+                'high_importance_channel', // Must match the channel created in init()
+                'High Importance Notifications',
+                channelDescription:
+                    'This channel is used for important notifications.',
+                importance: Importance.max,
+                priority: Priority.high,
+                icon: '@drawable/ic_notification',
+              ),
+            ),
+          );
+        }
       });
     } catch (e) {
       // Ignore

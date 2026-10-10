@@ -182,6 +182,11 @@ class InvozRoot extends StatelessWidget {
                 const ObserveSubscriptionEvent(),
               );
               context.read<NotificationBloc>().add(SetupNotificationsEvent());
+            } else if (state is Unauthenticated) {
+              // Reset subscription state so a new user doesn't inherit stale data
+              context.read<SubscriptionBloc>().add(
+                const ResetSubscriptionEvent(),
+              );
             }
           },
           child: BlocListener<BusinessProfileBloc, BusinessProfileState>(

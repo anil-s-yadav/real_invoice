@@ -26,6 +26,10 @@ class ActivateSubscriptionEvent extends SubscriptionEvent {
   List<Object?> get props => [plan];
 }
 
+class ResetSubscriptionEvent extends SubscriptionEvent {
+  const ResetSubscriptionEvent();
+}
+
 abstract class SubscriptionState extends Equatable {
   final SubscriptionPlanModel? plan;
   final bool isEligibleForWelcomeOffer;
@@ -68,6 +72,15 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     on<CheckSubscriptionStatusEvent>(_onCheckStatus);
     on<ObserveSubscriptionEvent>(_onObserveStatus);
     on<ActivateSubscriptionEvent>(_onActivatePlan);
+    on<ResetSubscriptionEvent>(_onReset);
+  }
+
+  Future<void> _onReset(
+    ResetSubscriptionEvent event,
+    Emitter<SubscriptionState> emit,
+  ) async {
+    await _repository.clearCache();
+    emit(const FreeTierState(isEligibleForWelcomeOffer: true));
   }
 
   Future<void> _onCheckStatus(

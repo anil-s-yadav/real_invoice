@@ -202,6 +202,14 @@ class SubscriptionRepository {
     } catch (_) {}
   }
 
+  /// Clear the locally cached plan (e.g. on sign-out)
+  Future<void> clearCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_cachedPlanKey);
+    } catch (_) {}
+  }
+
   Future<SubscriptionPlanModel?> _getCachedPlan() async {
     try {
       final prefs = await SharedPreferences.getInstance();

@@ -339,34 +339,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _triggerPayment(double totalPayable) {
     String prefillEmail = '';
     String prefillContact = '';
+
+    // Get email from Auth Profile (Google/Apple provides email)
+    try {
+      final fbUser = FirebaseAuth.instance.currentUser;
+      prefillEmail = fbUser?.email ?? '';
+    } catch (_) {}
+
+    // Get contact (and fallback email) exclusively from Business Profile
     try {
       final profileState = context.read<BusinessProfileBloc>().state;
       if (profileState is BusinessProfileLoaded) {
-        prefillEmail = profileState.profile.email ?? '';
+        if (prefillEmail.isEmpty) {
+          prefillEmail = profileState.profile.email ?? '';
+        }
         prefillContact = profileState.profile.phone ?? '';
       }
     } catch (_) {}
-    prefillEmail = prefillEmail.trim();
-    prefillContact = prefillContact.trim();
-
-    if (prefillEmail.isEmpty || prefillContact.isEmpty) {
-      try {
-        final fbUser = FirebaseAuth.instance.currentUser;
-        if (prefillEmail.isEmpty) {
-          prefillEmail = fbUser?.email ?? '';
-        }
-        if (prefillContact.isEmpty) {
-          prefillContact = fbUser?.phoneNumber ?? '';
-        }
-      } catch (_) {}
-    }
 
     prefillEmail = prefillEmail.trim();
     prefillContact = prefillContact.trim();
 
-    if (prefillContact.isEmpty) {
-      prefillContact = '9999999999';
-    } else {
+    if (prefillContact.isNotEmpty) {
       // Keep only digits and the '+' sign
       prefillContact = prefillContact.replaceAll(RegExp(r'[^\d+]'), '');
 
@@ -380,13 +374,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           prefillContact.length == 11) {
         prefillContact = prefillContact.substring(1); // Remove leading 0
       }
-
-      // For other countries (e.g., +1, +44), Razorpay requires the '+' and country code to
-      // automatically change the country flag in the UI, so we leave them intact.
     }
     log(prefillContact);
     final options = {
-      'key': kDebugMode ? 'rzp_test_ThkLyPi706leO9' : 'rzp_live_YOUR_PRODUCTION_KEY_HERE',
+      'key': kDebugMode
+          ? 'rzp_test_ThkLyPi706leO9'
+          : 'rzp_live_YOUR_PRODUCTION_KEY_HERE',
       'amount': (totalPayable * 100).toInt(),
       'name': 'Invoz App',
       'description': '${widget.planName} - $_selectedDuration Months Plan',

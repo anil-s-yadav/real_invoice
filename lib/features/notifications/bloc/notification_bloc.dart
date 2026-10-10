@@ -34,6 +34,8 @@ class MarkNotificationAsReadEvent extends NotificationEvent {
 
 class MarkAllNotificationsAsReadEvent extends NotificationEvent {}
 
+class ClearAllNotificationsEvent extends NotificationEvent {}
+
 // States
 abstract class NotificationState extends Equatable {
   const NotificationState();
@@ -76,6 +78,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<NotificationsUpdatedEvent>(_onNotificationsUpdated);
     on<MarkNotificationAsReadEvent>(_onMarkAsRead);
     on<MarkAllNotificationsAsReadEvent>(_onMarkAllAsRead);
+    on<ClearAllNotificationsEvent>(_onClearAll);
   }
 
   Future<void> _onSetupNotifications(
@@ -117,6 +120,13 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     await repository.markAllAsRead();
+  }
+
+  Future<void> _onClearAll(
+    ClearAllNotificationsEvent event,
+    Emitter<NotificationState> emit,
+  ) async {
+    await repository.clearAll();
   }
 
   @override

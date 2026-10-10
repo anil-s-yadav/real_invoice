@@ -41,10 +41,23 @@ class LocalNotificationService {
     );
 
     // Request permissions for Android 13+
-    flutterLocalNotificationsPlugin
+    final androidPlugin = flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+            AndroidFlutterLocalNotificationsPlugin>();
+    
+    if (androidPlugin != null) {
+      await androidPlugin.requestNotificationsPermission();
+      
+      // Create High Importance Channel for FCM pushes
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'high_importance_channel', // id
+        'High Importance Notifications', // title
+        description: 'This channel is used for important notifications.', // description
+        importance: Importance.max,
+      );
+      
+      await androidPlugin.createNotificationChannel(channel);
+    }
 
 
     _isInitialized = true;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoz/core/utils/premium_dialog_helper.dart';
-import 'package:invoz/features/ads/ad_banner_widget.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -126,7 +125,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ),
                   ),
                 ),
-                Center(child: AdBannerWidget()),
                 Expanded(
                   child: filtered.isEmpty
                       ? Center(

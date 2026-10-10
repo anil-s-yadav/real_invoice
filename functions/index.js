@@ -17,14 +17,24 @@ exports.onSubscriptionUpdate = functions.firestore
 
         if (!newData) return null; // Subscription deleted
 
-        // Check if plan upgraded or newly activated
-        const isNewActivation = !oldData && newData.isActive;
-        const isUpgrade = oldData && !oldData.isActive && newData.isActive;
+        const newIsActive = newData.status === 'Active' && newData.planName !== 'Free';
+        const oldIsActive = oldData ? (oldData.status === 'Active' && oldData.planName !== 'Free') : false;
 
-        if (isNewActivation || isUpgrade) {
+        const isNewActivation = newIsActive && !oldIsActive;
+        const isPlanChange = newIsActive && oldIsActive && newData.planName !== oldData.planName;
+        const isCancelled = oldIsActive && newData.status === 'Cancelled';
+
+        if (isNewActivation) {
             const title = "Premium Activated! 🎉";
             const body = `Your ${newData.planName || 'Premium'} plan is now active. Thank you!`;
-            
+            await sendNotificationAndSave(userId, title, body, 'subscription');
+        } else if (isPlanChange) {
+            const title = "Plan Updated! 🚀";
+            const body = `Your subscription has been updated to the ${newData.planName} plan.`;
+            await sendNotificationAndSave(userId, title, body, 'subscription');
+        } else if (isCancelled) {
+            const title = "Subscription Cancelled";
+            const body = `Your ${oldData.planName || 'Premium'} plan has been cancelled.`;
             await sendNotificationAndSave(userId, title, body, 'subscription');
         }
 
@@ -38,16 +48,17 @@ exports.dailyChecks = functions.pubsub.schedule('0 9 * * *').onRun(async (contex
 
     // A. Check Subscriptions
     const subsSnapshot = await db.collectionGroup('subscription')
-        .where('isActive', '==', true)
+        .where('status', '==', 'Active')
         .get();
 
     for (const doc of subsSnapshot.docs) {
         if (doc.id !== 'current') continue;
 
         const sub = doc.data();
-        if (!sub.endDate) continue;
+        if (sub.planName === 'Free') continue; // Skip free plans
+        if (!sub.expiryDate) continue;
 
-        const end = sub.endDate.toDate();
+        const end = sub.expiryDate.toDate();
         end.setHours(0,0,0,0);
         
         const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
@@ -82,7 +93,9 @@ exports.dailyChecks = functions.pubsub.schedule('0 9 * * *').onRun(async (contex
         if (!['sent', 'partial'].includes(inv.status)) continue;
         if (!inv.dueDate) continue;
 
-        const due = inv.dueDate.toDate();
+        // Parse ISO string to Date object
+        const due = new Date(inv.dueDate);
+        if (isNaN(due.getTime())) continue; // Skip invalid dates
         due.setHours(0,0,0,0);
         
         const diffDays = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
@@ -128,6 +141,20 @@ async function sendNotificationAndSave(userId, title, body, type, relatedId = nu
                 notification: {
                     title: title,
                     body: body
+                },
+                android: {
+                    priority: 'high',
+                    notification: {
+                        sound: 'default',
+                        channelId: 'high_importance_channel'
+                    }
+                },
+                apns: {
+                    payload: {
+                        aps: {
+                            sound: 'default'
+                        }
+                    }
                 },
                 data: {
                     type: type,

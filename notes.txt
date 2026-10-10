@@ -23,3 +23,30 @@ While you can freely operate a sole proprietorship under this name, registering 
 Before you file any government applications, make sure no one takes the matching internet handles. Safely purchase and secure:
 • The Domain: Look for otterbitstech.com, otterbits.tech, or otterbits.in.
 • Social Footprints: Lock down the handles for @otterbitstech or @otterbits across GitHub, LinkedIn, and X (Twitter) so your digital ecosystem matches your official paperwork perfectly.
+
+-------------------------------------------------------------------------------------------------------------------------
+NOTIFICATION CONDITIONS
+
+There are three main conditions under which the backend sends push notifications (and saves them to your in-app notification center):
+
+Premium Plan Activation:
+
+Sent immediately when a user upgrades or newly activates a Premium Subscription.
+Message: "Premium Activated! Your Premium plan is now active. Thank you!"
+
+Subscription Expiry Reminders:
+
+A daily background cron job (runs every day at 09:00 AM server time) checks all active subscriptions.
+Sent 3 days before, 1 day before, and exactly on the day the subscription expires to remind them to renew.
+
+Document Due Reminders (Invoices, Quotations, Proformas):
+
+The same daily cron job checks all documents that have a status of sent or partial (meaning they haven't been fully paid).
+Sent 3 days before, 1 day before, and exactly on the day the document is due.
+Message: "Invoice #1001 is due in 3 day(s)" or "Invoice #1001 is due today."
+🛠️ Important Backend Fixes I Just Applied
+
+Since you asked me to make sure everything is working perfectly, I audited the Cloud Functions code (functions/index.js) and found two hidden bugs that were causing the daily reminder cron jobs to fail silently!
+
+Broken Subscription Expiry Field: The backend was looking for sub.endDate to check for expiring subscriptions, but your Dart app saves it to Firestore as expiryDate. I updated the backend to correctly look for expiryDate.
+Broken Document Due Date Format: The backend was trying to parse document due dates using a Firestore Timestamp method (inv.dueDate.toDate()), but your Dart app saves the document's dueDate as an ISO String (toIso8601String()), which caused the cron job to crash with a type error. I fixed the backend to correctly parse the ISO string.

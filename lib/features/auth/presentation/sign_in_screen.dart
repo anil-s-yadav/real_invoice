@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/responsive_max_width.dart';
 import '../bloc/auth_bloc.dart';
@@ -257,6 +258,35 @@ class SignInScreen extends StatelessWidget {
                               ),
                             ),
 
+                          const SizedBox(height: 24),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            child: Wrap(
+                              alignment: WrapAlignment.center,
+                              children: [
+                                Text(
+                                  'By continuing, you agree to our ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? AppColors.darkTextSecondary : Colors.grey.shade600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                GestureDetector(
+                                  onTap: () => launchUrl(Uri.parse('https://invoz-d9222.web.app/privacy-policy.html')),
+                                  child: const Text(
+                                    'Privacy Policy',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w500,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                           const SizedBox(height: 40),
                         ],
                       ),

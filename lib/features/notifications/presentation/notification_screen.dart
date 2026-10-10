@@ -26,6 +26,34 @@ class NotificationScreen extends StatelessWidget {
               );
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.delete_sweep_outlined),
+            tooltip: 'Clear all',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Clear all notifications?'),
+                  content: const Text('This action cannot be undone.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Cancel'),
+                    ),
+                    FilledButton(
+                      onPressed: () {
+                        context.read<NotificationBloc>().add(
+                          ClearAllNotificationsEvent(),
+                        );
+                        Navigator.pop(ctx);
+                      },
+                      child: const Text('Clear'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: BlocBuilder<NotificationBloc, NotificationState>(

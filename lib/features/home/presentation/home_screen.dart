@@ -446,16 +446,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
 
-                        if (_showPromoBanner &&
-                            context.read<SubscriptionBloc>().state
-                                is! PremiumTierState &&
-                            context
-                                .read<SubscriptionBloc>()
-                                .state
-                                .isEligibleForWelcomeOffer) ...[
-                          _buildPremiumPromoBanner(context),
-                          const SizedBox(height: AppDimensions.xl),
-                        ],
+                        BlocBuilder<SubscriptionBloc, SubscriptionState>(
+                          builder: (context, subState) {
+                            if (_showPromoBanner &&
+                                subState is! PremiumTierState &&
+                                subState.isEligibleForWelcomeOffer) {
+                              return Column(
+                                children: [
+                                  _buildPremiumPromoBanner(context),
+                                  const SizedBox(height: AppDimensions.xl),
+                                ],
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
 
                         // 1. Overview Dashboard
                         _buildOverviewDashboard(

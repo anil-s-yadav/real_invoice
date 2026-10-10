@@ -8,6 +8,7 @@ import '../../customers/presentation/customer_list_screen.dart';
 import '../../products/bloc/product_bloc.dart';
 import '../../products/bloc/product_state.dart';
 import '../../products/presentation/product_list_screen.dart';
+import '../../ads/ad_banner_widget.dart';
 
 class CatalogScreen extends StatefulWidget {
   final int initialTabIndex;
@@ -90,6 +91,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   child: ResponsiveMaxWidth(
                     child: Column(
                       children: [
+                        const Center(child: AdBannerWidget()),
                         Expanded(
                           child: TabBarView(
                             children: const [

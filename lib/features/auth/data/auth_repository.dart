@@ -320,7 +320,9 @@ class FirebaseAuthRepository implements AuthRepository {
           .collection('users')
           .doc(uid);
       final userDoc = await userDocRef.get();
-      if (!userDoc.exists) {
+      
+      // If doc doesn't exist, OR it exists but only has FCM token (no createdAt)
+      if (!userDoc.exists || !userDoc.data()!.containsKey('createdAt')) {
         final fbUser = _firebaseAuth.currentUser;
         await userDocRef.set({
           'email': fbUser?.email ?? '',

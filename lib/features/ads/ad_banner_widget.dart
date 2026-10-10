@@ -20,9 +20,12 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
   @override
   void initState() {
     super.initState();
-    // Only load the ad if the user is not ad-free
+    _maybeLoadAd();
+  }
+
+  void _maybeLoadAd() {
     final subState = context.read<SubscriptionBloc>().state;
-    if (!subState.effectivePlan.isAdFree) {
+    if (!subState.effectivePlan.isAdFree && _bannerAd == null) {
       _loadAd();
     }
   }
@@ -48,6 +51,12 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
     )..load();
   }
 
+  void _disposeAd() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    _isAdLoaded = false;
+  }
+
   @override
   void dispose() {
     _bannerAd?.dispose();
@@ -56,19 +65,41 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SubscriptionBloc, SubscriptionState>(
+    return BlocConsumer<SubscriptionBloc, SubscriptionState>(
+      listener: (context, subState) {
+        // React to subscription state changes
+        if (subState.effectivePlan.isAdFree) {
+          // User upgraded to premium — dispose the ad
+          if (_bannerAd != null) {
+            _disposeAd();
+          }
+        } else {
+          // User is on free tier — load ad if not already loaded
+          if (_bannerAd == null) {
+            _loadAd();
+          }
+        }
+      },
       builder: (context, subState) {
-        // If the user's plan is Ad-Free, we return an empty widget
+        // If the user's plan is Ad-Free, return empty
         if (subState.effectivePlan.isAdFree) {
           return const SizedBox.shrink();
         }
 
-        // If the ad is not loaded yet, or it failed, return a placeholder or shrink
+        // If the ad is not loaded yet, return a placeholder
         if (!_isAdLoaded || _bannerAd == null) {
-          return SizedBox(
+          return Container(
             width: widget.size.width.toDouble(),
             height: widget.size.height.toDouble(),
-            child: const SizedBox.shrink(),
+            color: Colors.grey[200],
+            alignment: Alignment.center,
+            child: Text(
+              'Advertisement',
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 12,
+              ),
+            ),
           );
         }
 
