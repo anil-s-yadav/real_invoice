@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:invoz/firebase_options.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
@@ -24,7 +25,11 @@ abstract class AuthRepository {
   Stream<AuthUser?> get user;
   Future<AuthUser?> signInWithGoogle();
   Future<AuthUser> signInWithApple();
-  Future<AuthUser> signInWithEmailAndPassword(String email, String password, {String? name});
+  Future<AuthUser> signInWithEmailAndPassword(
+    String email,
+    String password, {
+    String? name,
+  });
   Future<void> signOut();
   Future<AuthUser?> getCurrentUser();
   Future<void> registerDevice({bool force = false});
@@ -45,10 +50,18 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> _ensureGoogleSignInInitialized() async {
     if (!_isGoogleSignInInitialized) {
       try {
-        if (kIsWeb) {
-          // the google sign in web plugin sometimes throws if initialized multiple times (e.g., hot restarts)
-          await _googleSignIn.initialize();
-        }
+        final serverClientId =
+            '556388897712-bibf3l0a44orhi08gkkhmv7d86g4ogat.apps.googleusercontent.com';
+        final clientId = kIsWeb
+            ? '556388897712-bibf3l0a44orhi08gkkhmv7d86g4ogat.apps.googleusercontent.com'
+            : (Platform.isAndroid
+                  ? null
+                  : DefaultFirebaseOptions.currentPlatform.iosClientId);
+
+        await _googleSignIn.initialize(
+          serverClientId: serverClientId,
+          clientId: clientId,
+        );
       } catch (e) {
         // Ignore "init() has already been called" error
         debugPrint('GoogleSignIn init ignored: $e');
@@ -317,11 +330,16 @@ class FirebaseAuthRepository implements AuthRepository {
         }, SetOptions(merge: true));
       }
 
-      final messaging = FirebaseMessaging.instance;
-      if (!kIsWeb && Platform.isIOS) {
-        await messaging.requestPermission();
+      String? token;
+      try {
+        final messaging = FirebaseMessaging.instance;
+        if (!kIsWeb && Platform.isIOS) {
+          await messaging.requestPermission();
+        }
+        token = await messaging.getToken();
+      } catch (e) {
+        debugPrint('FCM getToken failed: $e');
       }
-      final token = await messaging.getToken();
 
       final device = DeviceModel(
         deviceId: deviceId,

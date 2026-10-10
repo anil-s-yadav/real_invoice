@@ -117,110 +117,112 @@ class SignInScreen extends StatelessWidget {
                 SafeArea(
                   child: ResponsiveMaxWidth(
                     child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 20),
-                        // Logo and Title
-                        Center(
-                          child: Column(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(22),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFF003DFF,
-                                      ).withValues(alpha: 0.15),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(22),
-                                  child: Image.asset(
-                                    'assets/icons/applogo.png',
-                                    width: 92,
-                                    height: 92,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              Text(
-                                'Create professional invoices,\nquotations and receipts — effortlessly.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : const Color(0xFF6B7280),
-                                  height: 1.4,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Center Illustration
-                        Builder(
-                          builder: (context) {
-                            final screenHeight = MediaQuery.of(
-                              context,
-                            ).size.height;
-                            double illHeight = 320;
-                            double scale = 1.0;
-                            if (screenHeight < 750) {
-                              illHeight = 220;
-                              scale = 0.7;
-                            }
-                            return _CenterIllustration(
-                              height: illHeight,
-                              scale: scale,
-                            );
-                          },
-                        ),
-
-                        const SizedBox(height: 60),
-
-                        // Buttons
-                        if (isLoading)
-                          const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                            ),
-                          )
-                        else
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 20),
+                          // Logo and Title
+                          Center(
                             child: Column(
                               children: [
-                                _SocialSignInButton(
-                                  icon: Image.asset(
-                                    "assets/icons/google.png",
-                                    width: 24,
-                                    height: 24,
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(22),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFF003DFF,
+                                        ).withValues(alpha: 0.15),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 10),
+                                      ),
+                                    ],
                                   ),
-                                  label: 'Continue with Google',
-                                  backgroundColor: isDark
-                                      ? AppColors.darkSurface
-                                      : Colors.white,
-                                  textColor: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : const Color(0xFF111827),
-                                  hasBorder: true,
-                                  onPressed: () {
-                                    context.read<AuthBloc>().add(
-                                      const SignInWithGoogleRequestedEvent(),
-                                    );
-                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(22),
+                                    child: Image.asset(
+                                      'assets/icons/applogo.png',
+                                      width: 92,
+                                      height: 92,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  'Create professional invoices,\nquotations and receipts — effortlessly.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : const Color(0xFF6B7280),
+                                    height: 1.4,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Center Illustration
+                          Builder(
+                            builder: (context) {
+                              final screenHeight = MediaQuery.of(
+                                context,
+                              ).size.height;
+                              double illHeight = 320;
+                              double scale = 1.0;
+                              if (screenHeight < 750) {
+                                illHeight = 220;
+                                scale = 0.7;
+                              }
+                              return _CenterIllustration(
+                                height: illHeight,
+                                scale: scale,
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 60),
+
+                          // Buttons
+                          if (isLoading)
+                            const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            )
+                          else
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: Column(
+                                children: [
+                                  _SocialSignInButton(
+                                    icon: Image.asset(
+                                      "assets/icons/google.png",
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                    label: 'Continue with Google',
+                                    backgroundColor: isDark
+                                        ? AppColors.darkSurface
+                                        : Colors.white,
+                                    textColor: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : const Color(0xFF111827),
+                                    hasBorder: true,
+                                    onPressed: () {
+                                      context.read<AuthBloc>().add(
+                                        const SignInWithGoogleRequestedEvent(),
+                                      );
+                                    },
+                                  ),
                                   const SizedBox(height: 16),
                                   _SocialSignInButton(
                                     icon: const Icon(
@@ -236,31 +238,29 @@ class SignInScreen extends StatelessWidget {
                                       _showEmailLogin(context);
                                     },
                                   ),
-                                const SizedBox(height: 16),
-                                _SocialSignInButton(
-                                  icon: const Icon(
-                                    Icons.apple,
-                                    color: Colors.white,
-                                    size: 28,
+                                  const SizedBox(height: 16),
+                                  _SocialSignInButton(
+                                    icon: const Icon(
+                                      Icons.apple,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
+                                    label: 'Continue with Apple (Upcoming)',
+                                    backgroundColor: const Color(0xFF111827),
+                                    textColor: Colors.white,
+                                    hasBorder: false,
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Apple Login is coming soon!')));
+                                    },
                                   ),
-                                  label: 'Continue with Apple',
-                                  backgroundColor: const Color(0xFF111827),
-                                  textColor: Colors.white,
-                                  hasBorder: false,
-                                  onPressed: () {
-                                    context.read<AuthBloc>().add(
-                                      const SignInWithAppleRequestedEvent(),
-                                    );
-                                  },
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
 
-                        const SizedBox(height: 40),
-                      ],
+                          const SizedBox(height: 40),
+                        ],
+                      ),
                     ),
-                  ),
                   ),
                 ),
               ],
@@ -730,9 +730,9 @@ class _SocialSignInButton extends StatelessWidget {
 
 void _showEmailLogin(BuildContext context) {
   final nameCtrl = TextEditingController();
-  final emailCtrl = TextEditingController();
-  final passCtrl = TextEditingController();
-  
+  final emailCtrl = TextEditingController(text: " invoz.review@gmail.com");
+  final passCtrl = TextEditingController(text: "invoz@123Z");
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -809,10 +809,7 @@ void _showEmailLogin(BuildContext context) {
                 ),
                 child: const Text(
                   'Sign In',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),

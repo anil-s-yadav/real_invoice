@@ -1,36 +1,20 @@
 {
   "project_info": {
-    "project_number": "714420260814",
-    "project_id": "invoice-c1603",
-    "storage_bucket": "invoice-c1603.firebasestorage.app"
+    "project_number": "556388897712",
+    "project_id": "invoz-d9222",
+    "storage_bucket": "invoz-d9222.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:714420260814:android:513bdae45ce857ec28659f",
+        "mobilesdk_app_id": "1:556388897712:android:66f9e84300096a4ec57c75",
         "android_client_info": {
           "package_name": "com.invoice.invoz"
         }
       },
       "oauth_client": [
         {
-          "client_id": "714420260814-22h0l0pr37heiltm36nrbrb7eds0ou9f.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.invoice.invoz",
-            "certificate_hash": "193151d622432589f6e166cacdd93d8ad020377e"
-          }
-        },
-        {
-          "client_id": "714420260814-ar8l4ua51ehevbipe4bl58cg60mbsklc.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.invoice.invoz",
-            "certificate_hash": "142f0056e6ac48aa4d3b32ffc85d8fc89862aa0e"
-          }
-        },
-        {
-          "client_id": "714420260814-rjp464s7i6acnii7meufslorb43nks9b.apps.googleusercontent.com",
+          "client_id": "556388897712-2ekbm35l78g1gjoru8l3o7msq9scm2o9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.invoice.invoz",
@@ -38,24 +22,32 @@
           }
         },
         {
-          "client_id": "714420260814-vq24mn99nrvfmksfpk88m32hmc2u6v6o.apps.googleusercontent.com",
+          "client_id": "556388897712-lsom8v55943nl6l7gamvj7ih8hqlk4ao.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.invoice.invoz",
+            "certificate_hash": "142f0056e6ac48aa4d3b32ffc85d8fc89862aa0e"
+          }
+        },
+        {
+          "client_id": "556388897712-bibf3l0a44orhi08gkkhmv7d86g4ogat.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDlYaDSFZvO4GnT6Xf0R-vgCzvb9PMQquo"
+          "current_key": "AIzaSyBHbafvv0jXy0850t0w32ak1Urx6oC9xho"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "714420260814-vq24mn99nrvfmksfpk88m32hmc2u6v6o.apps.googleusercontent.com",
+              "client_id": "556388897712-bibf3l0a44orhi08gkkhmv7d86g4ogat.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "714420260814-6m5e9d4gvtqa418jl8ipiph69kmn5f89.apps.googleusercontent.com",
+              "client_id": "556388897712-3c0ku6i520av8is1qjha804ekjk9udvd.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.example.realInvoice"

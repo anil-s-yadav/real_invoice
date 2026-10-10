@@ -41,48 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCCeg_4FJPVqtsObClEWarAwLGYnMJq1EU',
-    appId: '1:714420260814:web:53c3ebce7af0e81228659f',
-    messagingSenderId: '714420260814',
-    projectId: 'invoice-c1603',
-    authDomain: 'invoice-c1603.firebaseapp.com',
-    storageBucket: 'invoice-c1603.firebasestorage.app',
-    measurementId: 'G-PQ16WNTY78',
+    apiKey: 'AIzaSyCe0qVeaCgIjUS0fcAvSSbfqNRSGv50e7Q',
+    appId: '1:556388897712:web:3c7eaf754795d4abc57c75',
+    messagingSenderId: '556388897712',
+    projectId: 'invoz-d9222',
+    authDomain: 'invoz-d9222.firebaseapp.com',
+    storageBucket: 'invoz-d9222.firebasestorage.app',
+    measurementId: 'G-V7M1GL1KZ0',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDlYaDSFZvO4GnT6Xf0R-vgCzvb9PMQquo',
-    appId: '1:714420260814:android:513bdae45ce857ec28659f',
-    messagingSenderId: '714420260814',
-    projectId: 'invoice-c1603',
-    storageBucket: 'invoice-c1603.firebasestorage.app',
+    apiKey: 'AIzaSyBHbafvv0jXy0850t0w32ak1Urx6oC9xho',
+    appId: '1:556388897712:android:66f9e84300096a4ec57c75',
+    messagingSenderId: '556388897712',
+    projectId: 'invoz-d9222',
+    storageBucket: 'invoz-d9222.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBAN6kGU7D7dTHRW4N-68hd2md3ynScy0k',
-    appId: '1:714420260814:ios:91265190be23854b28659f',
-    messagingSenderId: '714420260814',
-    projectId: 'invoice-c1603',
-    storageBucket: 'invoice-c1603.firebasestorage.app',
-    iosBundleId: 'com.example.realInvoice',
+    apiKey: 'AIzaSyDAwGlljhuJX7SyGIEYYjk2mNY5g0UKFZ4',
+    appId: '1:556388897712:ios:a116cf5131bb2d88c57c75',
+    messagingSenderId: '556388897712',
+    projectId: 'invoz-d9222',
+    storageBucket: 'invoz-d9222.firebasestorage.app',
+    iosClientId: '556388897712-sdlhefbjlps4ag4c7rifms6njf9u1e5r.apps.googleusercontent.com',
+    iosBundleId: 'com.invoice.invoz',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBAN6kGU7D7dTHRW4N-68hd2md3ynScy0k',
-    appId: '1:714420260814:ios:91265190be23854b28659f',
-    messagingSenderId: '714420260814',
-    projectId: 'invoice-c1603',
-    storageBucket: 'invoice-c1603.firebasestorage.app',
+    apiKey: 'AIzaSyDAwGlljhuJX7SyGIEYYjk2mNY5g0UKFZ4',
+    appId: '1:556388897712:ios:560d2a230ae55de2c57c75',
+    messagingSenderId: '556388897712',
+    projectId: 'invoz-d9222',
+    storageBucket: 'invoz-d9222.firebasestorage.app',
+    iosClientId: '556388897712-3c0ku6i520av8is1qjha804ekjk9udvd.apps.googleusercontent.com',
     iosBundleId: 'com.example.realInvoice',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCCeg_4FJPVqtsObClEWarAwLGYnMJq1EU',
-    appId: '1:714420260814:web:6060900269828b2c28659f',
-    messagingSenderId: '714420260814',
-    projectId: 'invoice-c1603',
-    authDomain: 'invoice-c1603.firebaseapp.com',
-    storageBucket: 'invoice-c1603.firebasestorage.app',
-    measurementId: 'G-CBPRNC422H',
+    apiKey: 'AIzaSyCe0qVeaCgIjUS0fcAvSSbfqNRSGv50e7Q',
+    appId: '1:556388897712:web:568904fad8d98065c57c75',
+    messagingSenderId: '556388897712',
+    projectId: 'invoz-d9222',
+    authDomain: 'invoz-d9222.firebaseapp.com',
+    storageBucket: 'invoz-d9222.firebasestorage.app',
+    measurementId: 'G-V8P9W3636S',
   );
 }

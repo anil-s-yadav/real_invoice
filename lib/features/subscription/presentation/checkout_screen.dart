@@ -174,7 +174,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Future<void> _openTermsUrl() async {
-    final url = Uri.parse('https://invoice-c1603.web.app/pricing-terms');
+    final url = Uri.parse('https://invoz-d9222.web.app/pricing-terms');
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }

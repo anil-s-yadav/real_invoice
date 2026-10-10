@@ -109,7 +109,7 @@ class HelpSupportScreen extends StatelessWidget {
                       isLast: true,
                       onTap: () async {
                         final Uri url = Uri.parse(
-                          'https://invoice-c1603.web.app/faq',
+                          'https://invoz-d9222.web.app/faq',
                         );
                         if (!await launchUrl(
                           url,

@@ -84,17 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _checkPromoBanner() async {
-    // Never show promo banner to premium users or old users with payment history
-    if (mounted) {
-      final subState = context.read<SubscriptionBloc>().state;
-      if (subState is PremiumTierState || !subState.isEligibleForWelcomeOffer) {
-        setState(() {
-          _showPromoBanner = false;
-        });
-        return;
-      }
-    }
-
     final prefs = await SharedPreferences.getInstance();
     final lastDismissedStr = prefs.getString('promo_banner_dismissed_date');
     if (lastDismissedStr != null) {
@@ -104,16 +93,20 @@ class _HomeScreenState extends State<HomeScreen> {
         final difference = now.difference(lastDismissed).inDays;
         if (difference < 2) {
           // Less than 2 days since dismissal
-          setState(() {
-            _showPromoBanner = false;
-          });
+          if (mounted) {
+            setState(() {
+              _showPromoBanner = false;
+            });
+          }
           return;
         }
       }
     }
-    setState(() {
-      _showPromoBanner = true;
-    });
+    if (mounted) {
+      setState(() {
+        _showPromoBanner = true;
+      });
+    }
   }
 
   Future<void> _dismissPromoBanner() async {

@@ -282,7 +282,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   onTap: () async {
                     final Uri url = Uri.parse(
-                      'https://invoice-c1603.web.app/privacy',
+                      'https://invoz-d9222.web.app/privacy',
                     );
                     if (!await launchUrl(
                       url,
@@ -306,7 +306,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   onTap: () async {
                     final Uri url = Uri.parse(
-                      'https://invoice-c1603.web.app/terms',
+                      'https://invoz-d9222.web.app/terms',
                     );
                     if (!await launchUrl(
                       url,
